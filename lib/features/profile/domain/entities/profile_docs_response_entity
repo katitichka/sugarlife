@@ -1,0 +1,13 @@
+import 'package:freezed_annotation/freezed_annotation.dart';
+
+part 'profile_docs_response_entity.freezed.dart';
+
+@freezed
+sealed class ProfileDocsResponseEntity with _$ProfileDocsResponseEntity {
+  const factory ProfileDocsResponseEntity({
+    required String id,
+    required String name,
+    required int age,
+    required String gender,
+  }) = _ProfileDocsResponseEntity;
+}
