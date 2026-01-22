@@ -4,6 +4,7 @@ import 'package:sugarlife/features/game_module/presentation/game_page.dart';
 import 'package:sugarlife/features/profile/presentation/profile_page.dart';
 import 'package:sugarlife/features/theory_module/presentation/theory_page.dart';
 import 'package:sugarlife/features/widgets/bottom_island.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
@@ -20,6 +21,10 @@ class _MainPageState extends State<MainPage> {
     const GamePage(),
     const ProfilePage(),
   ];
+  
+  final myModulesFuture = Supabase.instance.client
+      .from('modules')
+      .select();
 
   @override
   Widget build(BuildContext context) {

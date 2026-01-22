@@ -1,20 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:sugarlife/features/splash_page/splash_page.dart';
-import 'package:sugarlife/main_page.dart';
+import 'package:sugarlife/app.dart';
+import 'package:supabase_flutter/supabase_flutter.dart'; 
 
-void main() {
-  runApp(const SweetLifeApp());
-}
-
-class SweetLifeApp extends StatelessWidget {
-  const SweetLifeApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'СладкаяЖизнь',
-      debugShowCheckedModeBanner: false,
-      home: const MainPage(),
-    );
-  }
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Supabase.initialize(
+    url: 'https://txiaenkqdtgiqhzhepwq.supabase.co',
+    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR4aWFlbmtxZHRnaXFoemhlcHdxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg5NzQ1ODYsImV4cCI6MjA4NDU1MDU4Nn0.KHPrtctWAYOIpprMK1vvgSc1jgpbooJEApAOe0XRZ78',
+  );
+  app();
 }

@@ -98,7 +98,6 @@ class _NavItem extends StatelessWidget {
           iconPath,
           width: 28,
           height: 28,
-          color: isActive ? AppColors.navActive : AppColors.navInactive,
         ),
       ),
     );
