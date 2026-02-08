@@ -1,4 +1,4 @@
-import 'package:sugarlife/features/profile/data/DTOs/profile_docs_response_dto.dart';
+import 'package:sugarlife/features/profile/data/dtos/profile_docs_response_dto.dart';
 
 abstract interface class ProfileDataProvider {
   Future<void> register({

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sugarlife/core/theme/app_color.dart';
-import 'package:sugarlife/features/game_module/presentation/game_page.dart';
+import 'package:sugarlife/features/game_module/presentation/view/game_page.dart';
 import 'package:sugarlife/features/profile/presentation/profile_page.dart';
 import 'package:sugarlife/features/theory_module/presentation/theory_page.dart';
 import 'package:sugarlife/features/widgets/bottom_island.dart';

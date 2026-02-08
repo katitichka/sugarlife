@@ -1,5 +1,5 @@
 import 'package:sugarlife/core/theme/app_database.dart';
-import 'package:sugarlife/features/profile/data/DTOs/profile_docs_response_dto.dart';
+import 'package:sugarlife/features/profile/data/dtos/profile_docs_response_dto.dart';
 import 'package:sugarlife/features/profile/data/data_providers/implementations/profile_data_provider.dart';
 
 class ProfileDataProviderImpl implements ProfileDataProvider {
