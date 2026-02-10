@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:sugarlife/features/theory_module/data/dtos/theory_module_dto.dart';
 import 'package:sugarlife/features/theory_module/domain/entities/theory_module_entity.dart';
 
