@@ -1,4 +1,3 @@
-
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'theory_module_dto.freezed.dart';
@@ -17,5 +16,6 @@ sealed class TheoryModuleDto with _$TheoryModuleDto {
     required Map<String, dynamic> content,
   }) = _TheoryModuleDto;
 
-  factory TheoryModuleDto.fromJson(Map<String, Object?> json) => _$TheoryModuleDtoFromJson(json);
+  factory TheoryModuleDto.fromJson(Map<String, Object?> json) =>
+      _$TheoryModuleDtoFromJson(json);
 }

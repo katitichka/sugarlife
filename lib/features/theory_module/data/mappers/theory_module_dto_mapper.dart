@@ -14,7 +14,7 @@ abstract class TheoryModuleDtoMapper {
     );
   }
 
-  static Color _convertColor(String colorHex) {
+  static  Color _convertColor(String colorHex) {
     final hexCode = colorHex.replaceFirst('#', '');
     return Color(int.parse('FF$hexCode', radix: 16));
   }
