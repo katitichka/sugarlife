@@ -1,10 +1,10 @@
 
-import 'package:sugarlife/features/profile/domain/entities/profile_docs_response_entity';
+import 'package:sugarlife/features/profile/domain/entities/profile_entity.dart';
 
 abstract class ProfileRepository {
-  Future<ProfileDocsResponseEntity> getUser();
+  Future<ProfileEntity> getUser();
 
-  Future<void> saveUser(ProfileDocsResponseEntity user);
+  Future<void> saveUser(ProfileEntity user);
 
   Future<bool> hasUser();
 }

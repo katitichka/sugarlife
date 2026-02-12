@@ -3,7 +3,7 @@
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
-part of 'profile_docs_response_dto.dart';
+part of 'profile_entity.dart';
 
 // **************************************************************************
 // FreezedGenerator
@@ -11,41 +11,38 @@ part of 'profile_docs_response_dto.dart';
 
 // dart format off
 T _$identity<T>(T value) => value;
-
 /// @nodoc
-mixin _$ProfileDocsResponseDto {
+mixin _$ProfileEntity {
 
  String get id; String get name; int get age; String get gender;
-/// Create a copy of ProfileDocsResponseDto
+/// Create a copy of ProfileEntity
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
-$ProfileDocsResponseDtoCopyWith<ProfileDocsResponseDto> get copyWith => _$ProfileDocsResponseDtoCopyWithImpl<ProfileDocsResponseDto>(this as ProfileDocsResponseDto, _$identity);
+$ProfileEntityCopyWith<ProfileEntity> get copyWith => _$ProfileEntityCopyWithImpl<ProfileEntity>(this as ProfileEntity, _$identity);
 
-  /// Serializes this ProfileDocsResponseDto to a JSON map.
-  Map<String, dynamic> toJson();
 
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ProfileDocsResponseDto&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.age, age) || other.age == age)&&(identical(other.gender, gender) || other.gender == gender));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ProfileEntity&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.age, age) || other.age == age)&&(identical(other.gender, gender) || other.gender == gender));
 }
 
-@JsonKey(includeFromJson: false, includeToJson: false)
+
 @override
 int get hashCode => Object.hash(runtimeType,id,name,age,gender);
 
 @override
 String toString() {
-  return 'ProfileDocsResponseDto(id: $id, name: $name, age: $age, gender: $gender)';
+  return 'ProfileEntity(id: $id, name: $name, age: $age, gender: $gender)';
 }
 
 
 }
 
 /// @nodoc
-abstract mixin class $ProfileDocsResponseDtoCopyWith<$Res>  {
-  factory $ProfileDocsResponseDtoCopyWith(ProfileDocsResponseDto value, $Res Function(ProfileDocsResponseDto) _then) = _$ProfileDocsResponseDtoCopyWithImpl;
+abstract mixin class $ProfileEntityCopyWith<$Res>  {
+  factory $ProfileEntityCopyWith(ProfileEntity value, $Res Function(ProfileEntity) _then) = _$ProfileEntityCopyWithImpl;
 @useResult
 $Res call({
  String id, String name, int age, String gender
@@ -56,14 +53,14 @@ $Res call({
 
 }
 /// @nodoc
-class _$ProfileDocsResponseDtoCopyWithImpl<$Res>
-    implements $ProfileDocsResponseDtoCopyWith<$Res> {
-  _$ProfileDocsResponseDtoCopyWithImpl(this._self, this._then);
+class _$ProfileEntityCopyWithImpl<$Res>
+    implements $ProfileEntityCopyWith<$Res> {
+  _$ProfileEntityCopyWithImpl(this._self, this._then);
 
-  final ProfileDocsResponseDto _self;
-  final $Res Function(ProfileDocsResponseDto) _then;
+  final ProfileEntity _self;
+  final $Res Function(ProfileEntity) _then;
 
-/// Create a copy of ProfileDocsResponseDto
+/// Create a copy of ProfileEntity
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? age = null,Object? gender = null,}) {
   return _then(_self.copyWith(
@@ -78,8 +75,8 @@ as String,
 }
 
 
-/// Adds pattern-matching-related methods to [ProfileDocsResponseDto].
-extension ProfileDocsResponseDtoPatterns on ProfileDocsResponseDto {
+/// Adds pattern-matching-related methods to [ProfileEntity].
+extension ProfileEntityPatterns on ProfileEntity {
 /// A variant of `map` that fallback to returning `orElse`.
 ///
 /// It is equivalent to doing:
@@ -92,10 +89,10 @@ extension ProfileDocsResponseDtoPatterns on ProfileDocsResponseDto {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _ProfileDocsResponseDto value)?  $default,{required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _ProfileEntity value)?  $default,{required TResult orElse(),}){
 final _that = this;
 switch (_that) {
-case _ProfileDocsResponseDto() when $default != null:
+case _ProfileEntity() when $default != null:
 return $default(_that);case _:
   return orElse();
 
@@ -114,10 +111,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _ProfileDocsResponseDto value)  $default,){
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _ProfileEntity value)  $default,){
 final _that = this;
 switch (_that) {
-case _ProfileDocsResponseDto():
+case _ProfileEntity():
 return $default(_that);}
 }
 /// A variant of `map` that fallback to returning `null`.
@@ -132,10 +129,10 @@ return $default(_that);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _ProfileDocsResponseDto value)?  $default,){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _ProfileEntity value)?  $default,){
 final _that = this;
 switch (_that) {
-case _ProfileDocsResponseDto() when $default != null:
+case _ProfileEntity() when $default != null:
 return $default(_that);case _:
   return null;
 
@@ -155,7 +152,7 @@ return $default(_that);case _:
 
 @optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name,  int age,  String gender)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
-case _ProfileDocsResponseDto() when $default != null:
+case _ProfileEntity() when $default != null:
 return $default(_that.id,_that.name,_that.age,_that.gender);case _:
   return orElse();
 
@@ -176,7 +173,7 @@ return $default(_that.id,_that.name,_that.age,_that.gender);case _:
 
 @optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name,  int age,  String gender)  $default,) {final _that = this;
 switch (_that) {
-case _ProfileDocsResponseDto():
+case _ProfileEntity():
 return $default(_that.id,_that.name,_that.age,_that.gender);}
 }
 /// A variant of `when` that fallback to returning `null`
@@ -193,7 +190,7 @@ return $default(_that.id,_that.name,_that.age,_that.gender);}
 
 @optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name,  int age,  String gender)?  $default,) {final _that = this;
 switch (_that) {
-case _ProfileDocsResponseDto() when $default != null:
+case _ProfileEntity() when $default != null:
 return $default(_that.id,_that.name,_that.age,_that.gender);case _:
   return null;
 
@@ -203,48 +200,45 @@ return $default(_that.id,_that.name,_that.age,_that.gender);case _:
 }
 
 /// @nodoc
-@JsonSerializable()
 
-class _ProfileDocsResponseDto implements ProfileDocsResponseDto {
-  const _ProfileDocsResponseDto({required this.id, required this.name, required this.age, required this.gender});
-  factory _ProfileDocsResponseDto.fromJson(Map<String, dynamic> json) => _$ProfileDocsResponseDtoFromJson(json);
+
+class _ProfileEntity implements ProfileEntity {
+  const _ProfileEntity({required this.id, required this.name, required this.age, required this.gender});
+  
 
 @override final  String id;
 @override final  String name;
 @override final  int age;
 @override final  String gender;
 
-/// Create a copy of ProfileDocsResponseDto
+/// Create a copy of ProfileEntity
 /// with the given fields replaced by the non-null parameter values.
 @override @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
-_$ProfileDocsResponseDtoCopyWith<_ProfileDocsResponseDto> get copyWith => __$ProfileDocsResponseDtoCopyWithImpl<_ProfileDocsResponseDto>(this, _$identity);
+_$ProfileEntityCopyWith<_ProfileEntity> get copyWith => __$ProfileEntityCopyWithImpl<_ProfileEntity>(this, _$identity);
 
-@override
-Map<String, dynamic> toJson() {
-  return _$ProfileDocsResponseDtoToJson(this, );
-}
+
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ProfileDocsResponseDto&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.age, age) || other.age == age)&&(identical(other.gender, gender) || other.gender == gender));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ProfileEntity&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.age, age) || other.age == age)&&(identical(other.gender, gender) || other.gender == gender));
 }
 
-@JsonKey(includeFromJson: false, includeToJson: false)
+
 @override
 int get hashCode => Object.hash(runtimeType,id,name,age,gender);
 
 @override
 String toString() {
-  return 'ProfileDocsResponseDto(id: $id, name: $name, age: $age, gender: $gender)';
+  return 'ProfileEntity(id: $id, name: $name, age: $age, gender: $gender)';
 }
 
 
 }
 
 /// @nodoc
-abstract mixin class _$ProfileDocsResponseDtoCopyWith<$Res> implements $ProfileDocsResponseDtoCopyWith<$Res> {
-  factory _$ProfileDocsResponseDtoCopyWith(_ProfileDocsResponseDto value, $Res Function(_ProfileDocsResponseDto) _then) = __$ProfileDocsResponseDtoCopyWithImpl;
+abstract mixin class _$ProfileEntityCopyWith<$Res> implements $ProfileEntityCopyWith<$Res> {
+  factory _$ProfileEntityCopyWith(_ProfileEntity value, $Res Function(_ProfileEntity) _then) = __$ProfileEntityCopyWithImpl;
 @override @useResult
 $Res call({
  String id, String name, int age, String gender
@@ -255,17 +249,17 @@ $Res call({
 
 }
 /// @nodoc
-class __$ProfileDocsResponseDtoCopyWithImpl<$Res>
-    implements _$ProfileDocsResponseDtoCopyWith<$Res> {
-  __$ProfileDocsResponseDtoCopyWithImpl(this._self, this._then);
+class __$ProfileEntityCopyWithImpl<$Res>
+    implements _$ProfileEntityCopyWith<$Res> {
+  __$ProfileEntityCopyWithImpl(this._self, this._then);
 
-  final _ProfileDocsResponseDto _self;
-  final $Res Function(_ProfileDocsResponseDto) _then;
+  final _ProfileEntity _self;
+  final $Res Function(_ProfileEntity) _then;
 
-/// Create a copy of ProfileDocsResponseDto
+/// Create a copy of ProfileEntity
 /// with the given fields replaced by the non-null parameter values.
 @override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? age = null,Object? gender = null,}) {
-  return _then(_ProfileDocsResponseDto(
+  return _then(_ProfileEntity(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,age: null == age ? _self.age : age // ignore: cast_nullable_to_non_nullable

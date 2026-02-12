@@ -128,7 +128,7 @@ return selected(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  initial,TResult Function( String message)?  receiveInProgress,TResult Function( List<TheoryModuleEntity> theoryModules)?  receiveSuccess,TResult Function( String message)?  receiveFailed,TResult Function( int theoryModuleId)?  selected,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  initial,TResult Function( String message)?  receiveInProgress,TResult Function( List<TheoryModuleListEntity> theoryModules)?  receiveSuccess,TResult Function( String message)?  receiveFailed,TResult Function( int theoryModuleId)?  selected,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Initial() when initial != null:
 return initial();case ReceiveInProgress() when receiveInProgress != null:
@@ -153,7 +153,7 @@ return selected(_that.theoryModuleId);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  initial,required TResult Function( String message)  receiveInProgress,required TResult Function( List<TheoryModuleEntity> theoryModules)  receiveSuccess,required TResult Function( String message)  receiveFailed,required TResult Function( int theoryModuleId)  selected,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  initial,required TResult Function( String message)  receiveInProgress,required TResult Function( List<TheoryModuleListEntity> theoryModules)  receiveSuccess,required TResult Function( String message)  receiveFailed,required TResult Function( int theoryModuleId)  selected,}) {final _that = this;
 switch (_that) {
 case _Initial():
 return initial();case ReceiveInProgress():
@@ -174,7 +174,7 @@ return selected(_that.theoryModuleId);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  initial,TResult? Function( String message)?  receiveInProgress,TResult? Function( List<TheoryModuleEntity> theoryModules)?  receiveSuccess,TResult? Function( String message)?  receiveFailed,TResult? Function( int theoryModuleId)?  selected,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  initial,TResult? Function( String message)?  receiveInProgress,TResult? Function( List<TheoryModuleListEntity> theoryModules)?  receiveSuccess,TResult? Function( String message)?  receiveFailed,TResult? Function( int theoryModuleId)?  selected,}) {final _that = this;
 switch (_that) {
 case _Initial() when initial != null:
 return initial();case ReceiveInProgress() when receiveInProgress != null:
@@ -291,11 +291,11 @@ as String,
 
 
 class ReceiveSuccess implements TheoryModuleListState {
-  const ReceiveSuccess({required final  List<TheoryModuleEntity> theoryModules}): _theoryModules = theoryModules;
+  const ReceiveSuccess({required final  List<TheoryModuleListEntity> theoryModules}): _theoryModules = theoryModules;
   
 
- final  List<TheoryModuleEntity> _theoryModules;
- List<TheoryModuleEntity> get theoryModules {
+ final  List<TheoryModuleListEntity> _theoryModules;
+ List<TheoryModuleListEntity> get theoryModules {
   if (_theoryModules is EqualUnmodifiableListView) return _theoryModules;
   // ignore: implicit_dynamic_type
   return EqualUnmodifiableListView(_theoryModules);
@@ -332,7 +332,7 @@ abstract mixin class $ReceiveSuccessCopyWith<$Res> implements $TheoryModuleListS
   factory $ReceiveSuccessCopyWith(ReceiveSuccess value, $Res Function(ReceiveSuccess) _then) = _$ReceiveSuccessCopyWithImpl;
 @useResult
 $Res call({
- List<TheoryModuleEntity> theoryModules
+ List<TheoryModuleListEntity> theoryModules
 });
 
 
@@ -352,7 +352,7 @@ class _$ReceiveSuccessCopyWithImpl<$Res>
 @pragma('vm:prefer-inline') $Res call({Object? theoryModules = null,}) {
   return _then(ReceiveSuccess(
 theoryModules: null == theoryModules ? _self._theoryModules : theoryModules // ignore: cast_nullable_to_non_nullable
-as List<TheoryModuleEntity>,
+as List<TheoryModuleListEntity>,
   ));
 }
 

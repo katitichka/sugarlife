@@ -4,8 +4,9 @@ import 'package:sugarlife/features/game_module/data/dtos/game_module_question_dt
 import 'package:sugarlife/features/game_module/domain/entities/game_module_question_entity.dart';
 
 abstract class GameModuleQuestionDtoMapper {
-  static GameModuleQuestionEntity toEntity(
-      {required GameModuleQuestionDto dto}) {
+  static GameModuleQuestionEntity toEntity({
+    required GameModuleQuestionDto dto,
+  }) {
     return GameModuleQuestionEntity(
       id: dto.id,
       question: dto.question,
