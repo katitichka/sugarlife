@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sugarlife/core/theme/app_color.dart';
+import 'package:sugarlife/features/game_module/domain/entities/game_module_list_entity.dart';
+import 'package:sugarlife/features/game_module/presentation/bloc/game_module_list_bloc.dart';
+import 'package:sugarlife/features/widgets/main_page.dart';
 
 class GamePage extends StatefulWidget {
   const GamePage({super.key});
@@ -12,12 +16,7 @@ class GamePage extends StatefulWidget {
 class _GamePageState extends State<GamePage> {
   late List<Offset> positions;
   final ScrollController _scrollController = ScrollController();
-
-  static const double stepY = 100;
-  static const double stepX = 80;
   static const double circleSize = 60;
-  static const double bottomOffset = 100;
-  static const double topPadding = 100;
 
   @override
   void initState() {
@@ -27,54 +26,66 @@ class _GamePageState extends State<GamePage> {
         _scrollController.jumpTo(0);
       }
     });
-    
   }
 
   @override
   Widget build(BuildContext context) {
+    return BlocBuilder<GameModuleListBloc, GameModuleListState>(
+      builder: (context, state) => switch (state) {
+        ReceiveSuccess(:final gameModules) => _buildGameContent(gameModules),
+        ReceiveInProgress() =>
+          const Center(child: CircularProgressIndicator()),
+        ReceiveFailed(:final message) => Center(
+          child: Text('Ошибка: $message'),
+        ),
+        _ => const SizedBox.shrink(),
+      },
+    );
+  }
+
+  Widget _buildGameContent(List<GameModuleListEntity> levels) {
     double screenHeight = MediaQuery.of(context).size.height;
     double startY = screenHeight - 100;
     double centerX = MediaQuery.of(context).size.width / 2;
-    positions = List.generate(21, (index) => _calculatePosition(index, startY, centerX));
+    positions = List.generate(
+      levels.length,
+      (index) => _calculatePosition(index, startY, centerX),
+    );
 
     double minY = positions.map((p) => p.dy).reduce((a, b) => a < b ? a : b);
     double maxY = positions.map((p) => p.dy).reduce((a, b) => a > b ? a : b);
     double contentHeight = maxY - minY + 300;
-    
-    return Scaffold(
-      body: SingleChildScrollView(
-        reverse: true,
-        child: SizedBox(
-          height: contentHeight,
-          child: Stack(
-            children: positions.asMap().entries.map((entry) {
-              int index = entry.key;
-  Offset pos = entry.value;
-              return Positioned(
-                left: pos.dx,
-                top: pos.dy - minY + 100,
-                child: Container(
-                  width: circleSize,
-                  height: circleSize,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: AppColors.navActive,
-                  ),
-                  child: Center(
-                    child: Text(
-                      '${index + 1}',
-                      style: const TextStyle(color: AppColors.mainTextColor),
-                    ),
+
+    return SingleChildScrollView(
+      reverse: true,
+      child: SizedBox(
+        height: contentHeight,
+        child: Stack(
+          children: positions.asMap().entries.map((entry) {
+            int index = entry.key;
+            Offset pos = entry.value;
+            return Positioned(
+              left: pos.dx,
+              top: pos.dy - minY + 100,
+              child: Container(
+                width: circleSize,
+                height: circleSize,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: AppColors.navActive,
+                ),
+                child: Center(
+                  child: Text(
+                    '${index + 1}',
+                    style: const TextStyle(color: AppColors.mainTextColor),
                   ),
                 ),
-              );
-            }).toList(),
-          ),
+              ),
+            );
+          }).toList(),
         ),
       ),
-      );
-    
-    
+    );
   }
 }
 

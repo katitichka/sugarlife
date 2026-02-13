@@ -6,5 +6,4 @@ sealed class TheoryModuleListState with _$TheoryModuleListState {
   const factory TheoryModuleListState.receiveInProgress({required String message}) = ReceiveInProgress;
   const factory TheoryModuleListState.receiveSuccess({required List<TheoryModuleListEntity> theoryModules}) = ReceiveSuccess;
   const factory TheoryModuleListState.receiveFailed({required String message}) = ReceiveFailed;
-  const factory TheoryModuleListState.selected({required int theoryModuleId}) = Selected;
 }

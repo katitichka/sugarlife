@@ -1,4 +1,4 @@
-import 'package:sugarlife/features/profile/data/dtos/profile_docs_response_dto.dart';
+import 'package:sugarlife/features/profile/data/DTOs/profile_dto.dart';
 
 abstract interface class ProfileDataProvider {
   Future<void> register({
@@ -9,5 +9,5 @@ abstract interface class ProfileDataProvider {
 
   Future<bool> get isAuthenticated;
 
-  Future<ProfileDocsResponseDto?> get currentUser;
+  Future<ProfileDto?> get currentUser;
 }

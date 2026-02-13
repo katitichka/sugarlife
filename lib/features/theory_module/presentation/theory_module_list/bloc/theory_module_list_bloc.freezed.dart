@@ -55,15 +55,14 @@ extension TheoryModuleListStatePatterns on TheoryModuleListState {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( _Initial value)?  initial,TResult Function( ReceiveInProgress value)?  receiveInProgress,TResult Function( ReceiveSuccess value)?  receiveSuccess,TResult Function( ReceiveFailed value)?  receiveFailed,TResult Function( Selected value)?  selected,required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( _Initial value)?  initial,TResult Function( ReceiveInProgress value)?  receiveInProgress,TResult Function( ReceiveSuccess value)?  receiveSuccess,TResult Function( ReceiveFailed value)?  receiveFailed,required TResult orElse(),}){
 final _that = this;
 switch (_that) {
 case _Initial() when initial != null:
 return initial(_that);case ReceiveInProgress() when receiveInProgress != null:
 return receiveInProgress(_that);case ReceiveSuccess() when receiveSuccess != null:
 return receiveSuccess(_that);case ReceiveFailed() when receiveFailed != null:
-return receiveFailed(_that);case Selected() when selected != null:
-return selected(_that);case _:
+return receiveFailed(_that);case _:
   return orElse();
 
 }
@@ -81,15 +80,14 @@ return selected(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( _Initial value)  initial,required TResult Function( ReceiveInProgress value)  receiveInProgress,required TResult Function( ReceiveSuccess value)  receiveSuccess,required TResult Function( ReceiveFailed value)  receiveFailed,required TResult Function( Selected value)  selected,}){
+@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( _Initial value)  initial,required TResult Function( ReceiveInProgress value)  receiveInProgress,required TResult Function( ReceiveSuccess value)  receiveSuccess,required TResult Function( ReceiveFailed value)  receiveFailed,}){
 final _that = this;
 switch (_that) {
 case _Initial():
 return initial(_that);case ReceiveInProgress():
 return receiveInProgress(_that);case ReceiveSuccess():
 return receiveSuccess(_that);case ReceiveFailed():
-return receiveFailed(_that);case Selected():
-return selected(_that);}
+return receiveFailed(_that);}
 }
 /// A variant of `map` that fallback to returning `null`.
 ///
@@ -103,15 +101,14 @@ return selected(_that);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( _Initial value)?  initial,TResult? Function( ReceiveInProgress value)?  receiveInProgress,TResult? Function( ReceiveSuccess value)?  receiveSuccess,TResult? Function( ReceiveFailed value)?  receiveFailed,TResult? Function( Selected value)?  selected,}){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( _Initial value)?  initial,TResult? Function( ReceiveInProgress value)?  receiveInProgress,TResult? Function( ReceiveSuccess value)?  receiveSuccess,TResult? Function( ReceiveFailed value)?  receiveFailed,}){
 final _that = this;
 switch (_that) {
 case _Initial() when initial != null:
 return initial(_that);case ReceiveInProgress() when receiveInProgress != null:
 return receiveInProgress(_that);case ReceiveSuccess() when receiveSuccess != null:
 return receiveSuccess(_that);case ReceiveFailed() when receiveFailed != null:
-return receiveFailed(_that);case Selected() when selected != null:
-return selected(_that);case _:
+return receiveFailed(_that);case _:
   return null;
 
 }
@@ -128,14 +125,13 @@ return selected(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  initial,TResult Function( String message)?  receiveInProgress,TResult Function( List<TheoryModuleListEntity> theoryModules)?  receiveSuccess,TResult Function( String message)?  receiveFailed,TResult Function( int theoryModuleId)?  selected,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  initial,TResult Function( String message)?  receiveInProgress,TResult Function( List<TheoryModuleListEntity> theoryModules)?  receiveSuccess,TResult Function( String message)?  receiveFailed,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Initial() when initial != null:
 return initial();case ReceiveInProgress() when receiveInProgress != null:
 return receiveInProgress(_that.message);case ReceiveSuccess() when receiveSuccess != null:
 return receiveSuccess(_that.theoryModules);case ReceiveFailed() when receiveFailed != null:
-return receiveFailed(_that.message);case Selected() when selected != null:
-return selected(_that.theoryModuleId);case _:
+return receiveFailed(_that.message);case _:
   return orElse();
 
 }
@@ -153,14 +149,13 @@ return selected(_that.theoryModuleId);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  initial,required TResult Function( String message)  receiveInProgress,required TResult Function( List<TheoryModuleListEntity> theoryModules)  receiveSuccess,required TResult Function( String message)  receiveFailed,required TResult Function( int theoryModuleId)  selected,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  initial,required TResult Function( String message)  receiveInProgress,required TResult Function( List<TheoryModuleListEntity> theoryModules)  receiveSuccess,required TResult Function( String message)  receiveFailed,}) {final _that = this;
 switch (_that) {
 case _Initial():
 return initial();case ReceiveInProgress():
 return receiveInProgress(_that.message);case ReceiveSuccess():
 return receiveSuccess(_that.theoryModules);case ReceiveFailed():
-return receiveFailed(_that.message);case Selected():
-return selected(_that.theoryModuleId);}
+return receiveFailed(_that.message);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -174,14 +169,13 @@ return selected(_that.theoryModuleId);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  initial,TResult? Function( String message)?  receiveInProgress,TResult? Function( List<TheoryModuleListEntity> theoryModules)?  receiveSuccess,TResult? Function( String message)?  receiveFailed,TResult? Function( int theoryModuleId)?  selected,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  initial,TResult? Function( String message)?  receiveInProgress,TResult? Function( List<TheoryModuleListEntity> theoryModules)?  receiveSuccess,TResult? Function( String message)?  receiveFailed,}) {final _that = this;
 switch (_that) {
 case _Initial() when initial != null:
 return initial();case ReceiveInProgress() when receiveInProgress != null:
 return receiveInProgress(_that.message);case ReceiveSuccess() when receiveSuccess != null:
 return receiveSuccess(_that.theoryModules);case ReceiveFailed() when receiveFailed != null:
-return receiveFailed(_that.message);case Selected() when selected != null:
-return selected(_that.theoryModuleId);case _:
+return receiveFailed(_that.message);case _:
   return null;
 
 }
@@ -426,72 +420,6 @@ as String,
 }
 
 /// @nodoc
-
-
-class Selected implements TheoryModuleListState {
-  const Selected({required this.theoryModuleId});
-  
-
- final  int theoryModuleId;
-
-/// Create a copy of TheoryModuleListState
-/// with the given fields replaced by the non-null parameter values.
-@JsonKey(includeFromJson: false, includeToJson: false)
-@pragma('vm:prefer-inline')
-$SelectedCopyWith<Selected> get copyWith => _$SelectedCopyWithImpl<Selected>(this, _$identity);
-
-
-
-@override
-bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Selected&&(identical(other.theoryModuleId, theoryModuleId) || other.theoryModuleId == theoryModuleId));
-}
-
-
-@override
-int get hashCode => Object.hash(runtimeType,theoryModuleId);
-
-@override
-String toString() {
-  return 'TheoryModuleListState.selected(theoryModuleId: $theoryModuleId)';
-}
-
-
-}
-
-/// @nodoc
-abstract mixin class $SelectedCopyWith<$Res> implements $TheoryModuleListStateCopyWith<$Res> {
-  factory $SelectedCopyWith(Selected value, $Res Function(Selected) _then) = _$SelectedCopyWithImpl;
-@useResult
-$Res call({
- int theoryModuleId
-});
-
-
-
-
-}
-/// @nodoc
-class _$SelectedCopyWithImpl<$Res>
-    implements $SelectedCopyWith<$Res> {
-  _$SelectedCopyWithImpl(this._self, this._then);
-
-  final Selected _self;
-  final $Res Function(Selected) _then;
-
-/// Create a copy of TheoryModuleListState
-/// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') $Res call({Object? theoryModuleId = null,}) {
-  return _then(Selected(
-theoryModuleId: null == theoryModuleId ? _self.theoryModuleId : theoryModuleId // ignore: cast_nullable_to_non_nullable
-as int,
-  ));
-}
-
-
-}
-
-/// @nodoc
 mixin _$TheoryModuleListEvent {
 
 
@@ -535,12 +463,11 @@ extension TheoryModuleListEventPatterns on TheoryModuleListEvent {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( _Receive value)?  receive,TResult Function( _Select value)?  select,required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( _Receive value)?  receive,required TResult orElse(),}){
 final _that = this;
 switch (_that) {
 case _Receive() when receive != null:
-return receive(_that);case _Select() when select != null:
-return select(_that);case _:
+return receive(_that);case _:
   return orElse();
 
 }
@@ -558,12 +485,11 @@ return select(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( _Receive value)  receive,required TResult Function( _Select value)  select,}){
+@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( _Receive value)  receive,}){
 final _that = this;
 switch (_that) {
 case _Receive():
-return receive(_that);case _Select():
-return select(_that);}
+return receive(_that);}
 }
 /// A variant of `map` that fallback to returning `null`.
 ///
@@ -577,12 +503,11 @@ return select(_that);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( _Receive value)?  receive,TResult? Function( _Select value)?  select,}){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( _Receive value)?  receive,}){
 final _that = this;
 switch (_that) {
 case _Receive() when receive != null:
-return receive(_that);case _Select() when select != null:
-return select(_that);case _:
+return receive(_that);case _:
   return null;
 
 }
@@ -599,11 +524,10 @@ return select(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  receive,TResult Function( int id)?  select,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  receive,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Receive() when receive != null:
-return receive();case _Select() when select != null:
-return select(_that.id);case _:
+return receive();case _:
   return orElse();
 
 }
@@ -621,11 +545,10 @@ return select(_that.id);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  receive,required TResult Function( int id)  select,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  receive,}) {final _that = this;
 switch (_that) {
 case _Receive():
-return receive();case _Select():
-return select(_that.id);}
+return receive();}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -639,11 +562,10 @@ return select(_that.id);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  receive,TResult? Function( int id)?  select,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  receive,}) {final _that = this;
 switch (_that) {
 case _Receive() when receive != null:
-return receive();case _Select() when select != null:
-return select(_that.id);case _:
+return receive();case _:
   return null;
 
 }
@@ -682,71 +604,5 @@ String toString() {
 
 
 
-
-/// @nodoc
-
-
-class _Select implements TheoryModuleListEvent {
-  const _Select({required this.id});
-  
-
- final  int id;
-
-/// Create a copy of TheoryModuleListEvent
-/// with the given fields replaced by the non-null parameter values.
-@JsonKey(includeFromJson: false, includeToJson: false)
-@pragma('vm:prefer-inline')
-_$SelectCopyWith<_Select> get copyWith => __$SelectCopyWithImpl<_Select>(this, _$identity);
-
-
-
-@override
-bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Select&&(identical(other.id, id) || other.id == id));
-}
-
-
-@override
-int get hashCode => Object.hash(runtimeType,id);
-
-@override
-String toString() {
-  return 'TheoryModuleListEvent.select(id: $id)';
-}
-
-
-}
-
-/// @nodoc
-abstract mixin class _$SelectCopyWith<$Res> implements $TheoryModuleListEventCopyWith<$Res> {
-  factory _$SelectCopyWith(_Select value, $Res Function(_Select) _then) = __$SelectCopyWithImpl;
-@useResult
-$Res call({
- int id
-});
-
-
-
-
-}
-/// @nodoc
-class __$SelectCopyWithImpl<$Res>
-    implements _$SelectCopyWith<$Res> {
-  __$SelectCopyWithImpl(this._self, this._then);
-
-  final _Select _self;
-  final $Res Function(_Select) _then;
-
-/// Create a copy of TheoryModuleListEvent
-/// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') $Res call({Object? id = null,}) {
-  return _then(_Select(
-id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as int,
-  ));
-}
-
-
-}
 
 // dart format on

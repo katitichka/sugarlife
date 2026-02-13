@@ -1,6 +1,5 @@
 import 'package:bloc/bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sugarlife/features/theory_module/domain/entities/theory_module_list_entity.dart';
 import 'package:sugarlife/features/theory_module/domain/repositories/theory_module_repository.dart';
 
@@ -14,12 +13,7 @@ sealed class TheoryModuleListBloc
   TheoryModuleListBloc({required TheoryModuleRepository theoryModuleRepository})
     : _theoryModuleRepository = theoryModuleRepository,
       super(const _Initial()) {
-    on<TheoryModuleListEvent>(
-      (event, emit) => switch (event) {
-        _Receive() => _onReceiveTheoryModuleList(emit),
-        _Select(:final id) => _onSelectTheoryModuleList(emit, id),
-      },
-    );
+    on<_Receive>((event, emit) => _onReceiveTheoryModuleList(emit));
   }
 
   Future<void> _onReceiveTheoryModuleList(
@@ -41,19 +35,4 @@ sealed class TheoryModuleListBloc
       );
     }
   }
-
- Future<void> _onSelectTheoryModuleList(
-  Emitter<TheoryModuleListState> emit,
-  int id,
-) async {
-  try {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setInt('theoryModuleId', id);
-    
-    emit(TheoryModuleListState.selected(theoryModuleId: id));
-
-  } catch (e) {
-    emit(TheoryModuleListState.receiveFailed(message: 'Ошибка выбора модуля'));
-  }
-}
 }

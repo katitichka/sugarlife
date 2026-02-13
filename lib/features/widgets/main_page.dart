@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:sugarlife/core/theme/app_color.dart';
 import 'package:sugarlife/features/game_module/presentation/view/game_page.dart';
 import 'package:sugarlife/features/profile/presentation/profile_page.dart';
 import 'package:sugarlife/features/theory_module/presentation/theory_page.dart';
-import 'package:sugarlife/features/widgets/bottom_island.dart';
+import 'package:sugarlife/features/widgets/app_scaffold.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class MainPage extends StatefulWidget {
@@ -28,25 +27,10 @@ class _MainPageState extends State<MainPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      body: Stack(
-        children: [
-          // Контент страницы
-          IndexedStack(
-            index: _currentIndex,
-            children: _pages,
-          ),
-      
-          // Плавающее меню
-          BottomIsland(
-            currentIndex: _currentIndex,
-            onTap: (index) {
-              setState(() => _currentIndex = index);
-            },
-          ),
-        ],
-      ),
+    return AppScaffold(
+      currentIndex: _currentIndex,
+      pages: _pages,
+      onTap: (index) => setState(() => _currentIndex = index),
     );
   }
 }

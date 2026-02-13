@@ -1,5 +1,5 @@
 import 'package:sugarlife/core/theme/app_database.dart';
-import 'package:sugarlife/features/profile/data/dtos/profile_docs_response_dto.dart';
+import 'package:sugarlife/features/profile/data/DTOs/profile_dto.dart';
 import 'package:sugarlife/features/profile/data/data_providers/implementations/profile_data_provider.dart';
 
 class ProfileDataProviderImpl implements ProfileDataProvider {
@@ -29,10 +29,10 @@ class ProfileDataProviderImpl implements ProfileDataProvider {
   }
 
   @override
-  Future<ProfileDocsResponseDto?> get currentUser async {
+  Future<ProfileDto?> get currentUser async {
     final db = await AppDatabase.database;
     final result = await db.query('user', limit: 1);
     if (result.isEmpty) return null;
-    return ProfileDocsResponseDto.fromJson(result.first);
+    return ProfileDto.fromJson(result.first);
   }
 }
