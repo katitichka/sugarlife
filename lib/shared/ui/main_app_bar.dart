@@ -12,7 +12,7 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
     return AppBar(
       scrolledUnderElevation: 0,
       elevation: 0,
-      backgroundColor: AppColors.navActive,
+      backgroundColor: AppColors.blue,
       title: Text(
         title,
         style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w600, color: Color(0xff4B4E51)),

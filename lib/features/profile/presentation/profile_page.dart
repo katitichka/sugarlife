@@ -12,11 +12,11 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppColors.blue,
       body: Center(
         child: Text(
           'Профиль',
-          style: TextStyle(color: AppColors.mainTextColor, fontSize: 24),
+          style: TextStyle(color: AppColors.white, fontSize: 24),
         ),
       ),
     );

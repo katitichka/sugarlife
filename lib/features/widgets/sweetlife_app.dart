@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:sugarlife/features/widgets/main_page.dart';
+import 'package:sugarlife/core/router/app_router.dart';
 
 class SweetLifeApp extends StatelessWidget {
   const SweetLifeApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp.router(
       title: 'СладкаяЖизнь',
       debugShowCheckedModeBanner: false,
-      home: const MainPage(),
+      routerConfig: appRoute,
     );
   }
 }

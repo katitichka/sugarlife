@@ -1,26 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:sugarlife/core/theme/app_color.dart';
 import 'package:sugarlife/features/widgets/bottom_island.dart';
 
 class AppScaffold extends StatelessWidget {
-  final int currentIndex;
-  final List<Widget> pages;
-  final ValueChanged<int> onTap;
+  final StatefulNavigationShell navigationShell;
+  final bool showBottomNav;
 
-  const AppScaffold({super.key,required this.currentIndex, required this.pages, required this.onTap});
+  const AppScaffold({super.key, required this.navigationShell, required this.showBottomNav});
   @override
   Widget build(BuildContext context) {
+    print('AppScaffold build: showBottomNav = $showBottomNav');
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppColors.blue,
       body: Stack(
         children: [
-          // Контент страницы
-          IndexedStack(index: currentIndex, children: pages),
-
+          navigationShell,
           // Плавающее меню
+          if (showBottomNav)
           BottomIsland(
-            currentIndex: currentIndex,
-            onTap: onTap,
+            currentIndex: navigationShell.currentIndex,
+            onTap: (index) => navigationShell.goBranch(index),
           ),
         ],
       ),

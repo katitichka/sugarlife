@@ -23,7 +23,7 @@ class BottomIsland extends StatelessWidget {
           width: 211,
           height: 48,
           decoration: BoxDecoration(
-            color: AppColors.backgroundBottomMenu,
+            color: AppColors.white,
             borderRadius: BorderRadius.circular(32),
           ),
           child: Row(

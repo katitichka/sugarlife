@@ -73,17 +73,17 @@ class _TheoryPageState extends State<TheoryPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppColors.blue,
       appBar: AppBar(
         title: Text(
           'Теоретический модуль',
           style: GoogleFonts.comfortaa(
             fontSize: 22,
             fontWeight: FontWeight.w700,
-            color: AppColors.mainTextColor,
+            color: AppColors.white,
           ),
         ),
-        backgroundColor: AppColors.background,
+        backgroundColor: AppColors.blue,
         centerTitle: true,
       ),
       body: ListView.builder(
