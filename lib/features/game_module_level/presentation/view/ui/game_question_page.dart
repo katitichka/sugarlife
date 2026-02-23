@@ -13,6 +13,28 @@ class GameQuestionPage extends StatefulWidget {
 class _GameQuestionPageState extends State<GameQuestionPage> {
   String? _selectedStringAnswer;
   bool? _selectedBoolAnswer;
+  int? _lastQuestionId;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final state = context.watch<GameModuleLevelBloc>().state;
+    
+    int? currentQuestionId;
+    if (state is ReceiveSuccess) {
+      currentQuestionId = state.questions[state.currentIndex].id;
+    } else if (state is AnswerInProgress) {
+      currentQuestionId = state.question.id;
+    }
+    
+    if (_lastQuestionId != currentQuestionId) {
+      _lastQuestionId = currentQuestionId;
+      _selectedStringAnswer = null;
+      _selectedBoolAnswer = null;
+      print('Question changed to $currentQuestionId, answers reset');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final state = context.watch<GameModuleLevelBloc>().state;
@@ -21,7 +43,7 @@ class _GameQuestionPageState extends State<GameQuestionPage> {
   }
   final currentQuestion = state is ReceiveSuccess 
       ? state.questions[state.currentIndex] 
-      : null;
+      : (state is AnswerInProgress ? state.question : null);
     final isAnswered = state is ReceiveSuccess ? state.isAnswered : true;
     final isAnswerInProgress = state is AnswerInProgress;
     if (currentQuestion == null && !isAnswerInProgress) {
@@ -38,7 +60,7 @@ class _GameQuestionPageState extends State<GameQuestionPage> {
           : 'Объяснение')),
       body: Stack(
         children: [
-          if (!isAnswerInProgress && currentQuestion != null)
+          if (currentQuestion != null)
           Column(
             children: [
               SizedBox(height: 100),
@@ -151,18 +173,19 @@ Widget _buildExplantationOverlay(BuildContext context, AnswerInProgress state) {
 }
 
 void _handleAnswer(BuildContext context, QuestionType type, dynamic answer) {
+  
   switch (type) {
     case QuestionType.multipleChoice:
       context.read<GameModuleLevelBloc>().add(
-        GameModuleLevelEvent.answerMultipleChoice(answer: answer as String),
+        GameModuleLevelEvent.answerMultipleChoice(answer: answer),
       );
     case QuestionType.trueFalse:
       context.read<GameModuleLevelBloc>().add(
-        GameModuleLevelEvent.answerTrueFalse(answer: answer as bool),
+        GameModuleLevelEvent.answerTrueFalse(answer: answer),
       );
     case QuestionType.fillBlank:
       context.read<GameModuleLevelBloc>().add(
-        GameModuleLevelEvent.answerFillBlank(answer: answer as String),
+        GameModuleLevelEvent.answerFillBlank(answer: answer),
       );
   }
 }
@@ -175,6 +198,7 @@ Widget _buildButton(
   selectedAnswer,
   isAnswered,
 ) {
+  
   return ElevatedButton(
     onPressed: () {
       if (isAnswerInProgress) {
@@ -186,11 +210,14 @@ Widget _buildButton(
         // В состоянии вопроса - можно нажать только если есть выбранный ответ и еще не отвечали
         if (hasSelectedAnswer && !isAnswered) {
           _handleAnswer(context, currentQuestionType, selectedAnswer);
+          
         }
       }
     },
     child: Text(isAnswerInProgress ? 'Далее' : 'Готово'),
+    
   );
+  
 }
 
 Widget _buildAnswer(
@@ -288,16 +315,61 @@ class TrueFalseWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: question.answers.map((answer) {
-        return ListTile(
-          title: Text(answer),
-          onTap: () {
-            final boolAnswer = answer.toLowerCase() == 'true';
-            onAnswerSelected(boolAnswer);
-          },
-        );
-      }).toList(),
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Row(
+        children: [
+          // Кнопка "Правда" (true)
+          Expanded(
+            child: _buildAnswerCard(
+              answer: question.answers[0],
+              isSelected: selectedAnswer == true,
+              onTap: () => onAnswerSelected(true),
+            ),
+          ),
+          const SizedBox(width: 12),
+          
+          // Кнопка "Ложь" (false)
+          Expanded(
+            child: _buildAnswerCard(
+              answer: question.answers[1],
+              isSelected: selectedAnswer == false,
+              onTap: () => onAnswerSelected(false),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAnswerCard({
+    required String answer,
+    required bool isSelected,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        decoration: BoxDecoration(
+          color: isSelected ? AppColors.blue : Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: isSelected ? AppColors.blue : Colors.grey,
+            width: isSelected ? 2 : 1,
+          ),
+        ),
+        child: Center(
+          child: Text(
+            answer,
+            style: TextStyle(
+              color: isSelected ? Colors.white : Colors.black87,
+              fontSize: 16,
+              fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

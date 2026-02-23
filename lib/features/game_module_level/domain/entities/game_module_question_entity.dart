@@ -6,7 +6,7 @@ part 'game_module_question_entity.freezed.dart';
 
 @freezed
 sealed class GameModuleQuestionEntity with _$GameModuleQuestionEntity {
-  const GameModuleQuestionEntity._();  
+  const GameModuleQuestionEntity._();
   const factory GameModuleQuestionEntity({
     required int id,
     required String question,
@@ -26,11 +26,14 @@ sealed class GameModuleQuestionEntity with _$GameModuleQuestionEntity {
         return userSelectedAnswer == correctAnswer;
       case QuestionType.trueFalse:
         final userBool = userAnswer as bool;
-        final correctBool = correctAnswer == 'true';
-        return userBool == correctBool;
+        final userAnswerText = userBool
+            ? answers[0]
+            : answers[1]; // answers[0] - "Правда", answers[1] - "Ложь"
+        return userAnswerText == correctAnswer;
       case QuestionType.fillBlank:
         final userText = userAnswer as String;
-        return userText.trim().toLowerCase() == correctAnswer.trim().toLowerCase();
+        return userText.trim().toLowerCase() ==
+            correctAnswer.trim().toLowerCase();
     }
   }
 }
