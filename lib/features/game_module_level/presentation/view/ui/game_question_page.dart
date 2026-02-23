@@ -16,56 +16,138 @@ class _GameQuestionPageState extends State<GameQuestionPage> {
   @override
   Widget build(BuildContext context) {
     final state = context.watch<GameModuleLevelBloc>().state;
-    if (state is! ReceiveSuccess) return const SizedBox.shrink();
-    final isAnswered = state.isAnswered;
+    if (state is! ReceiveSuccess && state is! AnswerInProgress) {
+    return const SizedBox.shrink();
+  }
+  final currentQuestion = state is ReceiveSuccess 
+      ? state.questions[state.currentIndex] 
+      : null;
+    final isAnswered = state is ReceiveSuccess ? state.isAnswered : true;
     final isAnswerInProgress = state is AnswerInProgress;
-    final currentQuestion = state.questions[state.currentIndex];
-    final hasSelectedAnswer = _selectedStringAnswer != null || _selectedBoolAnswer != null;
-final selectedAnswer = _selectedStringAnswer ?? _selectedBoolAnswer;
+    if (currentQuestion == null && !isAnswerInProgress) {
+    return const SizedBox.shrink();
+
+  }
+  
+    final hasSelectedAnswer =
+        _selectedStringAnswer != null || _selectedBoolAnswer != null;
+    final selectedAnswer = _selectedStringAnswer ?? _selectedBoolAnswer;
     return Scaffold(
-      appBar: AppBar(title: Text('Уровень ${currentQuestion.levelId}')),
-      body: Column(
+      appBar: AppBar(title: Text(currentQuestion?.levelId != null 
+          ? 'Уровень ${currentQuestion!.levelId}' 
+          : 'Объяснение')),
+      body: Stack(
         children: [
-          SizedBox(height: 100),
-          Container(
-            child: Row(
-              children: [
-                Image.asset('assets/characters/orange.png'),
-                Container(
-                  width: 240,
-                  padding: EdgeInsets.all(8),
-                  child: Text(
-                    currentQuestion.question,
-                    style: TextStyle(fontSize: 17, color: AppColors.blue),
-                  ),
-                ),
-              ],
+          if (!isAnswerInProgress && currentQuestion != null)
+          Column(
+            children: [
+              SizedBox(height: 100),
+              _buildQuestionHeader(currentQuestion),
+              _buildAnswer(
+                currentQuestion,
+                onStringAnswerSelected: (answer) {
+                  setState(() => _selectedStringAnswer = answer);
+                },
+                onBoolAnswerSelected: (answer) {
+                  setState(() => _selectedBoolAnswer = answer);
+                },
+                selectedStringAnswer: _selectedStringAnswer,
+                selectedBoolAnswer: _selectedBoolAnswer,
+              ),
+
+              _buildButton(
+                context,
+                isAnswerInProgress,
+                hasSelectedAnswer,
+                currentQuestion.questionType,
+                selectedAnswer,
+                isAnswered,
+              ),
+            ],
+          ),
+          if (isAnswerInProgress)
+            Positioned(
+              bottom: 0,
+              left: 0,
+              right: 0,
+              child: _buildExplantationOverlay(
+                context,
+                state as AnswerInProgress,
+              ),
             ),
-          ),
-          _buildAnswer(
-            currentQuestion,
-            onAnswerSelected: (answer) {
-              setState(() {
-                if (currentQuestion.questionType == QuestionType.trueFalse) {
-                  _selectedBoolAnswer = answer as bool;
-                } else {
-                  _selectedStringAnswer = answer as String;
-                }
-              });
-            },
-          ),
-          
-          _buildButton(
-            context,
-            isAnswerInProgress,
-            hasSelectedAnswer,
-            currentQuestion.questionType,
-            selectedAnswer,
-          ),
         ],
       ),
     );
   }
+}
+
+Widget _buildQuestionHeader(GameModuleQuestionEntity question) {
+  return Padding(
+    padding: const EdgeInsets.symmetric(horizontal: 16),
+    child: Row(
+      children: [
+        // Аватар персонажа
+        Image.asset(
+          'assets/characters/orange.png',
+          width: 80,
+          height: 80,
+          fit: BoxFit.cover,
+        ),
+        const SizedBox(width: 12),
+
+        // Текст вопроса
+        Expanded(
+          child: Text(
+            question.question,
+            style: const TextStyle(
+              fontSize: 17,
+              color: AppColors.blue,
+              height: 1.4,
+            ),
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
+Widget _buildExplantationOverlay(BuildContext context, AnswerInProgress state) {
+  return Container(
+    padding: EdgeInsets.all(24),
+    decoration: BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      boxShadow: [
+        BoxShadow(color: Colors.black, blurRadius: 10, offset: Offset(0, -5)),
+      ],
+    ),
+    child: Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(
+          state.isCorrect ? Icons.check_circle : Icons.cancel,
+          color: state.isCorrect ? Colors.green : Colors.red,
+          size: 48,
+        ),
+        SizedBox(height: 16),
+        Text(
+          state.isCorrect ? 'Правильно!' : 'Неправильно',
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: state.isCorrect ? Colors.green : Colors.red,
+          ),
+        ),
+        SizedBox(height: 16),
+        Text(state.explanation, textAlign: TextAlign.center),
+        SizedBox(height: 16),
+        Text(
+          'Правильный ответ: ${state.correctAnswer}',
+          style: TextStyle(fontWeight: FontWeight.w500),
+        ),
+      ],
+    ),
+  );
 }
 
 void _handleAnswer(BuildContext context, QuestionType type, dynamic answer) {
@@ -91,88 +173,117 @@ Widget _buildButton(
   bool hasSelectedAnswer,
   QuestionType currentQuestionType,
   selectedAnswer,
+  isAnswered,
 ) {
   return ElevatedButton(
     onPressed: () {
       if (isAnswerInProgress) {
-        context.read<GameModuleLevelBloc>()
-          ..add(GameModuleLevelEvent.nextQuestion());
+        // В состоянии объяснения - всегда можно нажать Далее
+        context.read<GameModuleLevelBloc>().add(
+          GameModuleLevelEvent.nextQuestion(),
+        );
       } else {
-        switch (currentQuestionType) {
-          case QuestionType.multipleChoice:
-            context.read<GameModuleLevelBloc>().add(
-              GameModuleLevelEvent.answerMultipleChoice(answer: selectedAnswer),
-            );
-          case QuestionType.trueFalse:
-            final boolAnswer = selectedAnswer == 'true';
-            context.read<GameModuleLevelBloc>().add(
-              GameModuleLevelEvent.answerTrueFalse(answer: boolAnswer),
-            );
-          case QuestionType.fillBlank:
-            context.read<GameModuleLevelBloc>().add(
-              GameModuleLevelEvent.answerFillBlank(answer: selectedAnswer),
-            );
+        // В состоянии вопроса - можно нажать только если есть выбранный ответ и еще не отвечали
+        if (hasSelectedAnswer && !isAnswered) {
+          _handleAnswer(context, currentQuestionType, selectedAnswer);
         }
       }
-      ;
     },
-
     child: Text(isAnswerInProgress ? 'Далее' : 'Готово'),
   );
 }
 
 Widget _buildAnswer(
   GameModuleQuestionEntity question, {
-  required Function(dynamic) onAnswerSelected,
+  required Function(String) onStringAnswerSelected,
+  required Function(bool) onBoolAnswerSelected,
+  required String? selectedStringAnswer,
+  required bool? selectedBoolAnswer,
 }) {
   switch (question.questionType) {
     case QuestionType.multipleChoice:
+    case QuestionType.fillBlank:
       return MultipleChoiceWidget(
         question: question,
-        onAnswerSelected: onAnswerSelected,
+        selectedAnswer: selectedStringAnswer,
+        onAnswerSelected: onStringAnswerSelected,
       );
     case QuestionType.trueFalse:
       return TrueFalseWidget(
         question: question,
-        onAnswerSelected: onAnswerSelected,
-      );
-    case QuestionType.fillBlank:
-      return FillBlankWidget(
-        question: question,
-        onAnswerSelected: onAnswerSelected,
+        selectedAnswer: selectedBoolAnswer,
+        onAnswerSelected: onBoolAnswerSelected,
       );
   }
 }
 
 class MultipleChoiceWidget extends StatelessWidget {
   final GameModuleQuestionEntity question;
-  final Function(dynamic) onAnswerSelected;
+  final String? selectedAnswer;
+  final Function(String) onAnswerSelected;
   const MultipleChoiceWidget({
     required this.question,
     required this.onAnswerSelected,
+    required this.selectedAnswer,
+    super.key,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: question.answers.map((answer) {
-        return ListTile(
-          title: Text(answer),
-          onTap: () {
-            onAnswerSelected(answer);
-          },
-        );
-      }).toList(),
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: GridView.count(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        crossAxisCount: 2,
+        mainAxisSpacing: 12,
+        crossAxisSpacing: 12,
+        childAspectRatio: 2.5,
+        children: question.answers.map((answer) {
+          final isSelected = answer == selectedAnswer;
+
+          return GestureDetector(
+            onTap: () => onAnswerSelected(answer),
+            child: Container(
+              decoration: BoxDecoration(
+                color: isSelected ? AppColors.blue : AppColors.white,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: isSelected ? AppColors.blue : AppColors.grey,
+                  width: isSelected ? 2 : 1,
+                ),
+              ),
+              child: Center(
+                child: Text(
+                  answer,
+                  style: TextStyle(
+                    color: isSelected ? Colors.white : Colors.black87,
+                    fontSize: 16,
+                    fontWeight: isSelected
+                        ? FontWeight.w600
+                        : FontWeight.normal,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ),
+          );
+        }).toList(),
+      ),
     );
   }
 }
 
 class TrueFalseWidget extends StatelessWidget {
   final GameModuleQuestionEntity question;
-  final Function(dynamic) onAnswerSelected;
+  final Function(bool) onAnswerSelected;
+  final bool? selectedAnswer;
+
   const TrueFalseWidget({
+    super.key,
     required this.question,
     required this.onAnswerSelected,
+    this.selectedAnswer,
   });
 
   @override
@@ -193,8 +304,12 @@ class TrueFalseWidget extends StatelessWidget {
 
 class FillBlankWidget extends StatelessWidget {
   final GameModuleQuestionEntity question;
-  final Function(dynamic) onAnswerSelected;
-  const FillBlankWidget({required this.question, required this.onAnswerSelected});
+  final Function(String) onAnswerSelected;
+  const FillBlankWidget({
+    required this.question,
+    required this.onAnswerSelected,
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {

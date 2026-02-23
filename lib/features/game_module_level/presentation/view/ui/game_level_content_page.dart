@@ -21,10 +21,10 @@ class GameLevelContentPage extends StatelessWidget {
             if (state.currentIndex == -1) {
               return GameLevelStartLevelPage(levelId: levelId);
             } else {
-              return  GameQuestionPage();
+              return GameQuestionPage();
             }
           case AnswerInProgress():
-            return const _ExplanationPage();
+            return GameQuestionPage();
           case LevelCompleted():
             return const _CompletedPage();
           default:
@@ -67,16 +67,8 @@ class _ErrorPage extends StatelessWidget {
 //   }
 // }
 
-class _ExplanationPage extends StatelessWidget {
-  const _ExplanationPage();
 
-  @override
-  Widget build(BuildContext context) {
-    return const Scaffold(body: Center(child: Text('Экран объяснения')));
-  }
-}
-
-// 5. Завершение уровня (пока заглушка)
+// Завершение уровня (пока заглушка)
 class _CompletedPage extends StatelessWidget {
   const _CompletedPage();
 
