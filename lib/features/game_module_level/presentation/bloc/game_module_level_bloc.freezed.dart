@@ -683,15 +683,15 @@ return levelCompleted(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  initial,TResult Function( String message)?  receiveInProgress,TResult Function( List<GameModuleQuestionEntity> questions,  int currentIndex,  LevelProgressEntity? progress,  bool isAnswered)?  receiveSuccess,TResult Function( String message)?  receiveFailed,TResult Function( bool isCorrect,  String explanation,  String selectedAnswer,  String correctAnswer,  GameModuleQuestionEntity question,  int currentIndex,  List<GameModuleQuestionEntity> questions,  LevelProgressEntity? progress)?  answerInProgress,TResult Function()?  levelCompleted,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  initial,TResult Function( String message)?  receiveInProgress,TResult Function( List<GameModuleQuestionEntity> questions,  int currentIndex,  LevelProgressEntity? progress,  bool isAnswered,  Map<int, bool> answers)?  receiveSuccess,TResult Function( String message)?  receiveFailed,TResult Function( bool isCorrect,  String explanation,  String selectedAnswer,  String correctAnswer,  GameModuleQuestionEntity question,  int currentIndex,  List<GameModuleQuestionEntity> questions,  LevelProgressEntity? progress,  Map<int, bool> answers)?  answerInProgress,TResult Function( int correctAnswers,  int totalQuestions,  int stars)?  levelCompleted,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Initial() when initial != null:
 return initial();case ReceiveInProgress() when receiveInProgress != null:
 return receiveInProgress(_that.message);case ReceiveSuccess() when receiveSuccess != null:
-return receiveSuccess(_that.questions,_that.currentIndex,_that.progress,_that.isAnswered);case ReceiveFailed() when receiveFailed != null:
+return receiveSuccess(_that.questions,_that.currentIndex,_that.progress,_that.isAnswered,_that.answers);case ReceiveFailed() when receiveFailed != null:
 return receiveFailed(_that.message);case AnswerInProgress() when answerInProgress != null:
-return answerInProgress(_that.isCorrect,_that.explanation,_that.selectedAnswer,_that.correctAnswer,_that.question,_that.currentIndex,_that.questions,_that.progress);case LevelCompleted() when levelCompleted != null:
-return levelCompleted();case _:
+return answerInProgress(_that.isCorrect,_that.explanation,_that.selectedAnswer,_that.correctAnswer,_that.question,_that.currentIndex,_that.questions,_that.progress,_that.answers);case LevelCompleted() when levelCompleted != null:
+return levelCompleted(_that.correctAnswers,_that.totalQuestions,_that.stars);case _:
   return orElse();
 
 }
@@ -709,15 +709,15 @@ return levelCompleted();case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  initial,required TResult Function( String message)  receiveInProgress,required TResult Function( List<GameModuleQuestionEntity> questions,  int currentIndex,  LevelProgressEntity? progress,  bool isAnswered)  receiveSuccess,required TResult Function( String message)  receiveFailed,required TResult Function( bool isCorrect,  String explanation,  String selectedAnswer,  String correctAnswer,  GameModuleQuestionEntity question,  int currentIndex,  List<GameModuleQuestionEntity> questions,  LevelProgressEntity? progress)  answerInProgress,required TResult Function()  levelCompleted,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  initial,required TResult Function( String message)  receiveInProgress,required TResult Function( List<GameModuleQuestionEntity> questions,  int currentIndex,  LevelProgressEntity? progress,  bool isAnswered,  Map<int, bool> answers)  receiveSuccess,required TResult Function( String message)  receiveFailed,required TResult Function( bool isCorrect,  String explanation,  String selectedAnswer,  String correctAnswer,  GameModuleQuestionEntity question,  int currentIndex,  List<GameModuleQuestionEntity> questions,  LevelProgressEntity? progress,  Map<int, bool> answers)  answerInProgress,required TResult Function( int correctAnswers,  int totalQuestions,  int stars)  levelCompleted,}) {final _that = this;
 switch (_that) {
 case _Initial():
 return initial();case ReceiveInProgress():
 return receiveInProgress(_that.message);case ReceiveSuccess():
-return receiveSuccess(_that.questions,_that.currentIndex,_that.progress,_that.isAnswered);case ReceiveFailed():
+return receiveSuccess(_that.questions,_that.currentIndex,_that.progress,_that.isAnswered,_that.answers);case ReceiveFailed():
 return receiveFailed(_that.message);case AnswerInProgress():
-return answerInProgress(_that.isCorrect,_that.explanation,_that.selectedAnswer,_that.correctAnswer,_that.question,_that.currentIndex,_that.questions,_that.progress);case LevelCompleted():
-return levelCompleted();}
+return answerInProgress(_that.isCorrect,_that.explanation,_that.selectedAnswer,_that.correctAnswer,_that.question,_that.currentIndex,_that.questions,_that.progress,_that.answers);case LevelCompleted():
+return levelCompleted(_that.correctAnswers,_that.totalQuestions,_that.stars);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -731,15 +731,15 @@ return levelCompleted();}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  initial,TResult? Function( String message)?  receiveInProgress,TResult? Function( List<GameModuleQuestionEntity> questions,  int currentIndex,  LevelProgressEntity? progress,  bool isAnswered)?  receiveSuccess,TResult? Function( String message)?  receiveFailed,TResult? Function( bool isCorrect,  String explanation,  String selectedAnswer,  String correctAnswer,  GameModuleQuestionEntity question,  int currentIndex,  List<GameModuleQuestionEntity> questions,  LevelProgressEntity? progress)?  answerInProgress,TResult? Function()?  levelCompleted,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  initial,TResult? Function( String message)?  receiveInProgress,TResult? Function( List<GameModuleQuestionEntity> questions,  int currentIndex,  LevelProgressEntity? progress,  bool isAnswered,  Map<int, bool> answers)?  receiveSuccess,TResult? Function( String message)?  receiveFailed,TResult? Function( bool isCorrect,  String explanation,  String selectedAnswer,  String correctAnswer,  GameModuleQuestionEntity question,  int currentIndex,  List<GameModuleQuestionEntity> questions,  LevelProgressEntity? progress,  Map<int, bool> answers)?  answerInProgress,TResult? Function( int correctAnswers,  int totalQuestions,  int stars)?  levelCompleted,}) {final _that = this;
 switch (_that) {
 case _Initial() when initial != null:
 return initial();case ReceiveInProgress() when receiveInProgress != null:
 return receiveInProgress(_that.message);case ReceiveSuccess() when receiveSuccess != null:
-return receiveSuccess(_that.questions,_that.currentIndex,_that.progress,_that.isAnswered);case ReceiveFailed() when receiveFailed != null:
+return receiveSuccess(_that.questions,_that.currentIndex,_that.progress,_that.isAnswered,_that.answers);case ReceiveFailed() when receiveFailed != null:
 return receiveFailed(_that.message);case AnswerInProgress() when answerInProgress != null:
-return answerInProgress(_that.isCorrect,_that.explanation,_that.selectedAnswer,_that.correctAnswer,_that.question,_that.currentIndex,_that.questions,_that.progress);case LevelCompleted() when levelCompleted != null:
-return levelCompleted();case _:
+return answerInProgress(_that.isCorrect,_that.explanation,_that.selectedAnswer,_that.correctAnswer,_that.question,_that.currentIndex,_that.questions,_that.progress,_that.answers);case LevelCompleted() when levelCompleted != null:
+return levelCompleted(_that.correctAnswers,_that.totalQuestions,_that.stars);case _:
   return null;
 
 }
@@ -849,7 +849,7 @@ as String,
 
 
 class ReceiveSuccess implements GameModuleLevelState {
-  const ReceiveSuccess({required final  List<GameModuleQuestionEntity> questions, required this.currentIndex, required this.progress, required this.isAnswered}): _questions = questions;
+  const ReceiveSuccess({required final  List<GameModuleQuestionEntity> questions, required this.currentIndex, required this.progress, required this.isAnswered, required final  Map<int, bool> answers}): _questions = questions,_answers = answers;
   
 
  final  List<GameModuleQuestionEntity> _questions;
@@ -862,6 +862,13 @@ class ReceiveSuccess implements GameModuleLevelState {
  final  int currentIndex;
  final  LevelProgressEntity? progress;
  final  bool isAnswered;
+ final  Map<int, bool> _answers;
+ Map<int, bool> get answers {
+  if (_answers is EqualUnmodifiableMapView) return _answers;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableMapView(_answers);
+}
+
 
 /// Create a copy of GameModuleLevelState
 /// with the given fields replaced by the non-null parameter values.
@@ -873,16 +880,16 @@ $ReceiveSuccessCopyWith<ReceiveSuccess> get copyWith => _$ReceiveSuccessCopyWith
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ReceiveSuccess&&const DeepCollectionEquality().equals(other._questions, _questions)&&(identical(other.currentIndex, currentIndex) || other.currentIndex == currentIndex)&&(identical(other.progress, progress) || other.progress == progress)&&(identical(other.isAnswered, isAnswered) || other.isAnswered == isAnswered));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ReceiveSuccess&&const DeepCollectionEquality().equals(other._questions, _questions)&&(identical(other.currentIndex, currentIndex) || other.currentIndex == currentIndex)&&(identical(other.progress, progress) || other.progress == progress)&&(identical(other.isAnswered, isAnswered) || other.isAnswered == isAnswered)&&const DeepCollectionEquality().equals(other._answers, _answers));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_questions),currentIndex,progress,isAnswered);
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_questions),currentIndex,progress,isAnswered,const DeepCollectionEquality().hash(_answers));
 
 @override
 String toString() {
-  return 'GameModuleLevelState.receiveSuccess(questions: $questions, currentIndex: $currentIndex, progress: $progress, isAnswered: $isAnswered)';
+  return 'GameModuleLevelState.receiveSuccess(questions: $questions, currentIndex: $currentIndex, progress: $progress, isAnswered: $isAnswered, answers: $answers)';
 }
 
 
@@ -893,7 +900,7 @@ abstract mixin class $ReceiveSuccessCopyWith<$Res> implements $GameModuleLevelSt
   factory $ReceiveSuccessCopyWith(ReceiveSuccess value, $Res Function(ReceiveSuccess) _then) = _$ReceiveSuccessCopyWithImpl;
 @useResult
 $Res call({
- List<GameModuleQuestionEntity> questions, int currentIndex, LevelProgressEntity? progress, bool isAnswered
+ List<GameModuleQuestionEntity> questions, int currentIndex, LevelProgressEntity? progress, bool isAnswered, Map<int, bool> answers
 });
 
 
@@ -910,13 +917,14 @@ class _$ReceiveSuccessCopyWithImpl<$Res>
 
 /// Create a copy of GameModuleLevelState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') $Res call({Object? questions = null,Object? currentIndex = null,Object? progress = freezed,Object? isAnswered = null,}) {
+@pragma('vm:prefer-inline') $Res call({Object? questions = null,Object? currentIndex = null,Object? progress = freezed,Object? isAnswered = null,Object? answers = null,}) {
   return _then(ReceiveSuccess(
 questions: null == questions ? _self._questions : questions // ignore: cast_nullable_to_non_nullable
 as List<GameModuleQuestionEntity>,currentIndex: null == currentIndex ? _self.currentIndex : currentIndex // ignore: cast_nullable_to_non_nullable
 as int,progress: freezed == progress ? _self.progress : progress // ignore: cast_nullable_to_non_nullable
 as LevelProgressEntity?,isAnswered: null == isAnswered ? _self.isAnswered : isAnswered // ignore: cast_nullable_to_non_nullable
-as bool,
+as bool,answers: null == answers ? _self._answers : answers // ignore: cast_nullable_to_non_nullable
+as Map<int, bool>,
   ));
 }
 
@@ -1005,7 +1013,7 @@ as String,
 
 
 class AnswerInProgress implements GameModuleLevelState {
-  const AnswerInProgress({required this.isCorrect, required this.explanation, required this.selectedAnswer, required this.correctAnswer, required this.question, required this.currentIndex, required final  List<GameModuleQuestionEntity> questions, required this.progress}): _questions = questions;
+  const AnswerInProgress({required this.isCorrect, required this.explanation, required this.selectedAnswer, required this.correctAnswer, required this.question, required this.currentIndex, required final  List<GameModuleQuestionEntity> questions, required this.progress, required final  Map<int, bool> answers}): _questions = questions,_answers = answers;
   
 
  final  bool isCorrect;
@@ -1022,6 +1030,13 @@ class AnswerInProgress implements GameModuleLevelState {
 }
 
  final  LevelProgressEntity? progress;
+ final  Map<int, bool> _answers;
+ Map<int, bool> get answers {
+  if (_answers is EqualUnmodifiableMapView) return _answers;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableMapView(_answers);
+}
+
 
 /// Create a copy of GameModuleLevelState
 /// with the given fields replaced by the non-null parameter values.
@@ -1033,16 +1048,16 @@ $AnswerInProgressCopyWith<AnswerInProgress> get copyWith => _$AnswerInProgressCo
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is AnswerInProgress&&(identical(other.isCorrect, isCorrect) || other.isCorrect == isCorrect)&&(identical(other.explanation, explanation) || other.explanation == explanation)&&(identical(other.selectedAnswer, selectedAnswer) || other.selectedAnswer == selectedAnswer)&&(identical(other.correctAnswer, correctAnswer) || other.correctAnswer == correctAnswer)&&(identical(other.question, question) || other.question == question)&&(identical(other.currentIndex, currentIndex) || other.currentIndex == currentIndex)&&const DeepCollectionEquality().equals(other._questions, _questions)&&(identical(other.progress, progress) || other.progress == progress));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is AnswerInProgress&&(identical(other.isCorrect, isCorrect) || other.isCorrect == isCorrect)&&(identical(other.explanation, explanation) || other.explanation == explanation)&&(identical(other.selectedAnswer, selectedAnswer) || other.selectedAnswer == selectedAnswer)&&(identical(other.correctAnswer, correctAnswer) || other.correctAnswer == correctAnswer)&&(identical(other.question, question) || other.question == question)&&(identical(other.currentIndex, currentIndex) || other.currentIndex == currentIndex)&&const DeepCollectionEquality().equals(other._questions, _questions)&&(identical(other.progress, progress) || other.progress == progress)&&const DeepCollectionEquality().equals(other._answers, _answers));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,isCorrect,explanation,selectedAnswer,correctAnswer,question,currentIndex,const DeepCollectionEquality().hash(_questions),progress);
+int get hashCode => Object.hash(runtimeType,isCorrect,explanation,selectedAnswer,correctAnswer,question,currentIndex,const DeepCollectionEquality().hash(_questions),progress,const DeepCollectionEquality().hash(_answers));
 
 @override
 String toString() {
-  return 'GameModuleLevelState.answerInProgress(isCorrect: $isCorrect, explanation: $explanation, selectedAnswer: $selectedAnswer, correctAnswer: $correctAnswer, question: $question, currentIndex: $currentIndex, questions: $questions, progress: $progress)';
+  return 'GameModuleLevelState.answerInProgress(isCorrect: $isCorrect, explanation: $explanation, selectedAnswer: $selectedAnswer, correctAnswer: $correctAnswer, question: $question, currentIndex: $currentIndex, questions: $questions, progress: $progress, answers: $answers)';
 }
 
 
@@ -1053,7 +1068,7 @@ abstract mixin class $AnswerInProgressCopyWith<$Res> implements $GameModuleLevel
   factory $AnswerInProgressCopyWith(AnswerInProgress value, $Res Function(AnswerInProgress) _then) = _$AnswerInProgressCopyWithImpl;
 @useResult
 $Res call({
- bool isCorrect, String explanation, String selectedAnswer, String correctAnswer, GameModuleQuestionEntity question, int currentIndex, List<GameModuleQuestionEntity> questions, LevelProgressEntity? progress
+ bool isCorrect, String explanation, String selectedAnswer, String correctAnswer, GameModuleQuestionEntity question, int currentIndex, List<GameModuleQuestionEntity> questions, LevelProgressEntity? progress, Map<int, bool> answers
 });
 
 
@@ -1070,7 +1085,7 @@ class _$AnswerInProgressCopyWithImpl<$Res>
 
 /// Create a copy of GameModuleLevelState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') $Res call({Object? isCorrect = null,Object? explanation = null,Object? selectedAnswer = null,Object? correctAnswer = null,Object? question = null,Object? currentIndex = null,Object? questions = null,Object? progress = freezed,}) {
+@pragma('vm:prefer-inline') $Res call({Object? isCorrect = null,Object? explanation = null,Object? selectedAnswer = null,Object? correctAnswer = null,Object? question = null,Object? currentIndex = null,Object? questions = null,Object? progress = freezed,Object? answers = null,}) {
   return _then(AnswerInProgress(
 isCorrect: null == isCorrect ? _self.isCorrect : isCorrect // ignore: cast_nullable_to_non_nullable
 as bool,explanation: null == explanation ? _self.explanation : explanation // ignore: cast_nullable_to_non_nullable
@@ -1080,7 +1095,8 @@ as String,question: null == question ? _self.question : question // ignore: cast
 as GameModuleQuestionEntity,currentIndex: null == currentIndex ? _self.currentIndex : currentIndex // ignore: cast_nullable_to_non_nullable
 as int,questions: null == questions ? _self._questions : questions // ignore: cast_nullable_to_non_nullable
 as List<GameModuleQuestionEntity>,progress: freezed == progress ? _self.progress : progress // ignore: cast_nullable_to_non_nullable
-as LevelProgressEntity?,
+as LevelProgressEntity?,answers: null == answers ? _self._answers : answers // ignore: cast_nullable_to_non_nullable
+as Map<int, bool>,
   ));
 }
 
@@ -1112,32 +1128,70 @@ $LevelProgressEntityCopyWith<$Res>? get progress {
 
 
 class LevelCompleted implements GameModuleLevelState {
-  const LevelCompleted();
+  const LevelCompleted({required this.correctAnswers, required this.totalQuestions, required this.stars});
   
 
+ final  int correctAnswers;
+ final  int totalQuestions;
+ final  int stars;
 
-
+/// Create a copy of GameModuleLevelState
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$LevelCompletedCopyWith<LevelCompleted> get copyWith => _$LevelCompletedCopyWithImpl<LevelCompleted>(this, _$identity);
 
 
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is LevelCompleted);
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is LevelCompleted&&(identical(other.correctAnswers, correctAnswers) || other.correctAnswers == correctAnswers)&&(identical(other.totalQuestions, totalQuestions) || other.totalQuestions == totalQuestions)&&(identical(other.stars, stars) || other.stars == stars));
 }
 
 
 @override
-int get hashCode => runtimeType.hashCode;
+int get hashCode => Object.hash(runtimeType,correctAnswers,totalQuestions,stars);
 
 @override
 String toString() {
-  return 'GameModuleLevelState.levelCompleted()';
+  return 'GameModuleLevelState.levelCompleted(correctAnswers: $correctAnswers, totalQuestions: $totalQuestions, stars: $stars)';
 }
 
 
 }
 
+/// @nodoc
+abstract mixin class $LevelCompletedCopyWith<$Res> implements $GameModuleLevelStateCopyWith<$Res> {
+  factory $LevelCompletedCopyWith(LevelCompleted value, $Res Function(LevelCompleted) _then) = _$LevelCompletedCopyWithImpl;
+@useResult
+$Res call({
+ int correctAnswers, int totalQuestions, int stars
+});
 
 
+
+
+}
+/// @nodoc
+class _$LevelCompletedCopyWithImpl<$Res>
+    implements $LevelCompletedCopyWith<$Res> {
+  _$LevelCompletedCopyWithImpl(this._self, this._then);
+
+  final LevelCompleted _self;
+  final $Res Function(LevelCompleted) _then;
+
+/// Create a copy of GameModuleLevelState
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? correctAnswers = null,Object? totalQuestions = null,Object? stars = null,}) {
+  return _then(LevelCompleted(
+correctAnswers: null == correctAnswers ? _self.correctAnswers : correctAnswers // ignore: cast_nullable_to_non_nullable
+as int,totalQuestions: null == totalQuestions ? _self.totalQuestions : totalQuestions // ignore: cast_nullable_to_non_nullable
+as int,stars: null == stars ? _self.stars : stars // ignore: cast_nullable_to_non_nullable
+as int,
+  ));
+}
+
+
+}
 
 // dart format on

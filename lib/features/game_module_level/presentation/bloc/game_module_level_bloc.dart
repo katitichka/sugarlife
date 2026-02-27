@@ -68,6 +68,7 @@ class GameModuleLevelBloc
           currentIndex: -1,
           progress: progressResult,
           isAnswered: false,
+          answers: {},
         ),
       );
     } catch (e) {
@@ -83,7 +84,12 @@ class GameModuleLevelBloc
     final successState = state as ReceiveSuccess;
     final currentQuestion = successState.questions[successState.currentIndex];
     final isCorrect = currentQuestion.isAnswerCorrect(answer);
-    emit(successState.copyWith(isAnswered: true));
+    final newAnswers = Map<int, bool>.from(successState.answers);
+    newAnswers[successState.currentIndex] = isCorrect;
+    emit(successState.copyWith(
+      isAnswered: true,
+      answers: newAnswers,
+    ));
     emit(
       AnswerInProgress(
         isCorrect: isCorrect,
@@ -94,6 +100,7 @@ class GameModuleLevelBloc
         currentIndex: successState.currentIndex,
         questions: successState.questions,
         progress: successState.progress,
+        answers: newAnswers,
       ),
     );
   }
@@ -107,7 +114,12 @@ class GameModuleLevelBloc
     final currentQuestion = successState.questions[successState.currentIndex];
     final isCorrect = currentQuestion.isAnswerCorrect(answer);
     final answerAsString = answer ? 'true' : 'false';
-    emit(successState.copyWith(isAnswered: true));
+    final newAnswers = Map<int, bool>.from(successState.answers);
+    newAnswers[successState.currentIndex] = isCorrect;
+    emit(successState.copyWith(
+      isAnswered: true,
+      answers: newAnswers,
+    ));
     emit(
       AnswerInProgress(
         isCorrect: isCorrect,
@@ -118,6 +130,7 @@ class GameModuleLevelBloc
         currentIndex: successState.currentIndex,
         questions: successState.questions,
         progress: successState.progress,
+        answers: newAnswers,
       ),
     );
   }
@@ -130,7 +143,12 @@ class GameModuleLevelBloc
     final successState = state as ReceiveSuccess;
     final currentQuestion = successState.questions[successState.currentIndex];
     final isCorrect = currentQuestion.isAnswerCorrect(answer);
-    emit(successState.copyWith(isAnswered: true));
+    final newAnswers = Map<int, bool>.from(successState.answers);
+    newAnswers[successState.currentIndex] = isCorrect;
+    emit(successState.copyWith(
+      isAnswered: true,
+      answers: newAnswers,
+    ));
     emit(
       AnswerInProgress(
         isCorrect: isCorrect,
@@ -141,41 +159,68 @@ class GameModuleLevelBloc
         currentIndex: successState.currentIndex,
         questions: successState.questions,
         progress: successState.progress,
+        answers: newAnswers,
       ),
     );
   }
 
   Future<void> _nextQuestions({
-  required Emitter<GameModuleLevelState> emit,
-}) async {
-  int currentIndex;
-  List<GameModuleQuestionEntity> questions;
-  LevelProgressEntity? progress;
+    required Emitter<GameModuleLevelState> emit,
+  }) async {
+    int currentIndex;
+    List<GameModuleQuestionEntity> questions;
+    LevelProgressEntity? progress;
+    Map<int, bool> answers;
 
-  if (state is ReceiveSuccess) {
-    currentIndex = (state as ReceiveSuccess).currentIndex;
-    questions = (state as ReceiveSuccess).questions;
-    progress = (state as ReceiveSuccess).progress;
-  } else if (state is AnswerInProgress) {
-    currentIndex = (state as AnswerInProgress).currentIndex;
-    questions = (state as AnswerInProgress).questions;
-    progress = (state as AnswerInProgress).progress;
-  } else {
-    return;
-  }
+    if (state is ReceiveSuccess) {
+      currentIndex = (state as ReceiveSuccess).currentIndex;
+      questions = (state as ReceiveSuccess).questions;
+      progress = (state as ReceiveSuccess).progress;
+      answers = (state as ReceiveSuccess).answers;
+    } else if (state is AnswerInProgress) {
+      currentIndex = (state as AnswerInProgress).currentIndex;
+      questions = (state as AnswerInProgress).questions;
+      progress = (state as AnswerInProgress).progress;
+      answers = (state as AnswerInProgress).answers;
+    } else {
+      return;
+    }
 
-  final nextIndex = currentIndex + 1;
-  if (nextIndex < questions.length) {
-    emit(ReceiveSuccess(
-      questions: questions,
-      currentIndex: nextIndex,
-      progress: progress,
-      isAnswered: false,
-    ));
-  } else {
-    emit(LevelCompleted());
+    final nextIndex = currentIndex + 1;
+    if (nextIndex < questions.length) {
+      emit(
+        ReceiveSuccess(
+          questions: questions,
+          currentIndex: nextIndex,
+          progress: progress,
+          isAnswered: false,
+          answers: answers,
+        ),
+      );
+    } else {
+      final correctCount = answers.values.where((correct) => correct).length;
+      int stars;
+      if (correctCount >= 3)
+        stars = 3;
+      else if (correctCount == 2)
+        stars = 2;
+      else if (correctCount == 1)
+        stars = 1;
+      else
+        stars = 0;
+      await _levelProgressRepository.saveLevelProgress(
+        levelId: questions.first.levelId,
+        stars: stars,
+      );
+      emit(
+        LevelCompleted(
+          correctAnswers: correctCount,
+          totalQuestions: questions.length,
+          stars: stars,
+        ),
+      );
+    }
   }
-}
 
   Future<void> _retryLevel({
     required Emitter<GameModuleLevelState> emit,
@@ -199,6 +244,7 @@ class GameModuleLevelBloc
         currentIndex: 0,
         progress: currentState.progress,
         isAnswered: false,
+        answers: {},
       ),
     );
   }
