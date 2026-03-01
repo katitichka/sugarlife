@@ -14,7 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$LevelProgressEntity {
 
- int get levelId; bool get isCompleted; int? get stars; DateTime? get lastPlayedAt;
+ int get levelId; bool get isCompleted; int? get stars; DateTime? get lastPlayedAt; int get correctAnswers;
 /// Create a copy of LevelProgressEntity
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +25,16 @@ $LevelProgressEntityCopyWith<LevelProgressEntity> get copyWith => _$LevelProgres
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is LevelProgressEntity&&(identical(other.levelId, levelId) || other.levelId == levelId)&&(identical(other.isCompleted, isCompleted) || other.isCompleted == isCompleted)&&(identical(other.stars, stars) || other.stars == stars)&&(identical(other.lastPlayedAt, lastPlayedAt) || other.lastPlayedAt == lastPlayedAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is LevelProgressEntity&&(identical(other.levelId, levelId) || other.levelId == levelId)&&(identical(other.isCompleted, isCompleted) || other.isCompleted == isCompleted)&&(identical(other.stars, stars) || other.stars == stars)&&(identical(other.lastPlayedAt, lastPlayedAt) || other.lastPlayedAt == lastPlayedAt)&&(identical(other.correctAnswers, correctAnswers) || other.correctAnswers == correctAnswers));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,levelId,isCompleted,stars,lastPlayedAt);
+int get hashCode => Object.hash(runtimeType,levelId,isCompleted,stars,lastPlayedAt,correctAnswers);
 
 @override
 String toString() {
-  return 'LevelProgressEntity(levelId: $levelId, isCompleted: $isCompleted, stars: $stars, lastPlayedAt: $lastPlayedAt)';
+  return 'LevelProgressEntity(levelId: $levelId, isCompleted: $isCompleted, stars: $stars, lastPlayedAt: $lastPlayedAt, correctAnswers: $correctAnswers)';
 }
 
 
@@ -45,7 +45,7 @@ abstract mixin class $LevelProgressEntityCopyWith<$Res>  {
   factory $LevelProgressEntityCopyWith(LevelProgressEntity value, $Res Function(LevelProgressEntity) _then) = _$LevelProgressEntityCopyWithImpl;
 @useResult
 $Res call({
- int levelId, bool isCompleted, int? stars, DateTime? lastPlayedAt
+ int levelId, bool isCompleted, int? stars, DateTime? lastPlayedAt, int correctAnswers
 });
 
 
@@ -62,13 +62,14 @@ class _$LevelProgressEntityCopyWithImpl<$Res>
 
 /// Create a copy of LevelProgressEntity
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? levelId = null,Object? isCompleted = null,Object? stars = freezed,Object? lastPlayedAt = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? levelId = null,Object? isCompleted = null,Object? stars = freezed,Object? lastPlayedAt = freezed,Object? correctAnswers = null,}) {
   return _then(_self.copyWith(
 levelId: null == levelId ? _self.levelId : levelId // ignore: cast_nullable_to_non_nullable
 as int,isCompleted: null == isCompleted ? _self.isCompleted : isCompleted // ignore: cast_nullable_to_non_nullable
 as bool,stars: freezed == stars ? _self.stars : stars // ignore: cast_nullable_to_non_nullable
 as int?,lastPlayedAt: freezed == lastPlayedAt ? _self.lastPlayedAt : lastPlayedAt // ignore: cast_nullable_to_non_nullable
-as DateTime?,
+as DateTime?,correctAnswers: null == correctAnswers ? _self.correctAnswers : correctAnswers // ignore: cast_nullable_to_non_nullable
+as int,
   ));
 }
 
@@ -150,10 +151,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int levelId,  bool isCompleted,  int? stars,  DateTime? lastPlayedAt)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int levelId,  bool isCompleted,  int? stars,  DateTime? lastPlayedAt,  int correctAnswers)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _LevelProgressEntity() when $default != null:
-return $default(_that.levelId,_that.isCompleted,_that.stars,_that.lastPlayedAt);case _:
+return $default(_that.levelId,_that.isCompleted,_that.stars,_that.lastPlayedAt,_that.correctAnswers);case _:
   return orElse();
 
 }
@@ -171,10 +172,10 @@ return $default(_that.levelId,_that.isCompleted,_that.stars,_that.lastPlayedAt);
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int levelId,  bool isCompleted,  int? stars,  DateTime? lastPlayedAt)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int levelId,  bool isCompleted,  int? stars,  DateTime? lastPlayedAt,  int correctAnswers)  $default,) {final _that = this;
 switch (_that) {
 case _LevelProgressEntity():
-return $default(_that.levelId,_that.isCompleted,_that.stars,_that.lastPlayedAt);}
+return $default(_that.levelId,_that.isCompleted,_that.stars,_that.lastPlayedAt,_that.correctAnswers);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -188,10 +189,10 @@ return $default(_that.levelId,_that.isCompleted,_that.stars,_that.lastPlayedAt);
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int levelId,  bool isCompleted,  int? stars,  DateTime? lastPlayedAt)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int levelId,  bool isCompleted,  int? stars,  DateTime? lastPlayedAt,  int correctAnswers)?  $default,) {final _that = this;
 switch (_that) {
 case _LevelProgressEntity() when $default != null:
-return $default(_that.levelId,_that.isCompleted,_that.stars,_that.lastPlayedAt);case _:
+return $default(_that.levelId,_that.isCompleted,_that.stars,_that.lastPlayedAt,_that.correctAnswers);case _:
   return null;
 
 }
@@ -203,13 +204,14 @@ return $default(_that.levelId,_that.isCompleted,_that.stars,_that.lastPlayedAt);
 
 
 class _LevelProgressEntity implements LevelProgressEntity {
-  const _LevelProgressEntity({required this.levelId, required this.isCompleted, required this.stars, required this.lastPlayedAt});
+  const _LevelProgressEntity({required this.levelId, required this.isCompleted, required this.stars, required this.lastPlayedAt, required this.correctAnswers});
   
 
 @override final  int levelId;
 @override final  bool isCompleted;
 @override final  int? stars;
 @override final  DateTime? lastPlayedAt;
+@override final  int correctAnswers;
 
 /// Create a copy of LevelProgressEntity
 /// with the given fields replaced by the non-null parameter values.
@@ -221,16 +223,16 @@ _$LevelProgressEntityCopyWith<_LevelProgressEntity> get copyWith => __$LevelProg
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _LevelProgressEntity&&(identical(other.levelId, levelId) || other.levelId == levelId)&&(identical(other.isCompleted, isCompleted) || other.isCompleted == isCompleted)&&(identical(other.stars, stars) || other.stars == stars)&&(identical(other.lastPlayedAt, lastPlayedAt) || other.lastPlayedAt == lastPlayedAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _LevelProgressEntity&&(identical(other.levelId, levelId) || other.levelId == levelId)&&(identical(other.isCompleted, isCompleted) || other.isCompleted == isCompleted)&&(identical(other.stars, stars) || other.stars == stars)&&(identical(other.lastPlayedAt, lastPlayedAt) || other.lastPlayedAt == lastPlayedAt)&&(identical(other.correctAnswers, correctAnswers) || other.correctAnswers == correctAnswers));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,levelId,isCompleted,stars,lastPlayedAt);
+int get hashCode => Object.hash(runtimeType,levelId,isCompleted,stars,lastPlayedAt,correctAnswers);
 
 @override
 String toString() {
-  return 'LevelProgressEntity(levelId: $levelId, isCompleted: $isCompleted, stars: $stars, lastPlayedAt: $lastPlayedAt)';
+  return 'LevelProgressEntity(levelId: $levelId, isCompleted: $isCompleted, stars: $stars, lastPlayedAt: $lastPlayedAt, correctAnswers: $correctAnswers)';
 }
 
 
@@ -241,7 +243,7 @@ abstract mixin class _$LevelProgressEntityCopyWith<$Res> implements $LevelProgre
   factory _$LevelProgressEntityCopyWith(_LevelProgressEntity value, $Res Function(_LevelProgressEntity) _then) = __$LevelProgressEntityCopyWithImpl;
 @override @useResult
 $Res call({
- int levelId, bool isCompleted, int? stars, DateTime? lastPlayedAt
+ int levelId, bool isCompleted, int? stars, DateTime? lastPlayedAt, int correctAnswers
 });
 
 
@@ -258,13 +260,14 @@ class __$LevelProgressEntityCopyWithImpl<$Res>
 
 /// Create a copy of LevelProgressEntity
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? levelId = null,Object? isCompleted = null,Object? stars = freezed,Object? lastPlayedAt = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? levelId = null,Object? isCompleted = null,Object? stars = freezed,Object? lastPlayedAt = freezed,Object? correctAnswers = null,}) {
   return _then(_LevelProgressEntity(
 levelId: null == levelId ? _self.levelId : levelId // ignore: cast_nullable_to_non_nullable
 as int,isCompleted: null == isCompleted ? _self.isCompleted : isCompleted // ignore: cast_nullable_to_non_nullable
 as bool,stars: freezed == stars ? _self.stars : stars // ignore: cast_nullable_to_non_nullable
 as int?,lastPlayedAt: freezed == lastPlayedAt ? _self.lastPlayedAt : lastPlayedAt // ignore: cast_nullable_to_non_nullable
-as DateTime?,
+as DateTime?,correctAnswers: null == correctAnswers ? _self.correctAnswers : correctAnswers // ignore: cast_nullable_to_non_nullable
+as int,
   ));
 }
 

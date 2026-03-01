@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sugarlife/core/theme/app_color.dart';
-
+/// Страница, открывающаяся после прохождения уровня, показывает результаты.
 class GameLevelResultPage extends StatelessWidget {
   final int correctAnswers;
   final int totalQuestions;

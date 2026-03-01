@@ -9,5 +9,6 @@ sealed class LevelProgressEntity with _$LevelProgressEntity{
     required bool isCompleted,
     required int? stars,
     required DateTime? lastPlayedAt,
+    required int correctAnswers,
   }) =_LevelProgressEntity;
 }

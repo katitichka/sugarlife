@@ -20,27 +20,40 @@ class GameLevelContentPage extends StatelessWidget {
           case ReceiveFailed(:final message):
             return _ErrorPage(message: message);
           case ReceiveSuccess():
-            if (state.currentIndex == -1) {
+            if (state.currentIndex == -1 &&
+                state.progress?.isCompleted == true && (state.progress?.stars ?? 0) > 0) {
+                  /// Уровень уже пройден - показывается страница прогресса
+              return GameLevelStartLevelPage(
+                levelId: levelId,
+              );
+            } else if (state.currentIndex == -1) {
+              // Уровень не начат или не пройден
               return GameLevelStartLevelPage(levelId: levelId);
             } else {
+              // Идёт прохождение
               return GameQuestionPage();
             }
           case AnswerInProgress():
             return GameQuestionPage();
-          case LevelCompleted(:final correctAnswers, :final totalQuestions, :final stars):
-             return GameLevelResultPage(
+          case LevelCompleted(
+            :final correctAnswers,
+            :final totalQuestions,
+            :final stars,
+          ):
+          /// Только что прошли уровень - показывается страница результатов
+            return GameLevelResultPage(
               correctAnswers: correctAnswers,
               totalQuestions: totalQuestions,
               stars: stars,
               onFinish: () {
-                  if (correctAnswers == 0) {
-                    // Перезапустить текущий уровень
-                    context.go('/game/level/$levelId');
-                  } else {
-                    // Перейти на главный экран
-                    context.go('/game');
-                  }
-                },
+                if (correctAnswers == 0) {
+                  // Перезапустить текущий уровень
+                  context.go('/game/level/$levelId');
+                } else {
+                  // Перейти на главный экран
+                  context.go('/game');
+                }
+              },
             );
           default:
             return const SizedBox.shrink();
@@ -81,14 +94,3 @@ class _ErrorPage extends StatelessWidget {
 //     );
 //   }
 // }
-
-
-// Завершение уровня (пока заглушка)
-class _CompletedPage extends StatelessWidget {
-  const _CompletedPage();
-
-  @override
-  Widget build(BuildContext context) {
-    return const Scaffold(body: Center(child: Text('Уровень пройден!')));
-  }
-}

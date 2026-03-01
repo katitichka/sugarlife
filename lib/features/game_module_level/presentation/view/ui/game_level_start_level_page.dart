@@ -36,8 +36,9 @@ class GameLevelStartLevelPage extends StatelessWidget {
             const SizedBox(height: 32),
             if (progress?.isCompleted ?? false) ...[
               Text(
-                'Лучший результат:',
+                'Последний результат:',
                 style: Theme.of(context).textTheme.titleMedium,
+                textAlign: TextAlign.center,
               ),
               const SizedBox(height: 6),
               Row(

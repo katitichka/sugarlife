@@ -211,6 +211,7 @@ class GameModuleLevelBloc
       await _levelProgressRepository.saveLevelProgress(
         levelId: questions.first.levelId,
         stars: stars,
+        correctAnswers: correctCount,
       );
       emit(
         LevelCompleted(
@@ -229,7 +230,8 @@ class GameModuleLevelBloc
     final successState = state as ReceiveSuccess;
     final levelId = successState.questions.first.levelId;
     final ageCategory = successState.questions.first.ageCategory;
-    _receiveGameLevel(emit: emit, levelId: levelId, ageCategory: ageCategory);
+    await _levelProgressRepository.resetLevelProgress(levelId);
+    await _receiveGameLevel(emit: emit, levelId: levelId, ageCategory: ageCategory);
   }
 
   Future<void> _startLevel({
