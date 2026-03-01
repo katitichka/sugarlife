@@ -1,8 +1,10 @@
 import 'package:bloc/bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:path/path.dart';
 import 'package:sugarlife/core/enum/age_category.dart';
 import 'package:sugarlife/features/game_module_level/domain/entities/game_module_question_entity.dart';
 import 'package:sugarlife/features/game_module_level/domain/repositories/game_module_level_repository.dart';
+import 'package:sugarlife/features/game_module_list/presentation/bloc/game_module_list_bloc.dart';
 import 'package:sugarlife/features/profile/domain/entities/level_progress_entity.dart';
 import 'package:sugarlife/features/profile/domain/repositories/level_progress_repository.dart';
 
@@ -14,11 +16,14 @@ class GameModuleLevelBloc
     extends Bloc<GameModuleLevelEvent, GameModuleLevelState> {
   final GameModuleLevelRepository _gameModuleLevelRepository;
   final LevelProgressRepository _levelProgressRepository;
+  final GameModuleListBloc _gameModuleListBloc;
   GameModuleLevelBloc({
     required GameModuleLevelRepository gameModuleLevelRepository,
     required LevelProgressRepository levelProgressRepository,
+    required GameModuleListBloc gameModuleListBloc,
   }) : _gameModuleLevelRepository = gameModuleLevelRepository,
        _levelProgressRepository = levelProgressRepository,
+       _gameModuleListBloc = gameModuleListBloc,
        super(const _Initial()) {
     on<GameModuleLevelEvent>(
       (event, emit) => switch (event) {
@@ -86,10 +91,7 @@ class GameModuleLevelBloc
     final isCorrect = currentQuestion.isAnswerCorrect(answer);
     final newAnswers = Map<int, bool>.from(successState.answers);
     newAnswers[successState.currentIndex] = isCorrect;
-    emit(successState.copyWith(
-      isAnswered: true,
-      answers: newAnswers,
-    ));
+    emit(successState.copyWith(isAnswered: true, answers: newAnswers));
     emit(
       AnswerInProgress(
         isCorrect: isCorrect,
@@ -116,10 +118,7 @@ class GameModuleLevelBloc
     final answerAsString = answer ? 'true' : 'false';
     final newAnswers = Map<int, bool>.from(successState.answers);
     newAnswers[successState.currentIndex] = isCorrect;
-    emit(successState.copyWith(
-      isAnswered: true,
-      answers: newAnswers,
-    ));
+    emit(successState.copyWith(isAnswered: true, answers: newAnswers));
     emit(
       AnswerInProgress(
         isCorrect: isCorrect,
@@ -145,10 +144,7 @@ class GameModuleLevelBloc
     final isCorrect = currentQuestion.isAnswerCorrect(answer);
     final newAnswers = Map<int, bool>.from(successState.answers);
     newAnswers[successState.currentIndex] = isCorrect;
-    emit(successState.copyWith(
-      isAnswered: true,
-      answers: newAnswers,
-    ));
+    emit(successState.copyWith(isAnswered: true, answers: newAnswers));
     emit(
       AnswerInProgress(
         isCorrect: isCorrect,
@@ -213,8 +209,17 @@ class GameModuleLevelBloc
         stars: stars,
         correctAnswers: correctCount,
       );
+      _gameModuleListBloc.add(
+  GameModuleListEvent.levelCompleted(
+    levelId: questions.first.levelId,
+    stars: stars,
+    correctAnswers: correctCount,
+    totalQuestions: questions.length,
+  )
+);
       emit(
         LevelCompleted(
+          levelId: questions.first.levelId,
           correctAnswers: correctCount,
           totalQuestions: questions.length,
           stars: stars,
@@ -231,7 +236,11 @@ class GameModuleLevelBloc
     final levelId = successState.questions.first.levelId;
     final ageCategory = successState.questions.first.ageCategory;
     await _levelProgressRepository.resetLevelProgress(levelId);
-    await _receiveGameLevel(emit: emit, levelId: levelId, ageCategory: ageCategory);
+    await _receiveGameLevel(
+      emit: emit,
+      levelId: levelId,
+      ageCategory: ageCategory,
+    );
   }
 
   Future<void> _startLevel({

@@ -2,7 +2,12 @@ import 'package:sugarlife/features/profile/domain/entities/level_progress_entity
 
 abstract interface class LevelProgressRepository {
   Future<LevelProgressEntity?> getLevelProgress({required int levelId});
-  Future<void> saveLevelProgress({required int levelId, required int stars, required int correctAnswers});
+  Future<void> saveLevelProgress({
+    required int levelId,
+    required int stars,
+    required int correctAnswers,
+  });
   Future<bool> isLevelCompleted(int levelId);
   Future<void> resetLevelProgress(int levelId);
+  Future<Map<int, LevelProgressEntity>> getAllLevelsProgress();
 }

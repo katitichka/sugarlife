@@ -27,6 +27,7 @@ sealed class GameModuleLevelState with _$GameModuleLevelState {
     required Map<int,bool> answers,
   }) = AnswerInProgress;
   const factory GameModuleLevelState.levelCompleted({
+    required int levelId,
     required int correctAnswers,
     required int totalQuestions,
     required int stars,

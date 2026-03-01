@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sugarlife/features/game_module_level/presentation/bloc/game_module_level_bloc.dart';
+import 'package:sugarlife/features/game_module_level/presentation/bloc/game_module_level_bloc.dart'
+    as level;
 import 'package:sugarlife/features/game_module_level/presentation/view/ui/game_level_result_page.dart';
 import 'package:sugarlife/features/game_module_level/presentation/view/ui/game_level_start_level_page.dart';
 import 'package:sugarlife/features/game_module_level/presentation/view/ui/game_question_page.dart';
+import 'package:sugarlife/features/game_module_list/presentation/bloc/game_module_list_bloc.dart';
 
 class GameLevelContentPage extends StatelessWidget {
   final int levelId;
@@ -12,46 +15,38 @@ class GameLevelContentPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<GameModuleLevelBloc, GameModuleLevelState>(
+    return BlocBuilder<level.GameModuleLevelBloc, level.GameModuleLevelState>(
       builder: (context, state) {
         switch (state) {
-          case ReceiveInProgress():
+          case level.ReceiveInProgress():
             return const _LoadingPage();
-          case ReceiveFailed(:final message):
+          case level.ReceiveFailed(:final message):
             return _ErrorPage(message: message);
-          case ReceiveSuccess():
-            if (state.currentIndex == -1 &&
-                state.progress?.isCompleted == true && (state.progress?.stars ?? 0) > 0) {
-                  /// Уровень уже пройден - показывается страница прогресса
-              return GameLevelStartLevelPage(
-                levelId: levelId,
-              );
-            } else if (state.currentIndex == -1) {
-              // Уровень не начат или не пройден
+          case level.ReceiveSuccess():
+            final successState = state as level.ReceiveSuccess;
+            if (successState.currentIndex == -1
+            // && successState.progress?.isCompleted == true
+            ) {
               return GameLevelStartLevelPage(levelId: levelId);
             } else {
-              // Идёт прохождение
               return GameQuestionPage();
             }
-          case AnswerInProgress():
+          case level.AnswerInProgress():
             return GameQuestionPage();
-          case LevelCompleted(
+          case level.LevelCompleted(
             :final correctAnswers,
             :final totalQuestions,
             :final stars,
           ):
-          /// Только что прошли уровень - показывается страница результатов
             return GameLevelResultPage(
               correctAnswers: correctAnswers,
               totalQuestions: totalQuestions,
               stars: stars,
               onFinish: () {
                 if (correctAnswers == 0) {
-                  // Перезапустить текущий уровень
                   context.go('/game/level/$levelId');
                 } else {
-                  // Перейти на главный экран
-                  context.go('/game');
+                  context.pop(true);
                 }
               },
             );
@@ -81,16 +76,3 @@ class _ErrorPage extends StatelessWidget {
     return Scaffold(body: Center(child: Text('Ошибка: $message')));
   }
 }
-
-// class _StartPage extends StatelessWidget {
-//   const _StartPage();
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return const Scaffold(
-//       body: Center(
-//         child: Text('Стартовый экран'),
-//       ),
-//     );
-//   }
-// }

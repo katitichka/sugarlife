@@ -55,11 +55,12 @@ extension GameModuleListEventPatterns on GameModuleListEvent {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( _Receive value)?  receive,required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( _Receive value)?  receive,TResult Function( _LevelCompleted value)?  levelCompleted,required TResult orElse(),}){
 final _that = this;
 switch (_that) {
 case _Receive() when receive != null:
-return receive(_that);case _:
+return receive(_that);case _LevelCompleted() when levelCompleted != null:
+return levelCompleted(_that);case _:
   return orElse();
 
 }
@@ -77,11 +78,12 @@ return receive(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( _Receive value)  receive,}){
+@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( _Receive value)  receive,required TResult Function( _LevelCompleted value)  levelCompleted,}){
 final _that = this;
 switch (_that) {
 case _Receive():
-return receive(_that);}
+return receive(_that);case _LevelCompleted():
+return levelCompleted(_that);}
 }
 /// A variant of `map` that fallback to returning `null`.
 ///
@@ -95,11 +97,12 @@ return receive(_that);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( _Receive value)?  receive,}){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( _Receive value)?  receive,TResult? Function( _LevelCompleted value)?  levelCompleted,}){
 final _that = this;
 switch (_that) {
 case _Receive() when receive != null:
-return receive(_that);case _:
+return receive(_that);case _LevelCompleted() when levelCompleted != null:
+return levelCompleted(_that);case _:
   return null;
 
 }
@@ -116,10 +119,11 @@ return receive(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  receive,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  receive,TResult Function( int levelId,  int stars,  int correctAnswers,  int totalQuestions)?  levelCompleted,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Receive() when receive != null:
-return receive();case _:
+return receive();case _LevelCompleted() when levelCompleted != null:
+return levelCompleted(_that.levelId,_that.stars,_that.correctAnswers,_that.totalQuestions);case _:
   return orElse();
 
 }
@@ -137,10 +141,11 @@ return receive();case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  receive,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  receive,required TResult Function( int levelId,  int stars,  int correctAnswers,  int totalQuestions)  levelCompleted,}) {final _that = this;
 switch (_that) {
 case _Receive():
-return receive();}
+return receive();case _LevelCompleted():
+return levelCompleted(_that.levelId,_that.stars,_that.correctAnswers,_that.totalQuestions);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -154,10 +159,11 @@ return receive();}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  receive,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  receive,TResult? Function( int levelId,  int stars,  int correctAnswers,  int totalQuestions)?  levelCompleted,}) {final _that = this;
 switch (_that) {
 case _Receive() when receive != null:
-return receive();case _:
+return receive();case _LevelCompleted() when levelCompleted != null:
+return levelCompleted(_that.levelId,_that.stars,_that.correctAnswers,_that.totalQuestions);case _:
   return null;
 
 }
@@ -196,6 +202,78 @@ String toString() {
 
 
 
+
+/// @nodoc
+
+
+class _LevelCompleted implements GameModuleListEvent {
+  const _LevelCompleted({required this.levelId, required this.stars, required this.correctAnswers, required this.totalQuestions});
+  
+
+ final  int levelId;
+ final  int stars;
+ final  int correctAnswers;
+ final  int totalQuestions;
+
+/// Create a copy of GameModuleListEvent
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$LevelCompletedCopyWith<_LevelCompleted> get copyWith => __$LevelCompletedCopyWithImpl<_LevelCompleted>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _LevelCompleted&&(identical(other.levelId, levelId) || other.levelId == levelId)&&(identical(other.stars, stars) || other.stars == stars)&&(identical(other.correctAnswers, correctAnswers) || other.correctAnswers == correctAnswers)&&(identical(other.totalQuestions, totalQuestions) || other.totalQuestions == totalQuestions));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,levelId,stars,correctAnswers,totalQuestions);
+
+@override
+String toString() {
+  return 'GameModuleListEvent.levelCompleted(levelId: $levelId, stars: $stars, correctAnswers: $correctAnswers, totalQuestions: $totalQuestions)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$LevelCompletedCopyWith<$Res> implements $GameModuleListEventCopyWith<$Res> {
+  factory _$LevelCompletedCopyWith(_LevelCompleted value, $Res Function(_LevelCompleted) _then) = __$LevelCompletedCopyWithImpl;
+@useResult
+$Res call({
+ int levelId, int stars, int correctAnswers, int totalQuestions
+});
+
+
+
+
+}
+/// @nodoc
+class __$LevelCompletedCopyWithImpl<$Res>
+    implements _$LevelCompletedCopyWith<$Res> {
+  __$LevelCompletedCopyWithImpl(this._self, this._then);
+
+  final _LevelCompleted _self;
+  final $Res Function(_LevelCompleted) _then;
+
+/// Create a copy of GameModuleListEvent
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? levelId = null,Object? stars = null,Object? correctAnswers = null,Object? totalQuestions = null,}) {
+  return _then(_LevelCompleted(
+levelId: null == levelId ? _self.levelId : levelId // ignore: cast_nullable_to_non_nullable
+as int,stars: null == stars ? _self.stars : stars // ignore: cast_nullable_to_non_nullable
+as int,correctAnswers: null == correctAnswers ? _self.correctAnswers : correctAnswers // ignore: cast_nullable_to_non_nullable
+as int,totalQuestions: null == totalQuestions ? _self.totalQuestions : totalQuestions // ignore: cast_nullable_to_non_nullable
+as int,
+  ));
+}
+
+
+}
 
 /// @nodoc
 mixin _$GameModuleListState {
@@ -241,14 +319,15 @@ extension GameModuleListStatePatterns on GameModuleListState {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( _Initial value)?  initial,TResult Function( ReceiveInProgress value)?  receiveInProgress,TResult Function( ReceiveSuccess value)?  receiveSuccess,TResult Function( ReceiveFailed value)?  receiveFailed,required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( _Initial value)?  initial,TResult Function( ReceiveInProgress value)?  receiveInProgress,TResult Function( ReceiveSuccess value)?  receiveSuccess,TResult Function( ReceiveFailed value)?  receiveFailed,TResult Function( LevelJustCompleted value)?  levelJustCompleted,required TResult orElse(),}){
 final _that = this;
 switch (_that) {
 case _Initial() when initial != null:
 return initial(_that);case ReceiveInProgress() when receiveInProgress != null:
 return receiveInProgress(_that);case ReceiveSuccess() when receiveSuccess != null:
 return receiveSuccess(_that);case ReceiveFailed() when receiveFailed != null:
-return receiveFailed(_that);case _:
+return receiveFailed(_that);case LevelJustCompleted() when levelJustCompleted != null:
+return levelJustCompleted(_that);case _:
   return orElse();
 
 }
@@ -266,14 +345,15 @@ return receiveFailed(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( _Initial value)  initial,required TResult Function( ReceiveInProgress value)  receiveInProgress,required TResult Function( ReceiveSuccess value)  receiveSuccess,required TResult Function( ReceiveFailed value)  receiveFailed,}){
+@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( _Initial value)  initial,required TResult Function( ReceiveInProgress value)  receiveInProgress,required TResult Function( ReceiveSuccess value)  receiveSuccess,required TResult Function( ReceiveFailed value)  receiveFailed,required TResult Function( LevelJustCompleted value)  levelJustCompleted,}){
 final _that = this;
 switch (_that) {
 case _Initial():
 return initial(_that);case ReceiveInProgress():
 return receiveInProgress(_that);case ReceiveSuccess():
 return receiveSuccess(_that);case ReceiveFailed():
-return receiveFailed(_that);}
+return receiveFailed(_that);case LevelJustCompleted():
+return levelJustCompleted(_that);}
 }
 /// A variant of `map` that fallback to returning `null`.
 ///
@@ -287,14 +367,15 @@ return receiveFailed(_that);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( _Initial value)?  initial,TResult? Function( ReceiveInProgress value)?  receiveInProgress,TResult? Function( ReceiveSuccess value)?  receiveSuccess,TResult? Function( ReceiveFailed value)?  receiveFailed,}){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( _Initial value)?  initial,TResult? Function( ReceiveInProgress value)?  receiveInProgress,TResult? Function( ReceiveSuccess value)?  receiveSuccess,TResult? Function( ReceiveFailed value)?  receiveFailed,TResult? Function( LevelJustCompleted value)?  levelJustCompleted,}){
 final _that = this;
 switch (_that) {
 case _Initial() when initial != null:
 return initial(_that);case ReceiveInProgress() when receiveInProgress != null:
 return receiveInProgress(_that);case ReceiveSuccess() when receiveSuccess != null:
 return receiveSuccess(_that);case ReceiveFailed() when receiveFailed != null:
-return receiveFailed(_that);case _:
+return receiveFailed(_that);case LevelJustCompleted() when levelJustCompleted != null:
+return levelJustCompleted(_that);case _:
   return null;
 
 }
@@ -311,13 +392,14 @@ return receiveFailed(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  initial,TResult Function( String message)?  receiveInProgress,TResult Function( List<GameModuleListEntity> levels)?  receiveSuccess,TResult Function( String message)?  receiveFailed,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  initial,TResult Function( String message)?  receiveInProgress,TResult Function( List<GameModuleListEntity> levels,  Map<int, LevelProgressEntity> progressMap)?  receiveSuccess,TResult Function( String message)?  receiveFailed,TResult Function( int levelId,  int stars,  int correctAnswers,  int totalQuestions)?  levelJustCompleted,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Initial() when initial != null:
 return initial();case ReceiveInProgress() when receiveInProgress != null:
 return receiveInProgress(_that.message);case ReceiveSuccess() when receiveSuccess != null:
-return receiveSuccess(_that.levels);case ReceiveFailed() when receiveFailed != null:
-return receiveFailed(_that.message);case _:
+return receiveSuccess(_that.levels,_that.progressMap);case ReceiveFailed() when receiveFailed != null:
+return receiveFailed(_that.message);case LevelJustCompleted() when levelJustCompleted != null:
+return levelJustCompleted(_that.levelId,_that.stars,_that.correctAnswers,_that.totalQuestions);case _:
   return orElse();
 
 }
@@ -335,13 +417,14 @@ return receiveFailed(_that.message);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  initial,required TResult Function( String message)  receiveInProgress,required TResult Function( List<GameModuleListEntity> levels)  receiveSuccess,required TResult Function( String message)  receiveFailed,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  initial,required TResult Function( String message)  receiveInProgress,required TResult Function( List<GameModuleListEntity> levels,  Map<int, LevelProgressEntity> progressMap)  receiveSuccess,required TResult Function( String message)  receiveFailed,required TResult Function( int levelId,  int stars,  int correctAnswers,  int totalQuestions)  levelJustCompleted,}) {final _that = this;
 switch (_that) {
 case _Initial():
 return initial();case ReceiveInProgress():
 return receiveInProgress(_that.message);case ReceiveSuccess():
-return receiveSuccess(_that.levels);case ReceiveFailed():
-return receiveFailed(_that.message);}
+return receiveSuccess(_that.levels,_that.progressMap);case ReceiveFailed():
+return receiveFailed(_that.message);case LevelJustCompleted():
+return levelJustCompleted(_that.levelId,_that.stars,_that.correctAnswers,_that.totalQuestions);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -355,13 +438,14 @@ return receiveFailed(_that.message);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  initial,TResult? Function( String message)?  receiveInProgress,TResult? Function( List<GameModuleListEntity> levels)?  receiveSuccess,TResult? Function( String message)?  receiveFailed,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  initial,TResult? Function( String message)?  receiveInProgress,TResult? Function( List<GameModuleListEntity> levels,  Map<int, LevelProgressEntity> progressMap)?  receiveSuccess,TResult? Function( String message)?  receiveFailed,TResult? Function( int levelId,  int stars,  int correctAnswers,  int totalQuestions)?  levelJustCompleted,}) {final _that = this;
 switch (_that) {
 case _Initial() when initial != null:
 return initial();case ReceiveInProgress() when receiveInProgress != null:
 return receiveInProgress(_that.message);case ReceiveSuccess() when receiveSuccess != null:
-return receiveSuccess(_that.levels);case ReceiveFailed() when receiveFailed != null:
-return receiveFailed(_that.message);case _:
+return receiveSuccess(_that.levels,_that.progressMap);case ReceiveFailed() when receiveFailed != null:
+return receiveFailed(_that.message);case LevelJustCompleted() when levelJustCompleted != null:
+return levelJustCompleted(_that.levelId,_that.stars,_that.correctAnswers,_that.totalQuestions);case _:
   return null;
 
 }
@@ -471,7 +555,7 @@ as String,
 
 
 class ReceiveSuccess implements GameModuleListState {
-  const ReceiveSuccess({required final  List<GameModuleListEntity> levels}): _levels = levels;
+  const ReceiveSuccess({required final  List<GameModuleListEntity> levels, required final  Map<int, LevelProgressEntity> progressMap}): _levels = levels,_progressMap = progressMap;
   
 
  final  List<GameModuleListEntity> _levels;
@@ -479,6 +563,13 @@ class ReceiveSuccess implements GameModuleListState {
   if (_levels is EqualUnmodifiableListView) return _levels;
   // ignore: implicit_dynamic_type
   return EqualUnmodifiableListView(_levels);
+}
+
+ final  Map<int, LevelProgressEntity> _progressMap;
+ Map<int, LevelProgressEntity> get progressMap {
+  if (_progressMap is EqualUnmodifiableMapView) return _progressMap;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableMapView(_progressMap);
 }
 
 
@@ -492,16 +583,16 @@ $ReceiveSuccessCopyWith<ReceiveSuccess> get copyWith => _$ReceiveSuccessCopyWith
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ReceiveSuccess&&const DeepCollectionEquality().equals(other._levels, _levels));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ReceiveSuccess&&const DeepCollectionEquality().equals(other._levels, _levels)&&const DeepCollectionEquality().equals(other._progressMap, _progressMap));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_levels));
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_levels),const DeepCollectionEquality().hash(_progressMap));
 
 @override
 String toString() {
-  return 'GameModuleListState.receiveSuccess(levels: $levels)';
+  return 'GameModuleListState.receiveSuccess(levels: $levels, progressMap: $progressMap)';
 }
 
 
@@ -512,7 +603,7 @@ abstract mixin class $ReceiveSuccessCopyWith<$Res> implements $GameModuleListSta
   factory $ReceiveSuccessCopyWith(ReceiveSuccess value, $Res Function(ReceiveSuccess) _then) = _$ReceiveSuccessCopyWithImpl;
 @useResult
 $Res call({
- List<GameModuleListEntity> levels
+ List<GameModuleListEntity> levels, Map<int, LevelProgressEntity> progressMap
 });
 
 
@@ -529,10 +620,11 @@ class _$ReceiveSuccessCopyWithImpl<$Res>
 
 /// Create a copy of GameModuleListState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') $Res call({Object? levels = null,}) {
+@pragma('vm:prefer-inline') $Res call({Object? levels = null,Object? progressMap = null,}) {
   return _then(ReceiveSuccess(
 levels: null == levels ? _self._levels : levels // ignore: cast_nullable_to_non_nullable
-as List<GameModuleListEntity>,
+as List<GameModuleListEntity>,progressMap: null == progressMap ? _self._progressMap : progressMap // ignore: cast_nullable_to_non_nullable
+as Map<int, LevelProgressEntity>,
   ));
 }
 
@@ -599,6 +691,78 @@ class _$ReceiveFailedCopyWithImpl<$Res>
   return _then(ReceiveFailed(
 message: null == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
 as String,
+  ));
+}
+
+
+}
+
+/// @nodoc
+
+
+class LevelJustCompleted implements GameModuleListState {
+  const LevelJustCompleted({required this.levelId, required this.stars, required this.correctAnswers, required this.totalQuestions});
+  
+
+ final  int levelId;
+ final  int stars;
+ final  int correctAnswers;
+ final  int totalQuestions;
+
+/// Create a copy of GameModuleListState
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$LevelJustCompletedCopyWith<LevelJustCompleted> get copyWith => _$LevelJustCompletedCopyWithImpl<LevelJustCompleted>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is LevelJustCompleted&&(identical(other.levelId, levelId) || other.levelId == levelId)&&(identical(other.stars, stars) || other.stars == stars)&&(identical(other.correctAnswers, correctAnswers) || other.correctAnswers == correctAnswers)&&(identical(other.totalQuestions, totalQuestions) || other.totalQuestions == totalQuestions));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,levelId,stars,correctAnswers,totalQuestions);
+
+@override
+String toString() {
+  return 'GameModuleListState.levelJustCompleted(levelId: $levelId, stars: $stars, correctAnswers: $correctAnswers, totalQuestions: $totalQuestions)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $LevelJustCompletedCopyWith<$Res> implements $GameModuleListStateCopyWith<$Res> {
+  factory $LevelJustCompletedCopyWith(LevelJustCompleted value, $Res Function(LevelJustCompleted) _then) = _$LevelJustCompletedCopyWithImpl;
+@useResult
+$Res call({
+ int levelId, int stars, int correctAnswers, int totalQuestions
+});
+
+
+
+
+}
+/// @nodoc
+class _$LevelJustCompletedCopyWithImpl<$Res>
+    implements $LevelJustCompletedCopyWith<$Res> {
+  _$LevelJustCompletedCopyWithImpl(this._self, this._then);
+
+  final LevelJustCompleted _self;
+  final $Res Function(LevelJustCompleted) _then;
+
+/// Create a copy of GameModuleListState
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? levelId = null,Object? stars = null,Object? correctAnswers = null,Object? totalQuestions = null,}) {
+  return _then(LevelJustCompleted(
+levelId: null == levelId ? _self.levelId : levelId // ignore: cast_nullable_to_non_nullable
+as int,stars: null == stars ? _self.stars : stars // ignore: cast_nullable_to_non_nullable
+as int,correctAnswers: null == correctAnswers ? _self.correctAnswers : correctAnswers // ignore: cast_nullable_to_non_nullable
+as int,totalQuestions: null == totalQuestions ? _self.totalQuestions : totalQuestions // ignore: cast_nullable_to_non_nullable
+as int,
   ));
 }
 
