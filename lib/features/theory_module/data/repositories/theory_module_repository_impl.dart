@@ -1,4 +1,3 @@
-import 'package:sugarlife/features/theory_module/data/dtos/theory_module_dto.dart';
 import 'package:sugarlife/features/theory_module/data/mappers/theory_module_dto_mapper.dart';
 import 'package:sugarlife/features/theory_module/data/providers/theory_module_data_provider/implementations/theory_module_data_provider_impl.dart';
 import 'package:sugarlife/features/theory_module/domain/entities/theory_module_list_entity.dart';

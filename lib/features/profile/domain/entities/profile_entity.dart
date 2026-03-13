@@ -6,8 +6,8 @@ part 'profile_entity.freezed.dart';
 sealed class ProfileEntity with _$ProfileEntity {
   const factory ProfileEntity({
     required String id,
-    required String name,
-    required int age,
-    required String gender,
+    required String username,
+    required List<DateTime> correctDates, // даты павильных ответов для миф правда
+    required int currentAvatarId,
   }) = _ProfileEntity;
 }

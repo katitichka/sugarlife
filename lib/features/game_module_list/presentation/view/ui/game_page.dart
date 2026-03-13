@@ -7,7 +7,6 @@ import 'package:sugarlife/features/game_module_level/presentation/view/ui/game_l
 import 'package:sugarlife/features/game_module_list/domain/entities/game_module_list_entity.dart';
 import 'package:sugarlife/features/game_module_list/presentation/bloc/game_module_list_bloc.dart';
 import 'package:sugarlife/features/profile/domain/entities/level_progress_entity.dart';
-import 'package:sugarlife/features/profile/domain/repositories/level_progress_repository.dart';
 
 class GamePage extends StatefulWidget {
   const GamePage({super.key});

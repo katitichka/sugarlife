@@ -94,7 +94,7 @@ class _GameQuestionPageState extends State<GameQuestionPage> {
               right: 0,
               child: _buildExplantationOverlay(
                 context,
-                state as AnswerInProgress,
+                state,
               ),
             ),
         ],

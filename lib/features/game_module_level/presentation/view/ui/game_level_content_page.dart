@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:sugarlife/features/game_module_level/presentation/bloc/game_module_level_bloc.dart';
 import 'package:sugarlife/features/game_module_level/presentation/bloc/game_module_level_bloc.dart'
     as level;
 import 'package:sugarlife/features/game_module_level/presentation/view/ui/game_level_result_page.dart';
 import 'package:sugarlife/features/game_module_level/presentation/view/ui/game_level_start_level_page.dart';
 import 'package:sugarlife/features/game_module_level/presentation/view/ui/game_question_page.dart';
-import 'package:sugarlife/features/game_module_list/presentation/bloc/game_module_list_bloc.dart';
 
 class GameLevelContentPage extends StatelessWidget {
   final int levelId;
@@ -23,7 +21,7 @@ class GameLevelContentPage extends StatelessWidget {
           case level.ReceiveFailed(:final message):
             return _ErrorPage(message: message);
           case level.ReceiveSuccess():
-            final successState = state as level.ReceiveSuccess;
+            final successState = state;
             if (successState.currentIndex == -1
             // && successState.progress?.isCompleted == true
             ) {

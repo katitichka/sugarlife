@@ -41,7 +41,7 @@ class TheoryModuleDataProviderImpl implements TheoryModuleDataProvider {
     
 
     final jsonForDto = Map<String, dynamic>.from(rawData);
-    jsonForDto['character_image_url'] = characterImageUrl ?? ''; 
+    jsonForDto['character_image_url'] = characterImageUrl; 
     
     // Удаление вложенного characters 
     jsonForDto.remove('characters');
