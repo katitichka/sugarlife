@@ -6,7 +6,7 @@ class AuthRepositoryImpl implements AuthRepository {
   final SupabaseClient _supabase;
 
   AuthRepositoryImpl(this._supabase);
-  
+
   @override
   Future<ProfileEntity> signIn({
     required String email,
@@ -18,7 +18,7 @@ class AuthRepositoryImpl implements AuthRepository {
         email: email,
         password: password,
       );
-      
+
       // Проверка наличия данных пользователя в ответе
       final authUser = response.user;
       if (authUser == null) {
@@ -36,14 +36,14 @@ class AuthRepositoryImpl implements AuthRepository {
       if (profileData == null) {
         throw Exception('Профиль пользователя не найден');
       }
-      
+
       // Преобразование JSON-поля correct_dates в список DateTime
       final List<DateTime> correctDates =
           (profileData['correct_dates'] as List?)
               ?.map((date) => DateTime.parse(date.toString()))
               .toList() ??
           [];
-          
+
       // Формирование и возврат сущности профиля
       return ProfileEntity(
         id: authUser.id,
@@ -63,23 +63,23 @@ class AuthRepositoryImpl implements AuthRepository {
       // Получение текущего авторизованного пользователя
       final authUser = _supabase.auth.currentUser;
       if (authUser == null) return null;
-      
+
       // Получение данных профиля
       final profileData = await _supabase
           .from('user_profile')
           .select()
           .eq('id', authUser.id)
           .maybeSingle();
-          
+
       if (profileData == null) return null;
-      
+
       // Преобразование JSON-поля correct_dates
       final List<DateTime> correctDates =
           (profileData['correct_dates'] as List?)
               ?.map((date) => DateTime.parse(date.toString()))
               .toList() ??
           [];
-          
+
       // Формирование сущности профиля
       return ProfileEntity(
         id: authUser.id,
@@ -117,13 +117,13 @@ class AuthRepositoryImpl implements AuthRepository {
         password: password,
         data: {'username': username},
       );
-      
+
       // Проверка успешности создания пользователя
       final authUser = response.user;
       if (authUser == null) {
         throw Exception('Не удалось создать пользователя');
       }
-      
+
       // Попытка получения профиля (должен создаться триггером)
       final profileData = await _supabase
           .from('user_profile')
@@ -155,6 +155,20 @@ class AuthRepositoryImpl implements AuthRepository {
     } catch (e) {
       print('Ошибка регистрации: $e');
       rethrow;
+    }
+  }
+
+  @override
+  Future<bool> isEmailExists({required String email}) async {
+    try {
+      final result = await _supabase.rpc(
+        'check_email_exists',
+        params: {'p_email': email},
+      );
+      return result ?? false; // если результат null, возвращаем false
+    } catch (e) {
+      print('Ошибка проверки email: $e');
+      return false; // при ошибке считаем, что email свободен
     }
   }
 }

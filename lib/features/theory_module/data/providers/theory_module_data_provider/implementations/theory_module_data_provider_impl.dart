@@ -3,12 +3,13 @@ import 'package:sugarlife/features/theory_module/data/providers/theory_module_da
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class TheoryModuleDataProviderImpl implements TheoryModuleDataProvider {
-  final supabase = Supabase.instance.client;
+  final SupabaseClient _supabase;
+  TheoryModuleDataProviderImpl(this._supabase);
 
   @override
   Future<List<TheoryModuleDto>> getModules() async {
     try {
-      final responce = await supabase
+      final responce = await _supabase
           .from('theory_module')
           .select('*, characters(image_url)')
           .order('order_index', ascending: true);
@@ -23,7 +24,7 @@ class TheoryModuleDataProviderImpl implements TheoryModuleDataProvider {
   @override
   Future<TheoryModuleDto> getModuleById({required int id}) async {
     try {
-      final response = await supabase
+      final response = await _supabase
           .from('theory_module')
           .select('*, characters(image_url)')
           .eq('id', id)

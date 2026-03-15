@@ -70,6 +70,23 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   }) async {
     try {
       emit(const AuthState.loading());
+      if (password.length < 6) {
+        emit(
+          const AuthState.failure(
+            message: 'Пароль должен быть не менее 6 символов',
+          ),
+        );
+        return;
+      }
+      final isUniqueEmail = await _authRepository.isEmailExists(email: email);
+      if (isUniqueEmail) {
+        emit(
+          const AuthState.failure(
+            message: 'Аккаунт с такой почтой уже существует',
+          ),
+        );
+        return;
+      }
       final profile = await _authRepository.signUp(
         email: email,
         password: password,

@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:path/path.dart';
 import 'package:sugarlife/core/enum/age_category.dart';
+import 'package:sugarlife/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:sugarlife/features/auth/presentation/view/login_screen.dart';
+import 'package:sugarlife/features/auth/presentation/view/register_screen.dart';
 import 'package:sugarlife/features/game_module_level/presentation/game_module_level_provider.dart';
 import 'package:sugarlife/features/game_module_list/presentation/game_module_list_provider.dart';
 import 'package:sugarlife/features/game_module_level/presentation/view/ui/game_level_page.dart';
@@ -10,16 +15,30 @@ import 'package:sugarlife/features/theory_module/presentation/theory_page.dart';
 import 'package:sugarlife/features/widgets/app_scaffold.dart';
 
 final appRoute = GoRouter(
-  initialLocation: '/game',
+  initialLocation: '/login',
   routes: [
+    GoRoute(
+      path: '/login',
+      name: 'login',
+      builder: (context, state) => LoginScreen(),
+    ),
+    GoRoute(
+      path: '/register',
+      name: 'regicter',
+      builder: (context, state) => RegisterScreen(),
+    ),
+    // После авторизации
     StatefulShellRoute.indexedStack(
       builder: (context, state, navigationShell) {
         final fullPath = state.fullPath ?? '';
-        final showBottomNav = fullPath == '/game' || 
-                       fullPath == '/theory' || 
-                       fullPath == '/profile';
-        print('showBottomNav = $showBottomNav');
-        return AppScaffold(navigationShell: navigationShell, showBottomNav: showBottomNav,);
+        final showBottomNav =
+            fullPath == '/game' ||
+            fullPath == '/theory' ||
+            fullPath == '/profile';
+        return AppScaffold(
+          navigationShell: navigationShell,
+          showBottomNav: showBottomNav,
+        );
       },
       branches: [
         StatefulShellBranch(
@@ -93,6 +112,26 @@ final appRoute = GoRouter(
           ],
         ),
       ],
+      redirect: (context, state) {
+        final authState = context.read<AuthBloc>().state;
+        final isLoggedIn = authState.maybeWhen(
+          authenticated: (_) => true,
+          orElse: () => false,
+        );
+        final location = state.matchedLocation;
+        if (isLoggedIn && (location == '/login' || location == '/register')) {
+          return '/game';
+        }
+        // Если пользователь НЕ авторизован и пытается зайти в защищённую часть
+        if (!isLoggedIn &&
+            (location == '/game' ||
+                location == '/theory' ||
+                location == '/profile')) {
+          return '/login';
+        }
+        // В остальных случаях остаёмся на месте
+        return null;
+      },
     ),
   ],
 );

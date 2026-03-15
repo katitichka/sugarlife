@@ -11,5 +11,6 @@ Future<void> main() async {
     anonKey:
         'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR4aWFlbmtxZHRnaXFoemhlcHdxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg5NzQ1ODYsImV4cCI6MjA4NDU1MDU4Nn0.KHPrtctWAYOIpprMK1vvgSc1jgpbooJEApAOe0XRZ78',
   );
-  app(prefs);
+  final supabase = Supabase.instance.client;
+  app(prefs, supabase);
 }

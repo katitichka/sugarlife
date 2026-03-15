@@ -49,6 +49,7 @@ dependencies:
   bloc: ^9.2.0
   json_annotation: ^4.10.0
   go_router: ^17.1.0
+  dotted_decoration: ^2.0.0
 dev_dependencies:
   flutter_test:
     sdk: flutter
