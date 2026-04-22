@@ -21,6 +21,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   void initState() {
     super.initState();
+    _isLoading = false;
     _emailController.addListener(_updateButtonState);
     _passwordController.addListener(_updateButtonState);
   }
@@ -41,10 +42,10 @@ class _LoginScreenState extends State<LoginScreen> {
     return BlocListener<AuthBloc, AuthState>(
       listener: (context, state) {
         state.when(
-          initial: () {},
+          initial: () => setState(() => _isLoading = false),
           loading: () => setState(() => _isLoading = true),
           authenticated: (_) => context.go('/game'),
-          unauthenticated: () {},
+          unauthenticated: () => setState(() => _isLoading = false),
           failure: (message) {
             setState(() {
               _emailError = message;

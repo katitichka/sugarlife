@@ -234,7 +234,6 @@ class GameModuleLevelBloc
     final successState = state as ReceiveSuccess;
     final levelId = successState.questions.first.levelId;
     final ageCategory = successState.questions.first.ageCategory;
-    await _levelProgressRepository.resetLevelProgress(levelId);
     await _receiveGameLevel(
       emit: emit,
       levelId: levelId,

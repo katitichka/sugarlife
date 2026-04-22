@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:sugarlife/core/theme/app_color.dart';
 
 class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
@@ -15,8 +16,12 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
       backgroundColor: AppColors.blue,
       title: Text(
         title,
-        style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w600, color: Color(0xff4B4E51)),
+        style: GoogleFonts.comfortaa(
+            fontSize: 22,
+            fontWeight: FontWeight.w700,
+            color: AppColors.white,),
       ),
+      centerTitle: true,
       leading: leading,
       actions: actions,
     );

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:sugarlife/core/theme/app_color.dart';
 import 'package:sugarlife/features/auth/domain/repositories/auth_repository.dart';
 import 'package:sugarlife/features/auth/presentation/bloc/auth_bloc.dart';
@@ -29,33 +30,71 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    _emailController.addListener(_updateButtonState);
+    _passwordController.addListener(_updateButtonState);
+    _nameController.addListener(_updateButtonState);
+  }
+
+  void _updateButtonState() {
+    setState(() {});
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: Padding(
+    return BlocListener<AuthBloc, AuthState>(
+      listener: (context, state) {
+        state.when(
+          initial: () {},
+          loading: () => setState(() {
+            _isLoading = true;
+          }),
+          authenticated: (_) {
+            context.go('/login');
+          },
+          unauthenticated: () => setState(() {
+            _isLoading = false;
+          }),
+          failure: (message) {
+            setState(() {
+              _emailError = message;
+              _isLoading = false;
+            });
+          },
+        );
+      },
+      child: Scaffold(
+        body: Padding(
           padding: const EdgeInsets.all(15.0),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(height: 30),
-              Text(
-                'Сладкая жизнь',
-                style: TextStyle(
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.blue,
-                  fontSize: 28,
+              SizedBox(height: 40),
+              Center(
+                child: Text(
+                  'Сладкая жизнь',
+                  style: TextStyle(
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.blue,
+                    fontSize: 28,
+                  ),
+                  textAlign: TextAlign.center,
                 ),
               ),
               SizedBox(height: 20),
-              Text(
-                'Приветствуем Вас!',
-                style: TextStyle(
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.blue,
-                  fontSize: 24,
+              Center(
+                child: Text(
+                  'Приветствуем Вас!',
+                  style: TextStyle(
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.blue,
+                    fontSize: 24,
+                  ),
+                  textAlign: TextAlign.center,
                 ),
               ),
-              SizedBox(height: 50),
+              SizedBox(height: 60),
               Text(
                 'Создать аккаунт',
                 style: TextStyle(
@@ -94,31 +133,32 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   errorText: _passwordError,
                 ),
               ),
-              SizedBox(height: 50),
-
-              ElevatedButton(
-                onPressed:
-                    (_emailController.text.isEmpty ||
-                        _passwordController.text.isEmpty ||
-                        _isLoading)
-                    ? null
-                    : () {
-                        context.read<AuthBloc>().add(
-                          AuthEvent.signUpRequested(
-                            email: _emailController.text,
-                            password: _passwordController.text,
-                            username: _nameController.text,
-                          ),
-                        );
-                      },
-                child: Text(
-                  'Создать',
-                  style: TextStyle(
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.blue,
-                    fontSize: 32,
+              SizedBox(height: 30),
+              Center(
+                child: ElevatedButton(
+                  onPressed:
+                      (_emailController.text.isEmpty ||
+                          _passwordController.text.isEmpty ||
+                          _isLoading)
+                      ? null
+                      : () {
+                          context.read<AuthBloc>().add(
+                            AuthEvent.signUpRequested(
+                              email: _emailController.text,
+                              password: _passwordController.text,
+                              username: _nameController.text,
+                            ),
+                          );
+                        },
+                  child: Text(
+                    'Создать',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.blue,
+                      fontSize: 32,
+                    ),
+                    textAlign: TextAlign.center,
                   ),
-                  textAlign: TextAlign.center,
                 ),
               ),
             ],

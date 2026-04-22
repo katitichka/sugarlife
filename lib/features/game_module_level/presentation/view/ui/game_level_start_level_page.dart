@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sugarlife/core/theme/app_color.dart';
 import 'package:sugarlife/features/game_module_level/presentation/bloc/game_module_level_bloc.dart';
+import 'package:sugarlife/shared/ui/main_app_bar.dart';
 
 class GameLevelStartLevelPage extends StatelessWidget {
   final int levelId;
@@ -15,7 +16,7 @@ class GameLevelStartLevelPage extends StatelessWidget {
     final progress = state.progress;
     final questionsCount = state.questions.length;
     return Scaffold(
-      appBar: AppBar(title: Text('Уровень $levelId')),
+      appBar: MainAppBar(title: 'Уровень $levelId'),
       body: Padding(
         padding: const EdgeInsets.all(24),
         child: Column(

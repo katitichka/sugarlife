@@ -13,9 +13,9 @@ sealed class TheoryModuleDto with _$TheoryModuleDto {
     @JsonKey(name:'color_hex') required String colorHex,
     @JsonKey(name:'order_index') required int orderIndex,
     @JsonKey(name: 'character_image_url') required String characterImageUrl,
-    required Map<String, dynamic> content,
+    String? content,  // null для списка, есть для деталей
   }) = _TheoryModuleDto;
-
+  
   factory TheoryModuleDto.fromJson(Map<String, Object?> json) =>
       _$TheoryModuleDtoFromJson(json);
 }

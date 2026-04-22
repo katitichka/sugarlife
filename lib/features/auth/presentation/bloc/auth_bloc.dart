@@ -28,6 +28,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
             username: username,
           ),
         _LogoutPressed() => _logoutPressed(emit: emit),
+        _ProfileUpdate(:final newProfile) => _profileUpdate(
+          emit: emit,
+          newProfile: newProfile,
+        ),
       },
     );
   }
@@ -106,5 +110,15 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     } catch (e) {
       emit(AuthState.failure(message: 'Ошибка выхода: $e'));
     }
+  }
+
+  Future<void> _profileUpdate({
+    required Emitter<AuthState> emit,
+    required ProfileEntity newProfile,
+  }) async {
+    state.maybeWhen(
+      authenticated: (_) => emit(AuthState.authenticated(profile: newProfile)),
+      orElse: () => {},
+    );
   }
 }

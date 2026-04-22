@@ -8,6 +8,5 @@ abstract interface class LevelProgressRepository {
     required int correctAnswers,
   });
   Future<bool> isLevelCompleted(int levelId);
-  Future<void> resetLevelProgress(int levelId);
   Future<Map<int, LevelProgressEntity>> getAllLevelsProgress();
 }

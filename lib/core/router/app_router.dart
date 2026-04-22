@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:path/path.dart';
 import 'package:sugarlife/core/enum/age_category.dart';
 import 'package:sugarlife/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:sugarlife/features/auth/presentation/view/login_screen.dart';
 import 'package:sugarlife/features/auth/presentation/view/register_screen.dart';
+import 'package:sugarlife/features/characters/presentation/ui/choose_character_page.dart';
 import 'package:sugarlife/features/game_module_level/presentation/game_module_level_provider.dart';
 import 'package:sugarlife/features/game_module_list/presentation/game_module_list_provider.dart';
 import 'package:sugarlife/features/game_module_level/presentation/view/ui/game_level_page.dart';
 import 'package:sugarlife/features/game_module_list/presentation/view/ui/game_page.dart';
 import 'package:sugarlife/features/profile/presentation/profile_page.dart';
-import 'package:sugarlife/features/theory_module/presentation/theory_page.dart';
+import 'package:sugarlife/features/theory_module/presentation/theory_module_provider.dart';
+import 'package:sugarlife/features/theory_module/presentation/ui/theory_page.dart';
+import 'package:sugarlife/features/theory_module/presentation/ui/theory_screen_page.dart';
 import 'package:sugarlife/features/widgets/app_scaffold.dart';
 
 final appRoute = GoRouter(
@@ -24,8 +26,16 @@ final appRoute = GoRouter(
     ),
     GoRoute(
       path: '/register',
-      name: 'regicter',
+      name: 'register',
       builder: (context, state) => RegisterScreen(),
+    ),
+    GoRoute(
+      path: '/choose-character',
+      name: 'chooseCharacter',
+      builder: (context, state) {
+        final currentAvatarId = state.extra as int;
+        return ChooseCharacterPage(currentAvatarId: currentAvatarId);
+      },
     ),
     // После авторизации
     StatefulShellRoute.indexedStack(
@@ -46,7 +56,8 @@ final appRoute = GoRouter(
             GoRoute(
               path: '/theory',
               name: 'theory',
-              builder: (context, state) => const TheoryPage(),
+              builder: (context, state) =>
+                  const TheoryModuleProvider(child: TheoryPage()),
               routes: [
                 GoRoute(
                   path: 'module/:moduleId',
@@ -55,7 +66,7 @@ final appRoute = GoRouter(
                     final moduleId = int.parse(
                       state.pathParameters['moduleId']!,
                     );
-                    return Container();
+                    return TheoryScreenPage(moduleId: moduleId);
                   },
                 ),
               ],
@@ -107,7 +118,9 @@ final appRoute = GoRouter(
             GoRoute(
               path: '/profile',
               name: 'profile',
-              builder: (context, state) => const ProfilePage(),
+              builder: (context, state) {
+                return ProfilePage();
+              },
             ),
           ],
         ),

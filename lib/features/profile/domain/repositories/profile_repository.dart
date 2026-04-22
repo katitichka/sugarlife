@@ -1,10 +1,8 @@
+import 'package:sugarlife/features/characters/domain/entitites/character_entity.dart';
 
-// import 'package:sugarlife/features/profile/domain/entities/profile_entity.dart';
-
-// abstract class ProfileRepository {
-//   Future<ProfileEntity> getUser();
-
-//   Future<void> saveUser(ProfileEntity user);
-
-//   Future<bool> hasUser();
-// }
+abstract class ProfileRepository {
+  Future<String> getAvatarUrl(int avatarId);
+  Future<List<CharacterEntity>> getAllCharacters();
+  Future<void> updateUsername(String newUsername);
+  Future<void> updateAvatar(int avatarId);
+}

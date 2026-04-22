@@ -117,7 +117,6 @@ class AuthRepositoryImpl implements AuthRepository {
         password: password,
         data: {'username': username},
       );
-
       // Проверка успешности создания пользователя
       final authUser = response.user;
       if (authUser == null) {

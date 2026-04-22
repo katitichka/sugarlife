@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:sugarlife/features/theory_module/data/providers/theory_module_data_provider/implementations/theory_module_data_provider_impl.dart';
-import 'package:sugarlife/features/theory_module/data/providers/theory_module_data_provider/theory_module_data_provider.dart';
+import 'package:sugarlife/features/theory_module/data/providers/implementations/theory_module_data_provider_impl.dart';
+import 'package:sugarlife/features/theory_module/data/providers/theory_module_data_provider.dart';
 import 'package:sugarlife/features/theory_module/data/repositories/theory_module_repository_impl.dart';
 import 'package:sugarlife/features/theory_module/domain/repositories/theory_module_repository.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';

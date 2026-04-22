@@ -3,7 +3,7 @@
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
-part of 'theory_module_list_bloc.dart';
+part of 'theory_module_bloc.dart';
 
 // **************************************************************************
 // FreezedGenerator
@@ -12,7 +12,7 @@ part of 'theory_module_list_bloc.dart';
 // dart format off
 T _$identity<T>(T value) => value;
 /// @nodoc
-mixin _$TheoryModuleListState {
+mixin _$TheoryModuleState {
 
 
 
@@ -20,7 +20,7 @@ mixin _$TheoryModuleListState {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is TheoryModuleListState);
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is TheoryModuleState);
 }
 
 
@@ -29,20 +29,20 @@ int get hashCode => runtimeType.hashCode;
 
 @override
 String toString() {
-  return 'TheoryModuleListState()';
+  return 'TheoryModuleState()';
 }
 
 
 }
 
 /// @nodoc
-class $TheoryModuleListStateCopyWith<$Res>  {
-$TheoryModuleListStateCopyWith(TheoryModuleListState _, $Res Function(TheoryModuleListState) __);
+class $TheoryModuleStateCopyWith<$Res>  {
+$TheoryModuleStateCopyWith(TheoryModuleState _, $Res Function(TheoryModuleState) __);
 }
 
 
-/// Adds pattern-matching-related methods to [TheoryModuleListState].
-extension TheoryModuleListStatePatterns on TheoryModuleListState {
+/// Adds pattern-matching-related methods to [TheoryModuleState].
+extension TheoryModuleStatePatterns on TheoryModuleState {
 /// A variant of `map` that fallback to returning `orElse`.
 ///
 /// It is equivalent to doing:
@@ -125,7 +125,7 @@ return receiveFailed(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  initial,TResult Function( String message)?  receiveInProgress,TResult Function( List<TheoryModuleListEntity> theoryModules)?  receiveSuccess,TResult Function( String message)?  receiveFailed,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  initial,TResult Function( String message)?  receiveInProgress,TResult Function( List<TheoryModuleEntity> theoryModules)?  receiveSuccess,TResult Function( String message)?  receiveFailed,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Initial() when initial != null:
 return initial();case ReceiveInProgress() when receiveInProgress != null:
@@ -149,7 +149,7 @@ return receiveFailed(_that.message);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  initial,required TResult Function( String message)  receiveInProgress,required TResult Function( List<TheoryModuleListEntity> theoryModules)  receiveSuccess,required TResult Function( String message)  receiveFailed,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  initial,required TResult Function( String message)  receiveInProgress,required TResult Function( List<TheoryModuleEntity> theoryModules)  receiveSuccess,required TResult Function( String message)  receiveFailed,}) {final _that = this;
 switch (_that) {
 case _Initial():
 return initial();case ReceiveInProgress():
@@ -169,7 +169,7 @@ return receiveFailed(_that.message);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  initial,TResult? Function( String message)?  receiveInProgress,TResult? Function( List<TheoryModuleListEntity> theoryModules)?  receiveSuccess,TResult? Function( String message)?  receiveFailed,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  initial,TResult? Function( String message)?  receiveInProgress,TResult? Function( List<TheoryModuleEntity> theoryModules)?  receiveSuccess,TResult? Function( String message)?  receiveFailed,}) {final _that = this;
 switch (_that) {
 case _Initial() when initial != null:
 return initial();case ReceiveInProgress() when receiveInProgress != null:
@@ -186,7 +186,7 @@ return receiveFailed(_that.message);case _:
 /// @nodoc
 
 
-class _Initial implements TheoryModuleListState {
+class _Initial implements TheoryModuleState {
   const _Initial();
   
 
@@ -206,7 +206,7 @@ int get hashCode => runtimeType.hashCode;
 
 @override
 String toString() {
-  return 'TheoryModuleListState.initial()';
+  return 'TheoryModuleState.initial()';
 }
 
 
@@ -218,13 +218,13 @@ String toString() {
 /// @nodoc
 
 
-class ReceiveInProgress implements TheoryModuleListState {
+class ReceiveInProgress implements TheoryModuleState {
   const ReceiveInProgress({required this.message});
   
 
  final  String message;
 
-/// Create a copy of TheoryModuleListState
+/// Create a copy of TheoryModuleState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
@@ -243,14 +243,14 @@ int get hashCode => Object.hash(runtimeType,message);
 
 @override
 String toString() {
-  return 'TheoryModuleListState.receiveInProgress(message: $message)';
+  return 'TheoryModuleState.receiveInProgress(message: $message)';
 }
 
 
 }
 
 /// @nodoc
-abstract mixin class $ReceiveInProgressCopyWith<$Res> implements $TheoryModuleListStateCopyWith<$Res> {
+abstract mixin class $ReceiveInProgressCopyWith<$Res> implements $TheoryModuleStateCopyWith<$Res> {
   factory $ReceiveInProgressCopyWith(ReceiveInProgress value, $Res Function(ReceiveInProgress) _then) = _$ReceiveInProgressCopyWithImpl;
 @useResult
 $Res call({
@@ -269,7 +269,7 @@ class _$ReceiveInProgressCopyWithImpl<$Res>
   final ReceiveInProgress _self;
   final $Res Function(ReceiveInProgress) _then;
 
-/// Create a copy of TheoryModuleListState
+/// Create a copy of TheoryModuleState
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') $Res call({Object? message = null,}) {
   return _then(ReceiveInProgress(
@@ -284,19 +284,19 @@ as String,
 /// @nodoc
 
 
-class ReceiveSuccess implements TheoryModuleListState {
-  const ReceiveSuccess({required final  List<TheoryModuleListEntity> theoryModules}): _theoryModules = theoryModules;
+class ReceiveSuccess implements TheoryModuleState {
+  const ReceiveSuccess({required final  List<TheoryModuleEntity> theoryModules}): _theoryModules = theoryModules;
   
 
- final  List<TheoryModuleListEntity> _theoryModules;
- List<TheoryModuleListEntity> get theoryModules {
+ final  List<TheoryModuleEntity> _theoryModules;
+ List<TheoryModuleEntity> get theoryModules {
   if (_theoryModules is EqualUnmodifiableListView) return _theoryModules;
   // ignore: implicit_dynamic_type
   return EqualUnmodifiableListView(_theoryModules);
 }
 
 
-/// Create a copy of TheoryModuleListState
+/// Create a copy of TheoryModuleState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
@@ -315,18 +315,18 @@ int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(
 
 @override
 String toString() {
-  return 'TheoryModuleListState.receiveSuccess(theoryModules: $theoryModules)';
+  return 'TheoryModuleState.receiveSuccess(theoryModules: $theoryModules)';
 }
 
 
 }
 
 /// @nodoc
-abstract mixin class $ReceiveSuccessCopyWith<$Res> implements $TheoryModuleListStateCopyWith<$Res> {
+abstract mixin class $ReceiveSuccessCopyWith<$Res> implements $TheoryModuleStateCopyWith<$Res> {
   factory $ReceiveSuccessCopyWith(ReceiveSuccess value, $Res Function(ReceiveSuccess) _then) = _$ReceiveSuccessCopyWithImpl;
 @useResult
 $Res call({
- List<TheoryModuleListEntity> theoryModules
+ List<TheoryModuleEntity> theoryModules
 });
 
 
@@ -341,12 +341,12 @@ class _$ReceiveSuccessCopyWithImpl<$Res>
   final ReceiveSuccess _self;
   final $Res Function(ReceiveSuccess) _then;
 
-/// Create a copy of TheoryModuleListState
+/// Create a copy of TheoryModuleState
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') $Res call({Object? theoryModules = null,}) {
   return _then(ReceiveSuccess(
 theoryModules: null == theoryModules ? _self._theoryModules : theoryModules // ignore: cast_nullable_to_non_nullable
-as List<TheoryModuleListEntity>,
+as List<TheoryModuleEntity>,
   ));
 }
 
@@ -356,13 +356,13 @@ as List<TheoryModuleListEntity>,
 /// @nodoc
 
 
-class ReceiveFailed implements TheoryModuleListState {
+class ReceiveFailed implements TheoryModuleState {
   const ReceiveFailed({required this.message});
   
 
  final  String message;
 
-/// Create a copy of TheoryModuleListState
+/// Create a copy of TheoryModuleState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
@@ -381,14 +381,14 @@ int get hashCode => Object.hash(runtimeType,message);
 
 @override
 String toString() {
-  return 'TheoryModuleListState.receiveFailed(message: $message)';
+  return 'TheoryModuleState.receiveFailed(message: $message)';
 }
 
 
 }
 
 /// @nodoc
-abstract mixin class $ReceiveFailedCopyWith<$Res> implements $TheoryModuleListStateCopyWith<$Res> {
+abstract mixin class $ReceiveFailedCopyWith<$Res> implements $TheoryModuleStateCopyWith<$Res> {
   factory $ReceiveFailedCopyWith(ReceiveFailed value, $Res Function(ReceiveFailed) _then) = _$ReceiveFailedCopyWithImpl;
 @useResult
 $Res call({
@@ -407,7 +407,7 @@ class _$ReceiveFailedCopyWithImpl<$Res>
   final ReceiveFailed _self;
   final $Res Function(ReceiveFailed) _then;
 
-/// Create a copy of TheoryModuleListState
+/// Create a copy of TheoryModuleState
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') $Res call({Object? message = null,}) {
   return _then(ReceiveFailed(
@@ -420,7 +420,7 @@ as String,
 }
 
 /// @nodoc
-mixin _$TheoryModuleListEvent {
+mixin _$TheoryModuleEvent {
 
 
 
@@ -428,7 +428,7 @@ mixin _$TheoryModuleListEvent {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is TheoryModuleListEvent);
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is TheoryModuleEvent);
 }
 
 
@@ -437,20 +437,20 @@ int get hashCode => runtimeType.hashCode;
 
 @override
 String toString() {
-  return 'TheoryModuleListEvent()';
+  return 'TheoryModuleEvent()';
 }
 
 
 }
 
 /// @nodoc
-class $TheoryModuleListEventCopyWith<$Res>  {
-$TheoryModuleListEventCopyWith(TheoryModuleListEvent _, $Res Function(TheoryModuleListEvent) __);
+class $TheoryModuleEventCopyWith<$Res>  {
+$TheoryModuleEventCopyWith(TheoryModuleEvent _, $Res Function(TheoryModuleEvent) __);
 }
 
 
-/// Adds pattern-matching-related methods to [TheoryModuleListEvent].
-extension TheoryModuleListEventPatterns on TheoryModuleListEvent {
+/// Adds pattern-matching-related methods to [TheoryModuleEvent].
+extension TheoryModuleEventPatterns on TheoryModuleEvent {
 /// A variant of `map` that fallback to returning `orElse`.
 ///
 /// It is equivalent to doing:
@@ -576,7 +576,7 @@ return receive();case _:
 /// @nodoc
 
 
-class _Receive implements TheoryModuleListEvent {
+class _Receive implements TheoryModuleEvent {
   const _Receive();
   
 
@@ -596,7 +596,7 @@ int get hashCode => runtimeType.hashCode;
 
 @override
 String toString() {
-  return 'TheoryModuleListEvent.receive()';
+  return 'TheoryModuleEvent.receive()';
 }
 
 

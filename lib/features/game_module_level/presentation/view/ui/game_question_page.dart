@@ -4,6 +4,7 @@ import 'package:sugarlife/core/enum/question_type.dart';
 import 'package:sugarlife/core/theme/app_color.dart';
 import 'package:sugarlife/features/game_module_level/domain/entities/game_module_question_entity.dart';
 import 'package:sugarlife/features/game_module_level/presentation/bloc/game_module_level_bloc.dart';
+import 'package:sugarlife/shared/ui/main_app_bar.dart';
 
 class GameQuestionPage extends StatefulWidget {
   @override
@@ -55,9 +56,9 @@ class _GameQuestionPageState extends State<GameQuestionPage> {
         _selectedStringAnswer != null || _selectedBoolAnswer != null;
     final selectedAnswer = _selectedStringAnswer ?? _selectedBoolAnswer;
     return Scaffold(
-      appBar: AppBar(title: Text(currentQuestion?.levelId != null 
+      appBar: MainAppBar(title: currentQuestion?.levelId != null 
           ? 'Уровень ${currentQuestion!.levelId}' 
-          : 'Объяснение')),
+          : 'Объяснение'),
       body: Stack(
         children: [
           if (currentQuestion != null)

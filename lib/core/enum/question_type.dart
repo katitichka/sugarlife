@@ -1,7 +1,7 @@
 enum QuestionType {
   multipleChoice('multiple_choice'),
   trueFalse('true_false'),
-  fillBlank('fill_blanc');
+  fillBlank('fill_blank');
 
   final String value;
   const QuestionType(this.value);

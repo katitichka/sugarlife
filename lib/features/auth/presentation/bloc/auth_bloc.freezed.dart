@@ -55,14 +55,15 @@ extension AuthEventPatterns on AuthEvent {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( _AuthCheckStarted value)?  authCheckStarted,TResult Function( _SignInRequested value)?  signInRequested,TResult Function( _SignUpRequested value)?  signUpRequested,TResult Function( _LogoutPressed value)?  logoutPressed,required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( _AuthCheckStarted value)?  authCheckStarted,TResult Function( _SignInRequested value)?  signInRequested,TResult Function( _SignUpRequested value)?  signUpRequested,TResult Function( _LogoutPressed value)?  logoutPressed,TResult Function( _ProfileUpdate value)?  profileUpdate,required TResult orElse(),}){
 final _that = this;
 switch (_that) {
 case _AuthCheckStarted() when authCheckStarted != null:
 return authCheckStarted(_that);case _SignInRequested() when signInRequested != null:
 return signInRequested(_that);case _SignUpRequested() when signUpRequested != null:
 return signUpRequested(_that);case _LogoutPressed() when logoutPressed != null:
-return logoutPressed(_that);case _:
+return logoutPressed(_that);case _ProfileUpdate() when profileUpdate != null:
+return profileUpdate(_that);case _:
   return orElse();
 
 }
@@ -80,14 +81,15 @@ return logoutPressed(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( _AuthCheckStarted value)  authCheckStarted,required TResult Function( _SignInRequested value)  signInRequested,required TResult Function( _SignUpRequested value)  signUpRequested,required TResult Function( _LogoutPressed value)  logoutPressed,}){
+@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( _AuthCheckStarted value)  authCheckStarted,required TResult Function( _SignInRequested value)  signInRequested,required TResult Function( _SignUpRequested value)  signUpRequested,required TResult Function( _LogoutPressed value)  logoutPressed,required TResult Function( _ProfileUpdate value)  profileUpdate,}){
 final _that = this;
 switch (_that) {
 case _AuthCheckStarted():
 return authCheckStarted(_that);case _SignInRequested():
 return signInRequested(_that);case _SignUpRequested():
 return signUpRequested(_that);case _LogoutPressed():
-return logoutPressed(_that);}
+return logoutPressed(_that);case _ProfileUpdate():
+return profileUpdate(_that);}
 }
 /// A variant of `map` that fallback to returning `null`.
 ///
@@ -101,14 +103,15 @@ return logoutPressed(_that);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( _AuthCheckStarted value)?  authCheckStarted,TResult? Function( _SignInRequested value)?  signInRequested,TResult? Function( _SignUpRequested value)?  signUpRequested,TResult? Function( _LogoutPressed value)?  logoutPressed,}){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( _AuthCheckStarted value)?  authCheckStarted,TResult? Function( _SignInRequested value)?  signInRequested,TResult? Function( _SignUpRequested value)?  signUpRequested,TResult? Function( _LogoutPressed value)?  logoutPressed,TResult? Function( _ProfileUpdate value)?  profileUpdate,}){
 final _that = this;
 switch (_that) {
 case _AuthCheckStarted() when authCheckStarted != null:
 return authCheckStarted(_that);case _SignInRequested() when signInRequested != null:
 return signInRequested(_that);case _SignUpRequested() when signUpRequested != null:
 return signUpRequested(_that);case _LogoutPressed() when logoutPressed != null:
-return logoutPressed(_that);case _:
+return logoutPressed(_that);case _ProfileUpdate() when profileUpdate != null:
+return profileUpdate(_that);case _:
   return null;
 
 }
@@ -125,13 +128,14 @@ return logoutPressed(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  authCheckStarted,TResult Function( String email,  String password)?  signInRequested,TResult Function( String email,  String password,  String username)?  signUpRequested,TResult Function()?  logoutPressed,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  authCheckStarted,TResult Function( String email,  String password)?  signInRequested,TResult Function( String email,  String password,  String username)?  signUpRequested,TResult Function()?  logoutPressed,TResult Function( ProfileEntity newProfile)?  profileUpdate,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _AuthCheckStarted() when authCheckStarted != null:
 return authCheckStarted();case _SignInRequested() when signInRequested != null:
 return signInRequested(_that.email,_that.password);case _SignUpRequested() when signUpRequested != null:
 return signUpRequested(_that.email,_that.password,_that.username);case _LogoutPressed() when logoutPressed != null:
-return logoutPressed();case _:
+return logoutPressed();case _ProfileUpdate() when profileUpdate != null:
+return profileUpdate(_that.newProfile);case _:
   return orElse();
 
 }
@@ -149,13 +153,14 @@ return logoutPressed();case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  authCheckStarted,required TResult Function( String email,  String password)  signInRequested,required TResult Function( String email,  String password,  String username)  signUpRequested,required TResult Function()  logoutPressed,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  authCheckStarted,required TResult Function( String email,  String password)  signInRequested,required TResult Function( String email,  String password,  String username)  signUpRequested,required TResult Function()  logoutPressed,required TResult Function( ProfileEntity newProfile)  profileUpdate,}) {final _that = this;
 switch (_that) {
 case _AuthCheckStarted():
 return authCheckStarted();case _SignInRequested():
 return signInRequested(_that.email,_that.password);case _SignUpRequested():
 return signUpRequested(_that.email,_that.password,_that.username);case _LogoutPressed():
-return logoutPressed();}
+return logoutPressed();case _ProfileUpdate():
+return profileUpdate(_that.newProfile);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -169,13 +174,14 @@ return logoutPressed();}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  authCheckStarted,TResult? Function( String email,  String password)?  signInRequested,TResult? Function( String email,  String password,  String username)?  signUpRequested,TResult? Function()?  logoutPressed,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  authCheckStarted,TResult? Function( String email,  String password)?  signInRequested,TResult? Function( String email,  String password,  String username)?  signUpRequested,TResult? Function()?  logoutPressed,TResult? Function( ProfileEntity newProfile)?  profileUpdate,}) {final _that = this;
 switch (_that) {
 case _AuthCheckStarted() when authCheckStarted != null:
 return authCheckStarted();case _SignInRequested() when signInRequested != null:
 return signInRequested(_that.email,_that.password);case _SignUpRequested() when signUpRequested != null:
 return signUpRequested(_that.email,_that.password,_that.username);case _LogoutPressed() when logoutPressed != null:
-return logoutPressed();case _:
+return logoutPressed();case _ProfileUpdate() when profileUpdate != null:
+return profileUpdate(_that.newProfile);case _:
   return null;
 
 }
@@ -384,6 +390,81 @@ String toString() {
 
 
 
+
+/// @nodoc
+
+
+class _ProfileUpdate implements AuthEvent {
+  const _ProfileUpdate({required this.newProfile});
+  
+
+ final  ProfileEntity newProfile;
+
+/// Create a copy of AuthEvent
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$ProfileUpdateCopyWith<_ProfileUpdate> get copyWith => __$ProfileUpdateCopyWithImpl<_ProfileUpdate>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ProfileUpdate&&(identical(other.newProfile, newProfile) || other.newProfile == newProfile));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,newProfile);
+
+@override
+String toString() {
+  return 'AuthEvent.profileUpdate(newProfile: $newProfile)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$ProfileUpdateCopyWith<$Res> implements $AuthEventCopyWith<$Res> {
+  factory _$ProfileUpdateCopyWith(_ProfileUpdate value, $Res Function(_ProfileUpdate) _then) = __$ProfileUpdateCopyWithImpl;
+@useResult
+$Res call({
+ ProfileEntity newProfile
+});
+
+
+$ProfileEntityCopyWith<$Res> get newProfile;
+
+}
+/// @nodoc
+class __$ProfileUpdateCopyWithImpl<$Res>
+    implements _$ProfileUpdateCopyWith<$Res> {
+  __$ProfileUpdateCopyWithImpl(this._self, this._then);
+
+  final _ProfileUpdate _self;
+  final $Res Function(_ProfileUpdate) _then;
+
+/// Create a copy of AuthEvent
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? newProfile = null,}) {
+  return _then(_ProfileUpdate(
+newProfile: null == newProfile ? _self.newProfile : newProfile // ignore: cast_nullable_to_non_nullable
+as ProfileEntity,
+  ));
+}
+
+/// Create a copy of AuthEvent
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$ProfileEntityCopyWith<$Res> get newProfile {
+  
+  return $ProfileEntityCopyWith<$Res>(_self.newProfile, (value) {
+    return _then(_self.copyWith(newProfile: value));
+  });
+}
+}
 
 /// @nodoc
 mixin _$AuthState {
@@ -646,12 +727,12 @@ _$AuthenticatedCopyWith<_Authenticated> get copyWith => __$AuthenticatedCopyWith
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Authenticated&&const DeepCollectionEquality().equals(other.profile, profile));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Authenticated&&(identical(other.profile, profile) || other.profile == profile));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(profile));
+int get hashCode => Object.hash(runtimeType,profile);
 
 @override
 String toString() {
@@ -670,7 +751,7 @@ $Res call({
 });
 
 
-
+$ProfileEntityCopyWith<$Res> get profile;
 
 }
 /// @nodoc
@@ -683,14 +764,23 @@ class __$AuthenticatedCopyWithImpl<$Res>
 
 /// Create a copy of AuthState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') $Res call({Object? profile = freezed,}) {
+@pragma('vm:prefer-inline') $Res call({Object? profile = null,}) {
   return _then(_Authenticated(
-profile: freezed == profile ? _self.profile : profile // ignore: cast_nullable_to_non_nullable
+profile: null == profile ? _self.profile : profile // ignore: cast_nullable_to_non_nullable
 as ProfileEntity,
   ));
 }
 
-
+/// Create a copy of AuthState
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$ProfileEntityCopyWith<$Res> get profile {
+  
+  return $ProfileEntityCopyWith<$Res>(_self.profile, (value) {
+    return _then(_self.copyWith(profile: value));
+  });
+}
 }
 
 /// @nodoc
