@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_cached_svg/flutter_cached_svg.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:sugarlife/core/theme/app_color.dart';
 import 'package:sugarlife/features/characters/domain/entitites/character_entity.dart';
 import 'package:sugarlife/features/profile/domain/repositories/profile_repository.dart';
 
 class ChooseCharacterPage extends StatefulWidget {
   final int currentAvatarId;
+
   const ChooseCharacterPage({required this.currentAvatarId, super.key});
 
   @override
@@ -50,11 +52,29 @@ class _ChooseCharacterPageState extends State<ChooseCharacterPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Выберите своего аватара', style: TextStyle(color: AppColors.blue, fontFamily: ),),
+        centerTitle: true,
+        toolbarHeight: 90,
+        titleSpacing: 0, // Убирает отступы по бокам
+        title: Text(
+          'Выберите своего аватара',
+          textAlign: TextAlign.center,
+          maxLines: 2,
+          style: GoogleFonts.rubik(
+            fontSize: 22,
+            fontWeight: FontWeight.w500,
+            color: AppColors.blue,
+          ),
+        ),
+        leading: const SizedBox(width: 56), // Пустое место шириной с иконку
         actions: [
-          IconButton(
-            onPressed: () => Navigator.pop(context),
-            icon: Icon(Icons.close),
+          Padding(
+            padding: const EdgeInsets.only(right: 8.0),
+            child: IconButton(
+              iconSize: 35,
+              color: AppColors.blue,
+              onPressed: () => Navigator.pop(context),
+              icon: const Icon(Icons.cancel),
+            ),
           ),
         ],
       ),
@@ -62,8 +82,8 @@ class _ChooseCharacterPageState extends State<ChooseCharacterPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Container(
-              height: 420,
+            SizedBox(
+              height: 450,
               width: 320,
               child: GridView.builder(
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -108,7 +128,6 @@ class _ChooseCharacterPageState extends State<ChooseCharacterPage> {
                 },
               ),
             ),
-            SizedBox(height: 20),
             ElevatedButton(
               onPressed:
                   _selectedId != null && _selectedId != widget.currentAvatarId
@@ -119,7 +138,22 @@ class _ChooseCharacterPageState extends State<ChooseCharacterPage> {
                       Navigator.pop(context, selectedCharacter);
                     }
                   : null,
-
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.blue, // Цвет фона кнопки
+                foregroundColor: Colors.white, // Цвет текста
+                fixedSize: const Size(230, 70),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(90), // Скругление углов
+                ),
+                textStyle: GoogleFonts.rubik(
+                  fontSize: 32,
+                  fontWeight: FontWeight.w700,
+                ),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 32,
+                  vertical: 12,
+                ),
+              ),
               child: Text('Готово'),
             ),
           ],

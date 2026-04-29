@@ -1,5 +1,6 @@
 enum QuestionType {
   multipleChoice('multiple_choice'),
+  multipleSelect('multiple_select'),
   trueFalse('true_false'),
   fillBlank('fill_blank');
 
@@ -10,5 +11,16 @@ enum QuestionType {
     return QuestionType.values.firstWhere(
       (e) => e.value == value,
     );
+  }
+
+  /// Не бросает при неизвестном значении из БД.
+  static QuestionType parseLoose(String? value) {
+    if (value == null || value.isEmpty) {
+      return QuestionType.multipleChoice;
+    }
+    for (final e in QuestionType.values) {
+      if (e.value == value) return e;
+    }
+    return QuestionType.multipleChoice;
   }
 }

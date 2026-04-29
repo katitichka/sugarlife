@@ -78,11 +78,11 @@ class _ProfilePageState extends State<ProfilePage> {
       barrierDismissible: true,
       builder: (context) => Dialog(
         insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(44)),
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(44),
           child: SizedBox(
-            height: MediaQuery.of(context).size.height * 0.7,
+            height: MediaQuery.of(context).size.height * 0.80,
             width: MediaQuery.of(context).size.width * 0.9,
             child: ChooseCharacterPage(
               currentAvatarId: currentProfile.currentAvatarId,

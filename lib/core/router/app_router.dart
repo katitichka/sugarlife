@@ -1,15 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:sugarlife/core/enum/age_category.dart';
 import 'package:sugarlife/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:sugarlife/features/auth/presentation/view/login_screen.dart';
 import 'package:sugarlife/features/auth/presentation/view/register_screen.dart';
 import 'package:sugarlife/features/characters/presentation/ui/choose_character_page.dart';
-import 'package:sugarlife/features/game_module_level/presentation/game_module_level_provider.dart';
-import 'package:sugarlife/features/game_module_list/presentation/game_module_list_provider.dart';
-import 'package:sugarlife/features/game_module_level/presentation/view/ui/game_level_page.dart';
-import 'package:sugarlife/features/game_module_list/presentation/view/ui/game_page.dart';
+import 'package:sugarlife/features/game_module/level/presentation/game_module_level_provider.dart';
+import 'package:sugarlife/features/game_module/level/presentation/view/ui/game_level_page.dart';
+import 'package:sugarlife/features/game_module/list/presentation/view/ui/game_page.dart';
 import 'package:sugarlife/features/profile/presentation/profile_page.dart';
 import 'package:sugarlife/features/theory_module/presentation/theory_module_provider.dart';
 import 'package:sugarlife/features/theory_module/presentation/ui/theory_page.dart';
@@ -78,8 +76,7 @@ final appRoute = GoRouter(
             GoRoute(
               path: '/game',
               name: 'game',
-              builder: (context, state) =>
-                  GameModuleListProvider(child: const GamePage()),
+              builder: (context, state) => const GamePage(),
               routes: [
                 GoRoute(
                   path: 'level/:levelId',
@@ -89,7 +86,6 @@ final appRoute = GoRouter(
                     return GameModuleLevelProvider(
                       child: GameLevelPage(
                         levelId: levelId,
-                        ageCategory: AgeCategory.child,
                       ),
                     );
                   },
@@ -98,13 +94,8 @@ final appRoute = GoRouter(
                       path: 'question/:questionIndex',
                       name: 'gameLevelQuestion',
                       builder: (context, state) {
-                        final levelId = int.parse(
-                          state.pathParameters['levelId']!,
-                        );
-                        final questionIndex = int.parse(
-                          state.pathParameters['questionIndex']!,
-                        );
-                        return Container();
+                        // TODO: отдельный экран вопроса по deep link
+                        return const SizedBox.shrink();
                       },
                     ),
                   ],
