@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_cached_svg/flutter_cached_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sugarlife/core/theme/app_color.dart';
 import 'package:sugarlife/features/characters/domain/entitites/character_entity.dart';
 import 'package:sugarlife/features/profile/domain/repositories/profile_repository.dart';
+import 'package:sugarlife/features/widgets/remote_avatar_image.dart';
 
 class ChooseCharacterPage extends StatefulWidget {
   final int currentAvatarId;
@@ -108,8 +108,8 @@ class _ChooseCharacterPageState extends State<ChooseCharacterPage> {
                       child: Column(
                         children: [
                           Expanded(
-                            child: FlutterCachedSvg(
-                              character.imageUrl,
+                            child: RemoteAvatarImage(
+                              url: character.imageUrl,
                               width: double.infinity,
                               height: double.infinity,
                               fit: BoxFit.scaleDown,

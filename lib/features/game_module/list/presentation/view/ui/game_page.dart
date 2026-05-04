@@ -2,6 +2,8 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sugarlife/core/theme/app_color.dart';
+import 'package:sugarlife/features/achievement/presentation/bloc/achievement_bloc.dart';
+import 'package:sugarlife/features/achievement/presentation/widgets/achievement_reward_dialog.dart';
 import 'package:sugarlife/features/game_module/level/domain/entities/game_module_level_entity.dart';
 import 'package:sugarlife/features/game_module/list/presentation/bloc/game_module_list_bloc.dart';
 import 'package:sugarlife/features/profile/domain/entities/level_progress_entity.dart';
@@ -16,6 +18,8 @@ class GamePage extends StatefulWidget {
 class _GamePageState extends State<GamePage> {
   late List<Offset> positions;
   final ScrollController _scrollController = ScrollController();
+  bool _isAchievementDialogVisible = false;
+  int? _lastHandledAchievementId;
 
   /// Порядок: снизу вверх — первый уровень сценария, затем следующий (theory → order).
   static List<GameModuleLevelEntity> _orderedLevels(
@@ -38,6 +42,42 @@ class _GamePageState extends State<GamePage> {
     });
   }
 
+  Future<void> _showAchievementDialog(AchievementState state) async {
+    final achievement = state.pendingAchievement;
+    if (achievement == null ||
+        _isAchievementDialogVisible ||
+        _lastHandledAchievementId == achievement.id) {
+      return;
+    }
+
+    _isAchievementDialogVisible = true;
+    _lastHandledAchievementId = achievement.id;
+    await Future<void>.delayed(const Duration(milliseconds: 700));
+    if (!mounted) {
+      _isAchievementDialogVisible = false;
+      return;
+    }
+
+    await showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => AchievementRewardDialog(achievement: achievement),
+    );
+    if (!mounted) {
+      return;
+    }
+
+    context.read<AchievementBloc>().add(
+      AchievementEvent.markPendingAchievementShown(
+        achievementId: achievement.id,
+      ),
+    );
+    context.read<AchievementBloc>().add(
+      const AchievementEvent.loadAchievements(),
+    );
+    _isAchievementDialogVisible = false;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -45,6 +85,9 @@ class _GamePageState extends State<GamePage> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       context.read<GameModuleListBloc>().add(GameModuleListEvent.receive());
+      context.read<AchievementBloc>().add(
+        const AchievementEvent.checkPendingAchievement(),
+      );
       if (_scrollController.hasClients) {
         _scrollController.jumpTo(0);
       }
@@ -59,17 +102,28 @@ class _GamePageState extends State<GamePage> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<GameModuleListBloc, GameModuleListState>(
-      listenWhen: (previous, current) {
-        if (current is! ReceiveSuccess) return false;
-        if (previous is! ReceiveSuccess) return true;
-        return previous != current;
-      },
-      listener: (context, state) {
-        if (state is ReceiveSuccess) {
-          _scrollMapToStart();
-        }
-      },
+    return MultiBlocListener(
+      listeners: [
+        BlocListener<GameModuleListBloc, GameModuleListState>(
+          listenWhen: (previous, current) {
+            if (current is! ReceiveSuccess) return false;
+            if (previous is! ReceiveSuccess) return true;
+            return previous != current;
+          },
+          listener: (context, state) {
+            if (state is ReceiveSuccess) {
+              _scrollMapToStart();
+            }
+          },
+        ),
+        BlocListener<AchievementBloc, AchievementState>(
+          listenWhen: (previous, current) =>
+              previous.pendingAchievement?.id != current.pendingAchievement?.id,
+          listener: (context, state) {
+            _showAchievementDialog(state);
+          },
+        ),
+      ],
       child: BlocBuilder<GameModuleListBloc, GameModuleListState>(
         builder: (context, state) {
           if (state is ReceiveSuccess) {
@@ -91,26 +145,43 @@ class _GamePageState extends State<GamePage> {
   ) {
     final orderedLevels = _orderedLevels(levels);
 
-    const topPadding = 50.0;
+    const topPadding = 110.0;
     const bottomPadding = 70.0;
+    const circleSize = 60.0;
+    const moduleDividerHeight = 40.0;
+    const moduleInterLevelGap = 150.0;
+    const topModuleLabelGap = 20.0;
     final screenHeight = MediaQuery.of(context).size.height;
     final startY = screenHeight;
     final centerX = MediaQuery.of(context).size.width / 2;
-    const circleSize = 60.0;
     const calculator = LevelPositionCalculator();
     positions = List.generate(
       orderedLevels.length,
       (index) => calculator.calculatePosition(index, startY, centerX),
     );
 
-    final minY = positions.map((p) => p.dy).reduce((a, b) => a < b ? a : b);
-    final maxY = positions.map((p) => p.dy).reduce((a, b) => a > b ? a : b);
+    final moduleExtraGap =
+        moduleInterLevelGap - LevelPositionCalculator.stepY;
+    var passedModuleBreaks = 0;
+    final adjustedYs = <double>[];
+    for (var index = 0; index < orderedLevels.length; index++) {
+      if (index > 0 &&
+          orderedLevels[index].theoryModuleId !=
+              orderedLevels[index - 1].theoryModuleId) {
+        passedModuleBreaks++;
+      }
+      adjustedYs.add(positions[index].dy - passedModuleBreaks * moduleExtraGap);
+    }
+
+    final minY = adjustedYs.reduce((a, b) => a < b ? a : b);
+    final maxY = adjustedYs.reduce((a, b) => a > b ? a : b);
     final contentHeight = maxY - minY + topPadding + bottomPadding;
     final children = <Widget>[];
 
     for (final entry in positions.asMap().entries) {
       final index = entry.key;
       final pos = entry.value;
+      final adjustedTop = topPadding + adjustedYs[index] - minY;
       final level = orderedLevels[index];
       final bool isAccessible;
       if (index == 0) {
@@ -118,8 +189,7 @@ class _GamePageState extends State<GamePage> {
       } else {
         final prevLevelId = orderedLevels[index - 1].id;
         final prevProgress = progressMap[prevLevelId];
-        isAccessible =
-            prevProgress != null && prevProgress.isCompleted == true;
+        isAccessible = prevProgress != null && prevProgress.isCompleted == true;
       }
       final Color circleColor;
       if (progressMap[level.id]?.isCompleted == true) {
@@ -133,7 +203,7 @@ class _GamePageState extends State<GamePage> {
       children.add(
         Positioned(
           left: pos.dx,
-          top: pos.dy - minY,
+          top: adjustedTop,
           child: SizedBox(
             width: circleSize,
             height: circleSize,
@@ -147,7 +217,23 @@ class _GamePageState extends State<GamePage> {
                 elevation: 2,
               ),
               onPressed: isAccessible
-                  ? () => context.push('/game/level/${level.id}')
+                  ? () async {
+                      final achievementBloc = context.read<AchievementBloc>();
+                      final result = await context.push(
+                        '/game/level/${level.id}',
+                      );
+                      if (!mounted) {
+                        return;
+                      }
+                      if (result == true) {
+                        achievementBloc.add(
+                          const AchievementEvent.checkPendingAchievement(),
+                        );
+                        achievementBloc.add(
+                          const AchievementEvent.loadAchievements(),
+                        );
+                      }
+                    }
                   : null,
               child: Center(child: Text(label)),
             ),
@@ -158,25 +244,25 @@ class _GamePageState extends State<GamePage> {
       final isLastLevelInModule =
           index == orderedLevels.length - 1 ||
           orderedLevels[index + 1].theoryModuleId != level.theoryModuleId;
-      final hasNextModule = index < orderedLevels.length - 1;
-
-      if (isLastLevelInModule && hasNextModule) {
-        final nextPos = positions[index + 1];
-        final moduleLabelTop =
-            ((pos.dy + nextPos.dy) / 2) - minY - 10;
+      if (isLastLevelInModule) {
+        final hasNextModule = index < orderedLevels.length - 1;
+        final moduleLabelTop = hasNextModule
+            ? (() {
+                final nextTop = adjustedYs[index + 1] - minY;
+                final gapStart = adjustedTop + circleSize;
+                final gapEnd = nextTop;
+                return gapStart +
+                    (gapEnd - gapStart - moduleDividerHeight) / 2;
+              })()
+            : adjustedTop - topModuleLabelGap - moduleDividerHeight;
         children.add(
           Positioned(
             top: moduleLabelTop,
-            left: 0,
-            right: 0,
-            child: Text(
-              '----- Модуль ${level.theoryModuleId} -----',
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-                color: AppColors.blue,
-              ),
+            left: 16,
+            right: 16,
+            child: SizedBox(
+              height: moduleDividerHeight,
+              child: _ModuleDivider(moduleId: level.theoryModuleId),
             ),
           ),
         );
@@ -186,19 +272,46 @@ class _GamePageState extends State<GamePage> {
     return SingleChildScrollView(
       controller: _scrollController,
       child: Padding(
-        padding: const EdgeInsets.only(
-          left: 0,
-          right: 0,
-          top: 50,
-          bottom: 60,
-        ),
-        child: SizedBox(
-          height: contentHeight,
-          child: Stack(
-            children: children,
+        padding: const EdgeInsets.only(left: 0, right: 0, top: 50, bottom: 60),
+        child: SizedBox(height: contentHeight, child: Stack(children: children)),
+      ),
+    );
+  }
+}
+
+class _ModuleDivider extends StatelessWidget {
+  const _ModuleDivider({required this.moduleId});
+
+  final int moduleId;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        const Expanded(
+          child: Divider(
+            color: AppColors.white,
+            thickness: 1.5,
+            endIndent: 12,
           ),
         ),
-      ),
+        Text(
+          'Модуль $moduleId',
+          textAlign: TextAlign.center,
+          style: const TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+            color: AppColors.white,
+          ),
+        ),
+        const Expanded(
+          child: Divider(
+            color: AppColors.white,
+            thickness: 1.5,
+            indent: 12,
+          ),
+        ),
+      ],
     );
   }
 }

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sugarlife/core/cache/app_cache_service.dart';
+import 'package:sugarlife/features/achievement/data/repositories/achievement_repository_impl.dart';
+import 'package:sugarlife/features/achievement/domain/repositories/achievement_repository.dart';
+import 'package:sugarlife/features/achievement/presentation/bloc/achievement_bloc.dart';
 import 'package:sugarlife/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:sugarlife/features/auth/domain/repositories/auth_repository.dart';
 import 'package:sugarlife/features/game_module/level/data/repositories/game_module_level_repository_impl.dart';
@@ -25,6 +28,12 @@ Future<void> app(SupabaseClient supabase) async {
     MultiRepositoryProvider(
       providers: [
         RepositoryProvider<AppCacheService>(create: (_) => AppCacheService()),
+        RepositoryProvider<AchievementRepository>(
+          create: (context) => AchievementRepositoryImpl(
+            supabase,
+            context.read<AppCacheService>(),
+          ),
+        ),
         RepositoryProvider<LevelProgressRepository>(
           create: (_) => LevelProgressRepositoryImpl(supabase),
         ),
@@ -50,23 +59,25 @@ Future<void> app(SupabaseClient supabase) async {
           ),
         ),
         RepositoryProvider<ProfileRepository>(
-          create: (context) => ProfileRepositoryImpl(
-            supabase,
-            context.read<AppCacheService>(),
-          ),
+          create: (context) =>
+              ProfileRepositoryImpl(supabase, context.read<AppCacheService>()),
         ),
       ],
       child: MultiBlocProvider(
         providers: [
-          BlocProvider<AuthBloc>(
-            create: (context) => AuthBloc(
-              authRepository: context.read<AuthRepository>(),
+          BlocProvider<AchievementBloc>(
+            create: (context) => AchievementBloc(
+              achievementRepository: context.read<AchievementRepository>(),
             ),
+          ),
+          BlocProvider<AuthBloc>(
+            create: (context) =>
+                AuthBloc(authRepository: context.read<AuthRepository>()),
           ),
           BlocProvider<GameModuleListBloc>(
             create: (context) => GameModuleListBloc(
-              gameModuleLevelListRepository:
-                  context.read<GameModuleLevelListRepository>(),
+              gameModuleLevelListRepository: context
+                  .read<GameModuleLevelListRepository>(),
               gameProgressRepository: context.read<LevelProgressRepository>(),
             ),
           ),

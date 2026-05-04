@@ -1,4 +1,5 @@
 import 'package:sugarlife/features/characters/domain/entitites/character_entity.dart';
+import 'package:sugarlife/features/achievement/domain/entities/achievement_entity.dart';
 import 'package:sugarlife/features/game_module/level/domain/entities/game_module_level_entity.dart';
 import 'package:sugarlife/features/game_module/level/domain/entities/game_module_question_entity.dart';
 import 'package:sugarlife/features/theory_module/domain/entities/theory_module_entity.dart';
@@ -9,10 +10,15 @@ class AppCacheService {
   List<TheoryModuleEntity>? _theoryModules;
   final Map<int, TheoryModuleEntity> _theoryModuleById = {};
   List<CharacterEntity>? _characters;
+  List<AchievementEntity>? _achievements;
+  final Map<int, AchievementEntity> _achievementsById = {};
 
   List<GameModuleLevelEntity>? get levels => _levels;
   List<TheoryModuleEntity>? get theoryModules => _theoryModules;
   List<CharacterEntity>? get characters => _characters;
+  List<AchievementEntity>? get achievements => _achievements;
+  Map<int, AchievementEntity> get achievementsById =>
+      Map.unmodifiable(_achievementsById);
 
   List<GameModuleQuestionEntity>? getQuestionsForLevel(int levelId) {
     return _questionsByLevel[levelId];
@@ -63,11 +69,39 @@ class AppCacheService {
     _characters = List.unmodifiable(characters);
   }
 
+  void saveAchievements(List<AchievementEntity> achievements) {
+    _achievements = List.unmodifiable(achievements);
+    _achievementsById
+      ..clear()
+      ..addEntries(achievements.map((item) => MapEntry(item.id, item)));
+  }
+
+  void saveAchievement(AchievementEntity achievement) {
+    _achievementsById[achievement.id] = achievement;
+
+    if (_achievements == null) {
+      _achievements = List.unmodifiable([achievement]);
+      return;
+    }
+
+    final achievements = List<AchievementEntity>.from(_achievements!);
+    final index = achievements.indexWhere((item) => item.id == achievement.id);
+    if (index == -1) {
+      achievements.add(achievement);
+    } else {
+      achievements[index] = achievement;
+    }
+    achievements.sort((a, b) => a.id.compareTo(b.id));
+    _achievements = List.unmodifiable(achievements);
+  }
+
   void clearAll() {
     _levels = null;
     _questionsByLevel.clear();
     _theoryModules = null;
     _theoryModuleById.clear();
     _characters = null;
+    _achievements = null;
+    _achievementsById.clear();
   }
 }

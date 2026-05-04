@@ -1,13 +1,16 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:sugarlife/core/assets/app_assets.dart';
 import 'package:sugarlife/core/theme/app_color.dart';
+import 'package:sugarlife/features/achievement/presentation/bloc/achievement_bloc.dart';
 import 'package:sugarlife/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:sugarlife/features/characters/domain/entitites/character_entity.dart';
 import 'package:sugarlife/features/characters/presentation/ui/choose_character_page.dart';
 import 'package:sugarlife/features/profile/domain/entities/profile_entity.dart';
 import 'package:sugarlife/features/profile/domain/repositories/profile_repository.dart';
+import 'package:sugarlife/features/widgets/remote_avatar_image.dart';
 import 'package:sugarlife/shared/ui/main_app_bar.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -25,6 +28,14 @@ class _ProfilePageState extends State<ProfilePage> {
     _usernameController = TextEditingController();
     _profileRepository = context.read<ProfileRepository>();
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) {
+        return;
+      }
+      context.read<AchievementBloc>().add(
+        const AchievementEvent.loadAchievements(),
+      );
+    });
   }
 
   void _showEditNameDialog(ProfileEntity currentProfile) {
@@ -206,66 +217,161 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                 ],
               ),
-              body: Center(
-                child: Column(
-                  children: [
-                    Text(
-                      profile.username,
-                      style: const TextStyle(
-                        color: AppColors.white,
-                        fontSize: 50,
+              body: SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 24,
+                  ),
+                  child: Column(
+                    children: [
+                      Text(
+                        profile.username,
+                        style: const TextStyle(
+                          color: AppColors.white,
+                          fontSize: 50,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 20),
-                    FutureBuilder<String>(
-                      future: _profileRepository.getAvatarUrl(
-                        profile.currentAvatarId,
-                      ),
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return const CircularProgressIndicator();
-                        }
-                        if (snapshot.hasError ||
-                            !snapshot.hasData ||
-                            snapshot.data!.isEmpty) {
-                          return const Icon(
-                            Icons.error_outline,
-                            color: Colors.white,
-                            size: 48,
-                          );
-                        }
-                        final url = snapshot.data!;
-                        return Container(
-                          width: 150,
-                          height: 150,
-                          decoration: const BoxDecoration(
-                            shape: BoxShape.circle,
+                      const SizedBox(height: 20),
+                      SizedBox(
+                        width: 150,
+                        height: 150,
+                        child: FutureBuilder<String>(
+                          future: _profileRepository.getAvatarUrl(
+                            profile.currentAvatarId,
                           ),
-                          child: ClipOval(
-                            child: SvgPicture.network(
-                              url,
-                              width: 150,
-                              height: 150,
-                              fit: BoxFit.cover,
-                              allowDrawingOutsideViewBox: true,
-                              placeholderBuilder: (_) => const Center(
-                                child: CircularProgressIndicator(
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return const Center(
+                                child: CircularProgressIndicator(),
+                              );
+                            }
+                            if (snapshot.hasError ||
+                                !snapshot.hasData ||
+                                snapshot.data!.isEmpty) {
+                              return const Center(
+                                child: Icon(
+                                  Icons.error_outline,
                                   color: Colors.white,
+                                  size: 48,
+                                ),
+                              );
+                            }
+                            final url = snapshot.data!;
+                            return Container(
+                              decoration: const BoxDecoration(
+                                shape: BoxShape.circle,
+                              ),
+                              child: ClipOval(
+                                child: RemoteAvatarImage(
+                                  url: url,
+                                  width: 150,
+                                  height: 150,
+                                  fit: BoxFit.cover,
+                                  placeholder: const Center(
+                                    child: CircularProgressIndicator(
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  errorWidget: const Center(
+                                    child: Icon(
+                                      Icons.error_outline,
+                                      color: Colors.white,
+                                      size: 48,
+                                    ),
+                                  ),
                                 ),
                               ),
+                            );
+                          },
+                        ),
+                      ),
+                      const SizedBox(height: 32),
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          'Достижения',
+                          style: Theme.of(context).textTheme.titleLarge
+                              ?.copyWith(
+                                color: AppColors.white,
+                                fontWeight: FontWeight.w700,
+                              ),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      BlocBuilder<AchievementBloc, AchievementState>(
+                        builder: (context, achievementState) {
+                          final achievements = achievementState.achievements;
+                          final itemCount = achievements.isEmpty
+                              ? 5
+                              : achievements.length;
+                          return SizedBox(
+                            height: 66,
+                            child: ListView.builder(
+                              scrollDirection: Axis.horizontal,
+                              itemCount: itemCount,
+                              itemBuilder: (context, index) {
+                                if (achievements.isEmpty) {
+                                  return _AchievementPlaceholderCard();
+                                }
+
+                                final achievement = achievements[index];
+                                return Padding(
+                                  padding: const EdgeInsets.only(right: 8),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(14),
+                                    child: CachedNetworkImage(
+                                      imageUrl: achievement.iconUrl,
+                                      width: 58,
+                                      height: 58,
+                                      fit: BoxFit.cover,
+                                      errorWidget: (_, __, ___) => Image.asset(
+                                        AppAssets.achievementPlaceholder,
+                                        width: 58,
+                                        height: 58,
+                                        fit: BoxFit.cover,
+                                      ),
+                                      placeholder: (_, __) => Image.asset(
+                                        AppAssets.achievementPlaceholder,
+                                        width: 58,
+                                        height: 58,
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              },
                             ),
-                          ),
-                        );
-                      },
-                    ),
-                  ],
+                          );
+                        },
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
             orElse: () => const SizedBox.shrink(),
           );
         },
+      ),
+    );
+  }
+}
+
+class _AchievementPlaceholderCard extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(right: 8),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(14),
+        child: Image.asset(
+          AppAssets.achievementPlaceholder,
+          width: 58,
+          height: 58,
+          fit: BoxFit.cover,
+        ),
       ),
     );
   }
