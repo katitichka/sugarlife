@@ -26,10 +26,10 @@ class GameLevelContentPage extends StatelessWidget {
             ) {
               return GameLevelStartLevelPage(levelId: levelId);
             } else {
-              return GameQuestionPage();
+              return const GameQuestionPage();
             }
           case AnswerInProgress():
-            return GameQuestionPage();
+            return const GameQuestionPage();
           case LevelCompleted(
             :final correctAnswers,
             :final totalQuestions,

@@ -1,6 +1,6 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sugarlife/core/theme/app_color.dart';
 import 'package:sugarlife/features/auth/presentation/bloc/auth_bloc.dart';
@@ -50,6 +50,7 @@ class _ProfilePageState extends State<ProfilePage> {
               if (newUsername.isNotEmpty) {
                 try {
                   await _profileRepository.updateUsername(newUsername);
+                  if (!context.mounted) return;
                   final updatedProfile = currentProfile.copyWith(
                     username: newUsername,
                   );
@@ -59,6 +60,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   _usernameController.clear();
                   Navigator.pop(context);
                 } catch (e) {
+                  if (!context.mounted) return;
                   ScaffoldMessenger.of(
                     context,
                   ).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
@@ -91,9 +93,10 @@ class _ProfilePageState extends State<ProfilePage> {
         ),
       ),
     );
-    if (result != null && result is CharacterEntity) {
+    if (result != null) {
       try {
         await _profileRepository.updateAvatar(result.id);
+        if (!mounted) return;
         final updatedProfile = currentProfile.copyWith(
           currentAvatarId: result.id,
         );
@@ -214,14 +217,25 @@ class _ProfilePageState extends State<ProfilePage> {
                       ),
                     ),
                     const SizedBox(height: 20),
-                    FutureBuilder(
+                    FutureBuilder<String>(
                       future: _profileRepository.getAvatarUrl(
                         profile.currentAvatarId,
                       ),
                       builder: (context, snapshot) {
-                        if (!snapshot.hasData) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
                           return const CircularProgressIndicator();
                         }
+                        if (snapshot.hasError ||
+                            !snapshot.hasData ||
+                            snapshot.data!.isEmpty) {
+                          return const Icon(
+                            Icons.error_outline,
+                            color: Colors.white,
+                            size: 48,
+                          );
+                        }
+                        final url = snapshot.data!;
                         return Container(
                           width: 150,
                           height: 150,
@@ -229,24 +243,17 @@ class _ProfilePageState extends State<ProfilePage> {
                             shape: BoxShape.circle,
                           ),
                           child: ClipOval(
-                            child: CachedNetworkImage(
-                              imageUrl: snapshot.data!,
-                              imageBuilder: (context, imageProvider) =>
-                                  Container(
-                                    width: 150,
-                                    height: 150,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      image: DecorationImage(
-                                        image: imageProvider,
-                                        fit: BoxFit.cover,
-                                      ),
-                                    ),
-                                  ),
-                              placeholder: (context, url) =>
-                                  const CircularProgressIndicator(),
-                              errorWidget: (context, url, error) =>
-                                  const Icon(Icons.error),
+                            child: SvgPicture.network(
+                              url,
+                              width: 150,
+                              height: 150,
+                              fit: BoxFit.cover,
+                              allowDrawingOutsideViewBox: true,
+                              placeholderBuilder: (_) => const Center(
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
+                                ),
+                              ),
                             ),
                           ),
                         );

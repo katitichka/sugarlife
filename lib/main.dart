@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:sugarlife/app.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Supabase.initialize(
-    url: 'https://txiaenkqdtgiqhzhepwq.supabase.co',
-    anonKey:
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR4aWFlbmtxZHRnaXFoemhlcHdxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg5NzQ1ODYsImV4cCI6MjA4NDU1MDU4Nn0.KHPrtctWAYOIpprMK1vvgSc1jgpbooJEApAOe0XRZ78',
-  );
-  final supabase = Supabase.instance.client;
-  final session = Supabase.instance.client.auth.currentSession;
+  await dotenv.load(fileName: ".env");
   
-  app(supabase);
+  final supabaseUrl = dotenv.env['SUPABASE_URL']!;
+  final supabaseAnonKey = dotenv.env['SUPABASE_ANON_KEY']!;
+  await Supabase.initialize(
+    url: supabaseUrl,
+    anonKey: supabaseAnonKey,
+    debug: true,
+  );
+  app(Supabase.instance.client);
 }

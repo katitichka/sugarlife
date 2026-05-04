@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sugarlife/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:sugarlife/features/auth/presentation/view/login_screen.dart';
+import 'package:sugarlife/features/auth/presentation/view/splash_screen.dart';
 import 'package:sugarlife/features/auth/presentation/view/register_screen.dart';
 import 'package:sugarlife/features/characters/presentation/ui/choose_character_page.dart';
 import 'package:sugarlife/features/game_module/level/presentation/game_module_level_provider.dart';
@@ -15,8 +16,13 @@ import 'package:sugarlife/features/theory_module/presentation/ui/theory_screen_p
 import 'package:sugarlife/features/widgets/app_scaffold.dart';
 
 final appRoute = GoRouter(
-  initialLocation: '/login',
+  initialLocation: '/splash',
   routes: [
+    GoRoute(
+      path: '/splash',
+      name: 'splash',
+      builder: (context, state) => const SplashScreen(),
+    ),
     GoRoute(
       path: '/login',
       name: 'login',

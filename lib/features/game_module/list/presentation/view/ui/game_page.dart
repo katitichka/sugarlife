@@ -106,6 +106,82 @@ class _GamePageState extends State<GamePage> {
     final minY = positions.map((p) => p.dy).reduce((a, b) => a < b ? a : b);
     final maxY = positions.map((p) => p.dy).reduce((a, b) => a > b ? a : b);
     final contentHeight = maxY - minY + topPadding + bottomPadding;
+    final children = <Widget>[];
+
+    for (final entry in positions.asMap().entries) {
+      final index = entry.key;
+      final pos = entry.value;
+      final level = orderedLevels[index];
+      final bool isAccessible;
+      if (index == 0) {
+        isAccessible = true;
+      } else {
+        final prevLevelId = orderedLevels[index - 1].id;
+        final prevProgress = progressMap[prevLevelId];
+        isAccessible =
+            prevProgress != null && prevProgress.isCompleted == true;
+      }
+      final Color circleColor;
+      if (progressMap[level.id]?.isCompleted == true) {
+        circleColor = AppColors.green;
+      } else if (isAccessible) {
+        circleColor = AppColors.blue;
+      } else {
+        circleColor = AppColors.grey;
+      }
+      final label = '${level.orderIndex}';
+      children.add(
+        Positioned(
+          left: pos.dx,
+          top: pos.dy - minY,
+          child: SizedBox(
+            width: circleSize,
+            height: circleSize,
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                padding: EdgeInsets.zero,
+                shape: const CircleBorder(),
+                backgroundColor: circleColor,
+                foregroundColor: Colors.white,
+                disabledForegroundColor: Colors.white70,
+                elevation: 2,
+              ),
+              onPressed: isAccessible
+                  ? () => context.push('/game/level/${level.id}')
+                  : null,
+              child: Center(child: Text(label)),
+            ),
+          ),
+        ),
+      );
+
+      final isLastLevelInModule =
+          index == orderedLevels.length - 1 ||
+          orderedLevels[index + 1].theoryModuleId != level.theoryModuleId;
+      final hasNextModule = index < orderedLevels.length - 1;
+
+      if (isLastLevelInModule && hasNextModule) {
+        final nextPos = positions[index + 1];
+        final moduleLabelTop =
+            ((pos.dy + nextPos.dy) / 2) - minY - 10;
+        children.add(
+          Positioned(
+            top: moduleLabelTop,
+            left: 0,
+            right: 0,
+            child: Text(
+              '----- Модуль ${level.theoryModuleId} -----',
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: AppColors.blue,
+              ),
+            ),
+          ),
+        );
+      }
+    }
 
     return SingleChildScrollView(
       controller: _scrollController,
@@ -119,51 +195,7 @@ class _GamePageState extends State<GamePage> {
         child: SizedBox(
           height: contentHeight,
           child: Stack(
-            children: positions.asMap().entries.map((entry) {
-              final index = entry.key;
-              final pos = entry.value;
-              final level = orderedLevels[index];
-              final bool isAccessible;
-              if (index == 0) {
-                isAccessible = true;
-              } else {
-                final prevLevelId = orderedLevels[index - 1].id;
-                final prevProgress = progressMap[prevLevelId];
-                isAccessible =
-                    prevProgress != null && prevProgress.isCompleted == true;
-              }
-              final Color circleColor;
-              if (progressMap[level.id]?.isCompleted == true) {
-                circleColor = AppColors.green;
-              } else if (isAccessible) {
-                circleColor = AppColors.blue;
-              } else {
-                circleColor = AppColors.grey;
-              }
-              final label = '${index + 1}';
-              return Positioned(
-                left: pos.dx,
-                top: pos.dy - minY,
-                child: SizedBox(
-                  width: circleSize,
-                  height: circleSize,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      padding: EdgeInsets.zero,
-                      shape: const CircleBorder(),
-                      backgroundColor: circleColor,
-                      foregroundColor: Colors.white,
-                      disabledForegroundColor: Colors.white70,
-                      elevation: 2,
-                    ),
-                    onPressed: isAccessible
-                        ? () => context.push('/game/level/${level.id}')
-                        : null,
-                    child: Center(child: Text(label)),
-                  ),
-                ),
-              );
-            }).toList(),
+            children: children,
           ),
         ),
       ),

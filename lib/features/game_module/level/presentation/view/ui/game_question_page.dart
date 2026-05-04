@@ -7,6 +7,8 @@ import 'package:sugarlife/features/game_module/level/presentation/bloc/game_modu
 import 'package:sugarlife/shared/ui/main_app_bar.dart';
 
 class GameQuestionPage extends StatefulWidget {
+  const GameQuestionPage({super.key});
+
   @override
   State<GameQuestionPage> createState() => _GameQuestionPageState();
 }
@@ -34,7 +36,6 @@ class _GameQuestionPageState extends State<GameQuestionPage> {
       _selectedStringAnswer = null;
       _selectedBoolAnswer = null;
       _selectedMultipleSelectAnswer = null;
-      print('Question changed to $currentQuestionId, answers reset');
     }
   }
 
@@ -49,6 +50,9 @@ class _GameQuestionPageState extends State<GameQuestionPage> {
         : (state is AnswerInProgress ? state.question : null);
     final isAnswered = state is ReceiveSuccess ? state.isAnswered : true;
     final isAnswerInProgress = state is AnswerInProgress;
+    final selectionLocked =
+        isAnswerInProgress ||
+        (state is ReceiveSuccess && state.isAnswered);
     if (currentQuestion == null && !isAnswerInProgress) {
       return const SizedBox.shrink();
     }
@@ -76,13 +80,17 @@ class _GameQuestionPageState extends State<GameQuestionPage> {
                 _buildQuestionHeader(currentQuestion),
                 _buildAnswer(
                   currentQuestion,
+                  selectionLocked: selectionLocked,
                   onStringAnswerSelected: (answer) {
+                    if (selectionLocked) return;
                     setState(() => _selectedStringAnswer = answer);
                   },
                   onBoolAnswerSelected: (answer) {
+                    if (selectionLocked) return;
                     setState(() => _selectedBoolAnswer = answer);
                   },
                   onMultipleSelectSelected: (indices) {
+                    if (selectionLocked) return;
                     setState(() => _selectedMultipleSelectAnswer = indices);
                   },
                   selectedStringAnswer: _selectedStringAnswer,
@@ -252,6 +260,7 @@ Widget _buildButton(
 
 Widget _buildAnswer(
   GameModuleQuestionEntity question, {
+  required bool selectionLocked,
   required Function(String) onStringAnswerSelected,
   required Function(bool) onBoolAnswerSelected,
   required Function(List<int>) onMultipleSelectSelected,
@@ -263,23 +272,27 @@ Widget _buildAnswer(
     case QuestionType.multipleChoice:
       return MultipleChoiceWidget(
         question: question,
+        selectionLocked: selectionLocked,
         selectedAnswer: selectedStringAnswer,
         onAnswerSelected: onStringAnswerSelected,
       );
     case QuestionType.fillBlank:
       return FillBlankWidget(
         question: question,
+        selectionLocked: selectionLocked,
         onAnswerSelected: onStringAnswerSelected,
       );
     case QuestionType.trueFalse:
       return TrueFalseWidget(
         question: question,
+        selectionLocked: selectionLocked,
         selectedAnswer: selectedBoolAnswer,
         onAnswerSelected: onBoolAnswerSelected,
       );
     case QuestionType.multipleSelect:
       return MultipleSelectWidget(
         question: question,
+        selectionLocked: selectionLocked,
         selectedIndices: selectedMultipleSelectAnswer,
         onAnswerSelected: onMultipleSelectSelected,
       );
@@ -288,10 +301,12 @@ Widget _buildAnswer(
 
 class MultipleChoiceWidget extends StatelessWidget {
   final GameModuleQuestionEntity question;
+  final bool selectionLocked;
   final String? selectedAnswer;
   final Function(String) onAnswerSelected;
   const MultipleChoiceWidget({
     required this.question,
+    required this.selectionLocked,
     required this.onAnswerSelected,
     required this.selectedAnswer,
     super.key,
@@ -312,7 +327,7 @@ class MultipleChoiceWidget extends StatelessWidget {
           final isSelected = answer == selectedAnswer;
 
           return GestureDetector(
-            onTap: () => onAnswerSelected(answer),
+            onTap: selectionLocked ? null : () => onAnswerSelected(answer),
             child: Container(
               decoration: BoxDecoration(
                 color: isSelected ? AppColors.blue : AppColors.white,
@@ -345,12 +360,14 @@ class MultipleChoiceWidget extends StatelessWidget {
 
 class TrueFalseWidget extends StatelessWidget {
   final GameModuleQuestionEntity question;
+  final bool selectionLocked;
   final Function(bool) onAnswerSelected;
   final bool? selectedAnswer;
 
   const TrueFalseWidget({
     super.key,
     required this.question,
+    required this.selectionLocked,
     required this.onAnswerSelected,
     this.selectedAnswer,
   });
@@ -366,7 +383,7 @@ class TrueFalseWidget extends StatelessWidget {
             child: _buildAnswerCard(
               answer: question.answers[0],
               isSelected: selectedAnswer == true,
-              onTap: () => onAnswerSelected(true),
+              onTap: selectionLocked ? null : () => onAnswerSelected(true),
             ),
           ),
           const SizedBox(width: 12),
@@ -376,7 +393,7 @@ class TrueFalseWidget extends StatelessWidget {
             child: _buildAnswerCard(
               answer: question.answers[1],
               isSelected: selectedAnswer == false,
-              onTap: () => onAnswerSelected(false),
+              onTap: selectionLocked ? null : () => onAnswerSelected(false),
             ),
           ),
         ],
@@ -387,7 +404,7 @@ class TrueFalseWidget extends StatelessWidget {
   Widget _buildAnswerCard({
     required String answer,
     required bool isSelected,
-    required VoidCallback onTap,
+    required VoidCallback? onTap,
   }) {
     return GestureDetector(
       onTap: onTap,
@@ -418,9 +435,11 @@ class TrueFalseWidget extends StatelessWidget {
 
 class FillBlankWidget extends StatefulWidget {
   final GameModuleQuestionEntity question;
+  final bool selectionLocked;
   final Function(String) onAnswerSelected;
   const FillBlankWidget({
     required this.question,
+    required this.selectionLocked,
     required this.onAnswerSelected,
     super.key,
   });
@@ -447,6 +466,7 @@ class _FillBlankWidgetState extends State<FillBlankWidget> {
         children: [
           TextField(
             controller: _controller,
+            readOnly: widget.selectionLocked,
             decoration: InputDecoration(
               hintText: 'Введите ответ...',
               border: OutlineInputBorder(
@@ -456,14 +476,16 @@ class _FillBlankWidgetState extends State<FillBlankWidget> {
               fillColor: Colors.white,
               errorText: _errorText,
             ),
-            onChanged: (value) {
-              if (value.trim().isNotEmpty) {
-                setState(() => _errorText = null);
-                widget.onAnswerSelected(value.trim());
-              } else {
-                widget.onAnswerSelected('');
-              }
-            },
+            onChanged: widget.selectionLocked
+                ? null
+                : (value) {
+                    if (value.trim().isNotEmpty) {
+                      setState(() => _errorText = null);
+                      widget.onAnswerSelected(value.trim());
+                    } else {
+                      widget.onAnswerSelected('');
+                    }
+                  },
           ),
           const SizedBox(height: 8),
           Text(
@@ -480,12 +502,14 @@ class _FillBlankWidgetState extends State<FillBlankWidget> {
 }
 class MultipleSelectWidget extends StatefulWidget {
   final GameModuleQuestionEntity question;
+  final bool selectionLocked;
   final Function(List<int>) onAnswerSelected;
   final List<int>? selectedIndices;
 
   const MultipleSelectWidget({
     super.key,
     required this.question,
+    required this.selectionLocked,
     required this.onAnswerSelected,
     this.selectedIndices,
   });
@@ -520,16 +544,18 @@ class _MultipleSelectWidgetState extends State<MultipleSelectWidget> {
           children: List.generate(widget.question.answers.length, (index) {
             final isSelected = _selectedIndices.contains(index);
             return GestureDetector(
-              onTap: () {
-                setState(() {
-                  if (isSelected) {
-                    _selectedIndices.remove(index);
-                  } else {
-                    _selectedIndices.add(index);
-                  }
-                });
-                widget.onAnswerSelected(_selectedIndices.toList());
-              },
+              onTap: widget.selectionLocked
+                  ? null
+                  : () {
+                      setState(() {
+                        if (isSelected) {
+                          _selectedIndices.remove(index);
+                        } else {
+                          _selectedIndices.add(index);
+                        }
+                      });
+                      widget.onAnswerSelected(_selectedIndices.toList());
+                    },
               child: Container(
                 margin: const EdgeInsets.only(bottom: 12),
                 padding: const EdgeInsets.symmetric(
