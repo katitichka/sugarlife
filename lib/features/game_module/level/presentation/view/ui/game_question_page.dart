@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sugarlife/core/enum/question_type.dart';
 import 'package:sugarlife/core/theme/app_color.dart';
@@ -314,6 +314,29 @@ class MultipleChoiceWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final useSingleColumn = question.answers.any(_isLongAnswer);
+
+    if (useSingleColumn) {
+      return Expanded(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            children: question.answers.map((answer) {
+              final isSelected = answer == selectedAnswer;
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: _buildAnswerCard(
+                  answer: answer,
+                  isSelected: isSelected,
+                  isCompact: false,
+                ),
+              );
+            }).toList(),
+          ),
+        ),
+      );
+    }
+
     return Padding(
       padding: const EdgeInsets.all(16),
       child: GridView.count(
@@ -325,34 +348,57 @@ class MultipleChoiceWidget extends StatelessWidget {
         childAspectRatio: 2.5,
         children: question.answers.map((answer) {
           final isSelected = answer == selectedAnswer;
-
-          return GestureDetector(
-            onTap: selectionLocked ? null : () => onAnswerSelected(answer),
-            child: Container(
-              decoration: BoxDecoration(
-                color: isSelected ? AppColors.blue : AppColors.white,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: isSelected ? AppColors.blue : AppColors.grey,
-                  width: isSelected ? 2 : 1,
-                ),
-              ),
-              child: Center(
-                child: Text(
-                  answer,
-                  style: TextStyle(
-                    color: isSelected ? Colors.white : Colors.black87,
-                    fontSize: 16,
-                    fontWeight: isSelected
-                        ? FontWeight.w600
-                        : FontWeight.normal,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-            ),
+          return _buildAnswerCard(
+            answer: answer,
+            isSelected: isSelected,
+            isCompact: true,
           );
         }).toList(),
+      ),
+    );
+  }
+
+  bool _isLongAnswer(String answer) {
+    final normalized = answer.trim();
+    if (normalized.isEmpty) {
+      return false;
+    }
+    final wordsCount = normalized.split(RegExp(r'\s+')).length;
+    return wordsCount >= 2 || normalized.length > 16;
+  }
+
+  Widget _buildAnswerCard({
+    required String answer,
+    required bool isSelected,
+    required bool isCompact,
+  }) {
+    return GestureDetector(
+      onTap: selectionLocked ? null : () => onAnswerSelected(answer),
+      child: Container(
+        padding: EdgeInsets.symmetric(
+          horizontal: 12,
+          vertical: isCompact ? 8 : 14,
+        ),
+        decoration: BoxDecoration(
+          color: isSelected ? AppColors.blue : AppColors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: isSelected ? AppColors.blue : AppColors.grey,
+            width: isSelected ? 2 : 1,
+          ),
+        ),
+        child: Center(
+          child: Text(
+            answer,
+            style: TextStyle(
+              color: isSelected ? Colors.white : Colors.black87,
+              fontSize: 16,
+              fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+            ),
+            textAlign: TextAlign.center,
+            softWrap: true,
+          ),
+        ),
       ),
     );
   }
