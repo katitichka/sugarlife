@@ -63,7 +63,7 @@ class _SplashScreenState extends State<SplashScreen> {
               ),
             ),
             Positioned(
-              top: 20,
+              top: 30,
               left: 0,
               right: 0,
               child: Text(
@@ -79,9 +79,9 @@ class _SplashScreenState extends State<SplashScreen> {
             const Positioned(
               left: 0,
               right: 0,
-              bottom: 80,
+              bottom: 120,
               child: Center(
-                child: AnimatedLoadingDots(color: AppColors.blue),
+                child: AnimatedLoadingDots(color: AppColors.white),
               ),
             ),
           ],

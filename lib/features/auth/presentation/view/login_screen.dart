@@ -59,13 +59,15 @@ class _LoginScreenState extends State<LoginScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              SizedBox(height: 30),
+              SizedBox(height: 35),
               Text(
                 'Сладкая жизнь',
                 style: TextStyle(
                   fontWeight: FontWeight.w700,
                   color: AppColors.blue,
                   fontSize: 28,
+                  height: 0.9, 
+                  
                 ),
               ),
               SizedBox(height: 20),

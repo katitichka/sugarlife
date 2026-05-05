@@ -1,12 +1,66 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sugarlife/core/theme/app_color.dart';
 import 'package:sugarlife/features/achievement/presentation/bloc/achievement_bloc.dart';
 import 'package:sugarlife/features/achievement/presentation/widgets/achievement_reward_dialog.dart';
+import 'package:sugarlife/features/daily_card/presentation/view/daily_card_screen.dart';
 import 'package:sugarlife/features/game_module/level/domain/entities/game_module_level_entity.dart';
 import 'package:sugarlife/features/game_module/list/presentation/bloc/game_module_list_bloc.dart';
 import 'package:sugarlife/features/profile/domain/entities/level_progress_entity.dart';
+
+class LevelPositionCalculator {
+  static const int stepX = 80;
+  static const int stepY = 100;
+  const LevelPositionCalculator();
+  Offset calculatePosition(int index, double startY, double centerX) {
+    final remainder = index % 4;
+    final double x;
+    if (remainder == 0) {
+      x = centerX - stepX;
+    } else if (remainder == 1) {
+      x = centerX;
+    } else if (remainder == 2) {
+      x = centerX + stepX;
+    } else {
+      x = centerX;
+    }
+
+    final y = startY - index * stepY;
+    return Offset(x, y);
+  }
+}
+
+/// Вертикальные и горизонтальные константы карты уровней в [GamePage].
+class _GameMapMetrics {
+  _GameMapMetrics._();
+
+  static const topPadding = 110.0;
+  static const bottomPadding = 70.0;
+  static const circleSize = 60.0;
+  static const moduleDividerHeight = 40.0;
+  static const gapAroundModuleDivider = 10.0;
+  static const stackTopMargin = 8.0;
+  static const scrollPaddingTop = 50.0;
+  static const scrollPaddingBottom = 60.0;
+
+  /// Доп. высота контента Stack (как в исходной формуле `contentHeight`).
+  static const contentHeightExtra = 50.0;
+  static const dividerHorizontalInset = 16.0;
+
+  /// Высота блока «отступ — дивайдер — отступ» над верхом круга.
+  static double get dividerBlockAboveCircle =>
+      gapAroundModuleDivider * 2 + moduleDividerHeight;
+
+  /// Доп. вертикальный зазор на границе зигзага 4→1 относительно шага [LevelPositionCalculator.stepY].
+  static double get moduleExtraGap =>
+      circleSize +
+      gapAroundModuleDivider +
+      moduleDividerHeight +
+      gapAroundModuleDivider -
+      LevelPositionCalculator.stepY;
+}
 
 class GamePage extends StatefulWidget {
   const GamePage({super.key});
@@ -21,7 +75,7 @@ class _GamePageState extends State<GamePage> {
   bool _isAchievementDialogVisible = false;
   int? _lastHandledAchievementId;
 
-  /// Порядок: снизу вверх — первый уровень сценария, затем следующий (theory → order).
+  /// Снизу вверх: сортировка по theory, затем по order.
   static List<GameModuleLevelEntity> _orderedLevels(
     List<GameModuleLevelEntity> levels,
   ) {
@@ -144,69 +198,97 @@ class _GamePageState extends State<GamePage> {
     Map<int, LevelProgressEntity> progressMap,
   ) {
     final orderedLevels = _orderedLevels(levels);
+    if (orderedLevels.isEmpty) {
+      return const SizedBox.shrink();
+    }
 
-    const topPadding = 110.0;
-    const bottomPadding = 70.0;
-    const circleSize = 60.0;
-    const moduleDividerHeight = 40.0;
-    const moduleInterLevelGap = 150.0;
-    const topModuleLabelGap = 20.0;
+    // Порядковый номер модуля для подписи (1, 2, …), не id из БД.
+    final displayModuleByTheoryId = <int, int>{};
+    var nextDisplay = 1;
+    for (final level in orderedLevels) {
+      displayModuleByTheoryId.putIfAbsent(level.theoryModuleId, () {
+        return nextDisplay++;
+      });
+    }
+
     final screenHeight = MediaQuery.of(context).size.height;
-    final startY = screenHeight;
     final centerX = MediaQuery.of(context).size.width / 2;
     const calculator = LevelPositionCalculator();
+
     positions = List.generate(
       orderedLevels.length,
-      (index) => calculator.calculatePosition(index, startY, centerX),
+      (i) => calculator.calculatePosition(i, screenHeight, centerX),
     );
 
-    final moduleExtraGap =
-        moduleInterLevelGap - LevelPositionCalculator.stepY;
-    var passedModuleBreaks = 0;
+    // Сдвиг Y после каждого полного зигзага (4→1): доп. место под дивайдер.
+    var cycleBreaks = 0;
     final adjustedYs = <double>[];
-    for (var index = 0; index < orderedLevels.length; index++) {
-      if (index > 0 &&
-          orderedLevels[index].theoryModuleId !=
-              orderedLevels[index - 1].theoryModuleId) {
-        passedModuleBreaks++;
+    for (var i = 0; i < orderedLevels.length; i++) {
+      if (i > 0 && i % 4 == 0) {
+        cycleBreaks++;
       }
-      adjustedYs.add(positions[index].dy - passedModuleBreaks * moduleExtraGap);
+      adjustedYs.add(
+        positions[i].dy - cycleBreaks * _GameMapMetrics.moduleExtraGap,
+      );
     }
 
     final minY = adjustedYs.reduce((a, b) => a < b ? a : b);
     final maxY = adjustedYs.reduce((a, b) => a > b ? a : b);
-    final contentHeight = maxY - minY + topPadding + bottomPadding;
+
+    final baseLevelTop = List<double>.generate(
+      orderedLevels.length,
+      (i) => _GameMapMetrics.topPadding + adjustedYs[i] - minY,
+    );
+
+    final lastIndex = orderedLevels.length - 1;
+    var topShift = 0.0;
+    final rawTopDividerTop =
+        baseLevelTop[lastIndex] - _GameMapMetrics.dividerBlockAboveCircle;
+    if (rawTopDividerTop < _GameMapMetrics.stackTopMargin) {
+      topShift = _GameMapMetrics.stackTopMargin - rawTopDividerTop;
+    }
+
     final children = <Widget>[];
 
-    for (final entry in positions.asMap().entries) {
-      final index = entry.key;
-      final pos = entry.value;
-      final adjustedTop = topPadding + adjustedYs[index] - minY;
-      final level = orderedLevels[index];
+    void addHorizontalModuleDivider(double top, int displayModuleNumber) {
+      children.add(
+        Positioned(
+          top: top,
+          left: _GameMapMetrics.dividerHorizontalInset,
+          right: _GameMapMetrics.dividerHorizontalInset,
+          child: SizedBox(
+            height: _GameMapMetrics.moduleDividerHeight,
+            child: _ModuleDivider(displayModuleNumber: displayModuleNumber),
+          ),
+        ),
+      );
+    }
+
+    for (var i = 0; i < orderedLevels.length; i++) {
+      final pos = positions[i];
+      final levelTop = baseLevelTop[i] + topShift;
+      final level = orderedLevels[i];
+
       final bool isAccessible;
-      if (index == 0) {
+      if (i == 0) {
         isAccessible = true;
       } else {
-        final prevLevelId = orderedLevels[index - 1].id;
-        final prevProgress = progressMap[prevLevelId];
-        isAccessible = prevProgress != null && prevProgress.isCompleted == true;
+        final prevId = orderedLevels[i - 1].id;
+        final p = progressMap[prevId];
+        isAccessible = p != null && p.isCompleted == true;
       }
-      final Color circleColor;
-      if (progressMap[level.id]?.isCompleted == true) {
-        circleColor = AppColors.green;
-      } else if (isAccessible) {
-        circleColor = AppColors.blue;
-      } else {
-        circleColor = AppColors.grey;
-      }
-      final label = '${level.orderIndex}';
+
+      final circleColor = progressMap[level.id]?.isCompleted == true
+          ? AppColors.green
+          : (isAccessible ? AppColors.blue : AppColors.grey);
+
       children.add(
         Positioned(
           left: pos.dx,
-          top: adjustedTop,
+          top: levelTop,
           child: SizedBox(
-            width: circleSize,
-            height: circleSize,
+            width: _GameMapMetrics.circleSize,
+            height: _GameMapMetrics.circleSize,
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
                 padding: EdgeInsets.zero,
@@ -222,9 +304,7 @@ class _GamePageState extends State<GamePage> {
                       final result = await context.push(
                         '/game/level/${level.id}',
                       );
-                      if (!mounted) {
-                        return;
-                      }
+                      if (!mounted) return;
                       if (result == true) {
                         achievementBloc.add(
                           const AchievementEvent.checkPendingAchievement(),
@@ -235,68 +315,86 @@ class _GamePageState extends State<GamePage> {
                       }
                     }
                   : null,
-              child: Center(child: Text(label)),
+              child: Center(child: Text('${level.orderIndex}')),
             ),
           ),
         ),
       );
-
-      final isLastLevelInModule =
-          index == orderedLevels.length - 1 ||
-          orderedLevels[index + 1].theoryModuleId != level.theoryModuleId;
-      if (isLastLevelInModule) {
-        final hasNextModule = index < orderedLevels.length - 1;
-        final moduleLabelTop = hasNextModule
-            ? (() {
-                final nextTop = adjustedYs[index + 1] - minY;
-                final gapStart = adjustedTop + circleSize;
-                final gapEnd = nextTop;
-                return gapStart +
-                    (gapEnd - gapStart - moduleDividerHeight) / 2;
-              })()
-            : adjustedTop - topModuleLabelGap - moduleDividerHeight;
-        children.add(
-          Positioned(
-            top: moduleLabelTop,
-            left: 16,
-            right: 16,
-            child: SizedBox(
-              height: moduleDividerHeight,
-              child: _ModuleDivider(moduleId: level.theoryModuleId),
-            ),
-          ),
-        );
+      //TODO
+      if (i > 0 && i % 4 == 0) {
+        final prevLevelTop = baseLevelTop[i - 1] + topShift;
+        final dividerTop =
+            prevLevelTop +
+            _GameMapMetrics.circleSize +
+            _GameMapMetrics.gapAroundModuleDivider;
+        final display = displayModuleByTheoryId[level.theoryModuleId]!;
+        addHorizontalModuleDivider(dividerTop, display);
       }
     }
 
-    return SingleChildScrollView(
-      controller: _scrollController,
-      child: Padding(
-        padding: const EdgeInsets.only(left: 0, right: 0, top: 50, bottom: 60),
-        child: SizedBox(height: contentHeight, child: Stack(children: children)),
-      ),
+    final lastLevelTop = baseLevelTop[lastIndex] + topShift;
+    addHorizontalModuleDivider(
+      lastLevelTop - _GameMapMetrics.dividerBlockAboveCircle,
+      displayModuleByTheoryId[orderedLevels[lastIndex].theoryModuleId]!,
+    );
+
+    final contentHeight =
+        maxY -
+        minY +
+        _GameMapMetrics.topPadding +
+        _GameMapMetrics.bottomPadding +
+        _GameMapMetrics.contentHeightExtra +
+        topShift;
+    return Stack(
+      children: [
+        SingleChildScrollView(
+          controller: _scrollController,
+          child: Padding(
+            padding: const EdgeInsets.only(top: 50, bottom: 60),
+            child: SizedBox(
+              height: contentHeight,
+              child: Stack(children: children),
+            ),
+          ),
+        ),
+        Positioned(
+          top: 20,
+          right: 10,
+          child: IconButton(
+            icon: Image.asset(
+              'assets/icons/daily1.png',
+              width: 92,
+              height: 52,
+              fit: BoxFit.contain,
+            ), //TODO: сделать svg 
+            onPressed: () {
+              showDialog(
+                context: context,
+                barrierDismissible: false,
+                builder: (_) => const DailyCardScreen(),
+              );
+            },
+          ),
+        ),
+      ],
     );
   }
 }
 
 class _ModuleDivider extends StatelessWidget {
-  const _ModuleDivider({required this.moduleId});
+  const _ModuleDivider({required this.displayModuleNumber});
 
-  final int moduleId;
+  final int displayModuleNumber;
 
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
         const Expanded(
-          child: Divider(
-            color: AppColors.white,
-            thickness: 1.5,
-            endIndent: 12,
-          ),
+          child: Divider(color: AppColors.white, thickness: 1.5, endIndent: 12),
         ),
         Text(
-          'Модуль $moduleId',
+          'Модуль $displayModuleNumber',
           textAlign: TextAlign.center,
           style: const TextStyle(
             fontSize: 18,
@@ -305,35 +403,9 @@ class _ModuleDivider extends StatelessWidget {
           ),
         ),
         const Expanded(
-          child: Divider(
-            color: AppColors.white,
-            thickness: 1.5,
-            indent: 12,
-          ),
+          child: Divider(color: AppColors.white, thickness: 1.5, indent: 12),
         ),
       ],
     );
-  }
-}
-
-class LevelPositionCalculator {
-  static const int stepX = 80;
-  static const int stepY = 100;
-  const LevelPositionCalculator();
-  Offset calculatePosition(int index, double startY, double centerX) {
-    final remainder = index % 4;
-    final double x;
-    if (remainder == 0) {
-      x = centerX - stepX;
-    } else if (remainder == 1) {
-      x = centerX;
-    } else if (remainder == 2) {
-      x = centerX + stepX;
-    } else {
-      x = centerX;
-    }
-
-    final y = startY - index * stepY;
-    return Offset(x, y);
   }
 }
