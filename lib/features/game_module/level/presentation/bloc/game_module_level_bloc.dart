@@ -178,12 +178,35 @@ class GameModuleLevelBloc
     final newAnswers = Map<int, bool>.from(successState.answers);
     newAnswers[successState.currentIndex] = isCorrect;
     emit(successState.copyWith(isAnswered: true, answers: newAnswers));
+    // Формирование текста правильного ответа для отображения
+    String correctAnswerText = '';
+    var indices = currentQuestion.correctAnswerIndices;
+    if (indices == null || indices.isEmpty) {
+      final raw = currentQuestion.correctAnswer;
+      if (raw != null && raw.isNotEmpty) {
+        indices = raw
+            .split(',')
+            .map((e) => int.tryParse(e.trim()))
+            .whereType<int>()
+            .toList();
+      }
+    }
+    if (indices != null && indices.isNotEmpty) {
+      final correctAnswers = indices
+          .where((i) => i >= 0 && i < currentQuestion.answers.length)
+          .map((index) => currentQuestion.answers[index])
+          .toList();
+      correctAnswerText = correctAnswers.join(', ');
+    }
     emit(
       AnswerInProgress(
         isCorrect: isCorrect,
         explanation: currentQuestion.explanation,
-        selectedAnswer: selectedIndices.toString(),
-        correctAnswer: currentQuestion.correctAnswerIndices?.toString() ?? '',
+        selectedAnswer: selectedIndices
+          .map((i) => currentQuestion.answers[i])
+          .toList()
+          .join(', '),
+        correctAnswer: correctAnswerText,
         question: currentQuestion,
         currentIndex: successState.currentIndex,
         questions: successState.questions,
@@ -280,17 +303,6 @@ class GameModuleLevelBloc
             ..sort((a, b) => a.orderIndex.compareTo(b.orderIndex));
 
       if (moduleLevels.isEmpty) {
-        return;
-      }
-
-      final lastOrderIndex = moduleLevels.last.orderIndex;
-      print(
-        'Проверка модуля ${currentLevel.theoryModuleId} после уровня ${currentLevel.id}',
-      );
-      if (currentLevel.orderIndex != lastOrderIndex) {
-        print(
-          'Уровень ${currentLevel.id} не последний в модуле ${currentLevel.theoryModuleId}',
-        );
         return;
       }
 

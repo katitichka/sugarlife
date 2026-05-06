@@ -14,8 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$ProfileEntity {
 
- String get id; String get username; List<DateTime> get correctDates;// даты павильных ответов для миф правда
- int get currentAvatarId;
+ String get id; String get username; int get currentAvatarId;
 /// Create a copy of ProfileEntity
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -26,16 +25,16 @@ $ProfileEntityCopyWith<ProfileEntity> get copyWith => _$ProfileEntityCopyWithImp
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ProfileEntity&&(identical(other.id, id) || other.id == id)&&(identical(other.username, username) || other.username == username)&&const DeepCollectionEquality().equals(other.correctDates, correctDates)&&(identical(other.currentAvatarId, currentAvatarId) || other.currentAvatarId == currentAvatarId));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ProfileEntity&&(identical(other.id, id) || other.id == id)&&(identical(other.username, username) || other.username == username)&&(identical(other.currentAvatarId, currentAvatarId) || other.currentAvatarId == currentAvatarId));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,id,username,const DeepCollectionEquality().hash(correctDates),currentAvatarId);
+int get hashCode => Object.hash(runtimeType,id,username,currentAvatarId);
 
 @override
 String toString() {
-  return 'ProfileEntity(id: $id, username: $username, correctDates: $correctDates, currentAvatarId: $currentAvatarId)';
+  return 'ProfileEntity(id: $id, username: $username, currentAvatarId: $currentAvatarId)';
 }
 
 
@@ -46,7 +45,7 @@ abstract mixin class $ProfileEntityCopyWith<$Res>  {
   factory $ProfileEntityCopyWith(ProfileEntity value, $Res Function(ProfileEntity) _then) = _$ProfileEntityCopyWithImpl;
 @useResult
 $Res call({
- String id, String username, List<DateTime> correctDates, int currentAvatarId
+ String id, String username, int currentAvatarId
 });
 
 
@@ -63,12 +62,11 @@ class _$ProfileEntityCopyWithImpl<$Res>
 
 /// Create a copy of ProfileEntity
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? username = null,Object? correctDates = null,Object? currentAvatarId = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? username = null,Object? currentAvatarId = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,username: null == username ? _self.username : username // ignore: cast_nullable_to_non_nullable
-as String,correctDates: null == correctDates ? _self.correctDates : correctDates // ignore: cast_nullable_to_non_nullable
-as List<DateTime>,currentAvatarId: null == currentAvatarId ? _self.currentAvatarId : currentAvatarId // ignore: cast_nullable_to_non_nullable
+as String,currentAvatarId: null == currentAvatarId ? _self.currentAvatarId : currentAvatarId // ignore: cast_nullable_to_non_nullable
 as int,
   ));
 }
@@ -151,10 +149,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String username,  List<DateTime> correctDates,  int currentAvatarId)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String username,  int currentAvatarId)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _ProfileEntity() when $default != null:
-return $default(_that.id,_that.username,_that.correctDates,_that.currentAvatarId);case _:
+return $default(_that.id,_that.username,_that.currentAvatarId);case _:
   return orElse();
 
 }
@@ -172,10 +170,10 @@ return $default(_that.id,_that.username,_that.correctDates,_that.currentAvatarId
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String username,  List<DateTime> correctDates,  int currentAvatarId)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String username,  int currentAvatarId)  $default,) {final _that = this;
 switch (_that) {
 case _ProfileEntity():
-return $default(_that.id,_that.username,_that.correctDates,_that.currentAvatarId);}
+return $default(_that.id,_that.username,_that.currentAvatarId);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -189,10 +187,10 @@ return $default(_that.id,_that.username,_that.correctDates,_that.currentAvatarId
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String username,  List<DateTime> correctDates,  int currentAvatarId)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String username,  int currentAvatarId)?  $default,) {final _that = this;
 switch (_that) {
 case _ProfileEntity() when $default != null:
-return $default(_that.id,_that.username,_that.correctDates,_that.currentAvatarId);case _:
+return $default(_that.id,_that.username,_that.currentAvatarId);case _:
   return null;
 
 }
@@ -204,19 +202,11 @@ return $default(_that.id,_that.username,_that.correctDates,_that.currentAvatarId
 
 
 class _ProfileEntity implements ProfileEntity {
-  const _ProfileEntity({required this.id, required this.username, required final  List<DateTime> correctDates, required this.currentAvatarId}): _correctDates = correctDates;
+  const _ProfileEntity({required this.id, required this.username, required this.currentAvatarId});
   
 
 @override final  String id;
 @override final  String username;
- final  List<DateTime> _correctDates;
-@override List<DateTime> get correctDates {
-  if (_correctDates is EqualUnmodifiableListView) return _correctDates;
-  // ignore: implicit_dynamic_type
-  return EqualUnmodifiableListView(_correctDates);
-}
-
-// даты павильных ответов для миф правда
 @override final  int currentAvatarId;
 
 /// Create a copy of ProfileEntity
@@ -229,16 +219,16 @@ _$ProfileEntityCopyWith<_ProfileEntity> get copyWith => __$ProfileEntityCopyWith
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ProfileEntity&&(identical(other.id, id) || other.id == id)&&(identical(other.username, username) || other.username == username)&&const DeepCollectionEquality().equals(other._correctDates, _correctDates)&&(identical(other.currentAvatarId, currentAvatarId) || other.currentAvatarId == currentAvatarId));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ProfileEntity&&(identical(other.id, id) || other.id == id)&&(identical(other.username, username) || other.username == username)&&(identical(other.currentAvatarId, currentAvatarId) || other.currentAvatarId == currentAvatarId));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,id,username,const DeepCollectionEquality().hash(_correctDates),currentAvatarId);
+int get hashCode => Object.hash(runtimeType,id,username,currentAvatarId);
 
 @override
 String toString() {
-  return 'ProfileEntity(id: $id, username: $username, correctDates: $correctDates, currentAvatarId: $currentAvatarId)';
+  return 'ProfileEntity(id: $id, username: $username, currentAvatarId: $currentAvatarId)';
 }
 
 
@@ -249,7 +239,7 @@ abstract mixin class _$ProfileEntityCopyWith<$Res> implements $ProfileEntityCopy
   factory _$ProfileEntityCopyWith(_ProfileEntity value, $Res Function(_ProfileEntity) _then) = __$ProfileEntityCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String username, List<DateTime> correctDates, int currentAvatarId
+ String id, String username, int currentAvatarId
 });
 
 
@@ -266,12 +256,11 @@ class __$ProfileEntityCopyWithImpl<$Res>
 
 /// Create a copy of ProfileEntity
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? username = null,Object? correctDates = null,Object? currentAvatarId = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? username = null,Object? currentAvatarId = null,}) {
   return _then(_ProfileEntity(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,username: null == username ? _self.username : username // ignore: cast_nullable_to_non_nullable
-as String,correctDates: null == correctDates ? _self._correctDates : correctDates // ignore: cast_nullable_to_non_nullable
-as List<DateTime>,currentAvatarId: null == currentAvatarId ? _self.currentAvatarId : currentAvatarId // ignore: cast_nullable_to_non_nullable
+as String,currentAvatarId: null == currentAvatarId ? _self.currentAvatarId : currentAvatarId // ignore: cast_nullable_to_non_nullable
 as int,
   ));
 }

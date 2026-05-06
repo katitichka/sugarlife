@@ -165,14 +165,40 @@ class AchievementRepositoryImpl implements AchievementRepository {
         .eq('achievement_id', achievement.id)
         .maybeSingle();
     if (existingRelation != null) {
+      final shownIds = await _getShownAchievementIds();
+      if (!shownIds.contains(achievement.id)) {
+        final prefs = await _prefs;
+        await prefs.setInt(_pendingAchievementKey, achievement.id);
+        print(
+          'Достижение ${achievement.id} уже в БД, pending восстановлен для показа карточки',
+        );
+        return achievement;
+      }
       print('Достижение ${achievement.id} уже было выдано');
       return null;
     }
 
-    await _supabase.from('user_achievement').insert({
-      'user_id': userId,
-      'achievement_id': achievement.id,
-    });
+    try {
+      await _supabase.from('user_achievement').insert({
+        'user_id': userId,
+        'achievement_id': achievement.id,
+      });
+    } catch (e) {
+      // Сеть могла оборваться после успешного INSERT на сервере.
+      // Проверяем факт записи и продолжаем, если связь уже создана.
+      final relationAfterFailure = await _supabase
+          .from('user_achievement')
+          .select('achievement_id')
+          .eq('user_id', userId)
+          .eq('achievement_id', achievement.id)
+          .maybeSingle();
+      if (relationAfterFailure == null) {
+        rethrow;
+      }
+      print(
+        'INSERT вернул ошибку ($e), но запись достижения ${achievement.id} уже есть в БД',
+      );
+    }
 
     print('Сохранено достижение ${achievement.id} для пользователя $userId');
 

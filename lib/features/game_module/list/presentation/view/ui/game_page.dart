@@ -4,7 +4,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sugarlife/core/theme/app_color.dart';
 import 'package:sugarlife/features/achievement/presentation/bloc/achievement_bloc.dart';
-import 'package:sugarlife/features/achievement/presentation/widgets/achievement_reward_dialog.dart';
+import 'package:sugarlife/features/achievement/presentation/view/achievement_reward_dialog.dart';
 import 'package:sugarlife/features/daily_card/presentation/view/daily_card_screen.dart';
 import 'package:sugarlife/features/game_module/level/domain/entities/game_module_level_entity.dart';
 import 'package:sugarlife/features/game_module/list/presentation/bloc/game_module_list_bloc.dart';
@@ -103,33 +103,38 @@ class _GamePageState extends State<GamePage> {
         _lastHandledAchievementId == achievement.id) {
       return;
     }
+    if (!(ModalRoute.of(context)?.isCurrent ?? true)) {
+      return;
+    }
 
     _isAchievementDialogVisible = true;
-    _lastHandledAchievementId = achievement.id;
-    await Future<void>.delayed(const Duration(milliseconds: 700));
-    if (!mounted) {
+    try {
+      await Future<void>.delayed(const Duration(milliseconds: 700));
+      if (!mounted || !(ModalRoute.of(context)?.isCurrent ?? true)) {
+        return;
+      }
+
+      await showDialog<void>(
+        context: context,
+        barrierDismissible: false,
+        builder: (_) => AchievementRewardDialog(achievement: achievement),
+      );
+      if (!mounted) {
+        return;
+      }
+
+      _lastHandledAchievementId = achievement.id;
+      context.read<AchievementBloc>().add(
+        AchievementEvent.markPendingAchievementShown(
+          achievementId: achievement.id,
+        ),
+      );
+      context.read<AchievementBloc>().add(
+        const AchievementEvent.loadAchievements(),
+      );
+    } finally {
       _isAchievementDialogVisible = false;
-      return;
     }
-
-    await showDialog<void>(
-      context: context,
-      barrierDismissible: false,
-      builder: (_) => AchievementRewardDialog(achievement: achievement),
-    );
-    if (!mounted) {
-      return;
-    }
-
-    context.read<AchievementBloc>().add(
-      AchievementEvent.markPendingAchievementShown(
-        achievementId: achievement.id,
-      ),
-    );
-    context.read<AchievementBloc>().add(
-      const AchievementEvent.loadAchievements(),
-    );
-    _isAchievementDialogVisible = false;
   }
 
   @override
@@ -275,7 +280,8 @@ class _GamePageState extends State<GamePage> {
       } else {
         final prevId = orderedLevels[i - 1].id;
         final p = progressMap[prevId];
-        isAccessible = p != null && p.isCompleted == true;
+        // Следующий уровень доступен только если предыдущий пройден минимум на 1 звезду.
+        isAccessible = p != null && (p.stars ?? 0) > 0;
       }
 
       final circleColor = progressMap[level.id]?.isCompleted == true

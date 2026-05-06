@@ -6,15 +6,27 @@ abstract class GameModuleQuestionDtoMapper {
   static GameModuleQuestionEntity toEntity({
     required GameModuleQuestionDto dto,
   }) {
+    final questionType = QuestionType.parseLoose(dto.questionsType);
+    
+    List<int>? correctAnswerIndices;
+    if (questionType == QuestionType.multipleSelect && dto.correctAnswer != null) {
+      correctAnswerIndices = dto.correctAnswer!
+          .split(',')
+          .map((e) => int.tryParse(e.trim()))
+          .whereType<int>()
+          .toList();
+    }
+    
     return GameModuleQuestionEntity(
       id: dto.id,
       question: dto.question,
-      questionType: QuestionType.parseLoose(dto.questionsType),
+      questionType: questionType,
       answers: dto.answers,
       explanation: dto.explanation,
       orderIndex: dto.orderIndex,
       levelId: dto.levelId,
       correctAnswer: dto.correctAnswer,
+      correctAnswerIndices: correctAnswerIndices,
     );
   }
 }

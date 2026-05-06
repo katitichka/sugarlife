@@ -48,7 +48,6 @@ class AuthRepositoryImpl implements AuthRepository {
       return ProfileEntity(
         id: authUser.id,
         username: profileData['username'] ?? '',
-        correctDates: correctDates,
         currentAvatarId: profileData['current_avatar_id'] ?? 1,
       );
     } catch (e) {
@@ -73,18 +72,10 @@ class AuthRepositoryImpl implements AuthRepository {
 
       if (profileData == null) return null;
 
-      // Преобразование JSON-поля correct_dates
-      final List<DateTime> correctDates =
-          (profileData['correct_dates'] as List?)
-              ?.map((date) => DateTime.parse(date.toString()))
-              .toList() ??
-          [];
-
       // Формирование сущности профиля
       return ProfileEntity(
         id: authUser.id,
         username: profileData['username'] ?? '',
-        correctDates: correctDates,
         currentAvatarId: profileData['current_avatar_id'] ?? 1,
       );
     } catch (e) {
@@ -135,7 +126,6 @@ class AuthRepositoryImpl implements AuthRepository {
         await _supabase.from('user_profile').insert({
           'id': authUser.id,
           'username': username,
-          'correct_dates': [],
           'current_avatar_id': 1,
         });
 
@@ -177,18 +167,11 @@ ProfileEntity _mapToProfileEntity(
   User authUser,
   Map<String, dynamic> profileData,
 ) {
-  // Парсинг JSON-строк в объекты DateTime
-  final List<DateTime> correctDates =
-      (profileData['correct_dates'] as List?)
-          ?.map((date) => DateTime.parse(date.toString()))
-          .toList() ??
-      [];
 
   // Формирование сущности профиля
   return ProfileEntity(
     id: authUser.id,
     username: profileData['username'] ?? '',
-    correctDates: correctDates,
     currentAvatarId: profileData['current_avatar_id'] ?? 1,
   );
 }

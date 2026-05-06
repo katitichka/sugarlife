@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_markdown/flutter_markdown.dart';
-import 'package:sugarlife/features/theory_module/domain/repositories/theory_module_repository.dart';
+import 'package:sugarlife/features/theory_module/domain/entities/theory_module_entity.dart';
+import 'package:sugarlife/features/theory_module/presentation/bloc/theory_module_bloc.dart';
 import 'package:sugarlife/shared/ui/main_app_bar.dart';
 
 class TheoryScreenPage extends StatelessWidget {
@@ -10,81 +10,76 @@ class TheoryScreenPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theoryRepository = context.read<TheoryModuleRepository>();
     return Scaffold(
-      appBar: MainAppBar(title: 'Модуль ${moduleId - 1}'),
-      body: FutureBuilder(
-        future: theoryRepository.getModuleById(id: moduleId),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          if (snapshot.hasError) {
-            return Center(child: Text('Ошибка: ${snapshot.error}'));
-          }
-          if (!snapshot.hasData) {
-            return const Center(child: Text('Модуль не найден'));
-          }
-          final module = snapshot.data!;
-          final Color moduleColor = module.color;
-          return SingleChildScrollView(
-            padding: EdgeInsets.all(15),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  module.title,
-                  style: Theme.of(context).textTheme.headlineMedium,
+      appBar: MainAppBar(title: 'Теоретический модуль'),
+      body: BlocBuilder<TheoryModuleBloc, TheoryModuleState>(
+        builder: (context, state) {
+          switch (state) {
+            case ReceiveInProgress():
+              return const Center(child: CircularProgressIndicator());
+            case ReceiveFailed(:final message):
+              return Center(child: Text('Ошибка: $message'));
+            case ReceiveSuccess():
+              final module = _findModuleById(state.theoryModules, moduleId);
+              if (module == null) {
+                return const Center(child: Text('Модуль не найден'));
+              }
+              return SingleChildScrollView(
+                padding: const EdgeInsets.all(15),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      module.title,
+                      style: Theme.of(context).textTheme.headlineMedium,
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      module.subtitle,
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    const SizedBox(height: 20),
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 20),
+                      child: Image.asset(
+                        _imageAssetForModule(moduleId),
+                        width: double.infinity,
+                        fit: BoxFit.contain,
+                        errorBuilder: (context, error, stackTrace) => Container(
+                          height: 200,
+                          color: Colors.grey[200],
+                          child: const Center(
+                            child: Text('Изображение не найдено'),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 10),
-                Text(
-                  module.subtitle,
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-                const SizedBox(height: 20),
-                MarkdownBody(
-                  data: module.content ?? 'Нет содержимого',
-                  selectable: true,
-                  styleSheet: MarkdownStyleSheet(
-                    // Стиль для заголовков h1 (#)
-                    h1: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: moduleColor,
-                    ),
-                    // Стиль для заголовков h2 (##)
-                    h2: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: moduleColor,
-                    ),
-                    // Стиль для заголовков h3 (###)
-                    h3: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                      color: moduleColor,
-                    ),
-                    // Стиль для обычного текста
-                    p: TextStyle(
-                      fontSize: 16,
-                      color: Colors.black87,
-                      height: 1.5,
-                    ),
-                    // Стиль для списков (маркированных)
-                    listBullet: TextStyle(fontSize: 16, color: Colors.black87),
-                    // Стиль для жирного текста (**текст**)
-                    strong: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                    ),
-                    blockSpacing: 16,
-                  ),
-                ),
-              ],
-            ),
-          );
+              );
+            default:
+              return const Center(child: CircularProgressIndicator());
+          }
         },
       ),
     );
+  }
+
+  String _imageAssetForModule(int id) {
+    // Пока все модули используют локальную картинку,
+    // позже можно добавить разные изображения по id.
+    return 'assets/images/theory1.png';
+  }
+
+  TheoryModuleEntity? _findModuleById(
+    List<TheoryModuleEntity> modules,
+    int id,
+  ) {
+    for (final module in modules) {
+      if (module.id == id) {
+        return module;
+      }
+    }
+    return null;
   }
 }

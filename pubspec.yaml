@@ -84,6 +84,7 @@ flutter:
     - assets/achievements/
     - assets/icons/
     - assets/characters/
+    - assets/images/
     - assets/images/splash_background.png
     # - assets/lottie
 

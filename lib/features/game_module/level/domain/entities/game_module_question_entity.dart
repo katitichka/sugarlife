@@ -35,17 +35,33 @@ sealed class GameModuleQuestionEntity with _$GameModuleQuestionEntity {
             correctAnswer?.trim().toLowerCase();
       case QuestionType.multipleSelect:
         final userIndices = userAnswer as List<int>;
-        if (correctAnswer == null) return false;
+        final correctIndices = _resolvedMultipleSelectIndices();
 
-        // Парсим строку '0, 2, 4, 5, 6' в List<int>
-        final correctIndices = correctAnswer!
-            .split(',')
-            .map((e) => int.tryParse(e.trim()))
-            .whereType<int>()
-            .toList();
-
+        if (correctIndices == null || correctIndices.isEmpty) return false;
         if (userIndices.length != correctIndices.length) return false;
-        return userIndices.toSet().containsAll(correctIndices);
+        
+        final sortedUser = List.of(userIndices)..sort();
+        final sortedCorrect = List.of(correctIndices)..sort();
+        
+        for (int i = 0; i < sortedUser.length; i++) {
+          if (sortedUser[i] != sortedCorrect[i]) return false;
+        }
+        return true;
     }
+  }
+
+  /// Индексы для `multiple_select`: из поля или из строки `correctAnswer` (кэш/старый формат).
+  List<int>? _resolvedMultipleSelectIndices() {
+    if (correctAnswerIndices != null && correctAnswerIndices!.isNotEmpty) {
+      return correctAnswerIndices;
+    }
+    final raw = correctAnswer;
+    if (raw == null || raw.isEmpty) return null;
+    final parsed = raw
+        .split(',')
+        .map((e) => int.tryParse(e.trim()))
+        .whereType<int>()
+        .toList();
+    return parsed.isEmpty ? null : parsed;
   }
 }
