@@ -36,10 +36,20 @@ class AchievementBloc extends Bloc<AchievementEvent, AchievementState> {
   Future<void> _checkPendingAchievement(Emitter<AchievementState> emit) async {
     try {
       final achievement = await _achievementRepository.getPendingAchievement();
-      emit(state.copyWith(pendingAchievement: achievement));
+      emit(
+        state.copyWith(
+          pendingAchievement: achievement,
+          pendingSyncToken: state.pendingSyncToken + 1,
+        ),
+      );
     } catch (e) {
       print('Ошибка получения pending-достижения: $e');
-      emit(state.copyWith(pendingAchievement: null));
+      emit(
+        state.copyWith(
+          pendingAchievement: null,
+          pendingSyncToken: state.pendingSyncToken + 1,
+        ),
+      );
     }
   }
 
@@ -55,6 +65,11 @@ class AchievementBloc extends Bloc<AchievementEvent, AchievementState> {
       print('Ошибка сохранения показа достижения: $e');
     }
 
-    emit(state.copyWith(pendingAchievement: null));
+    emit(
+      state.copyWith(
+        pendingAchievement: null,
+        pendingSyncToken: state.pendingSyncToken + 1,
+      ),
+    );
   }
 }

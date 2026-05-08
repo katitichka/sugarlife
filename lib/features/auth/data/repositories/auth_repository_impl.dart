@@ -37,13 +37,6 @@ class AuthRepositoryImpl implements AuthRepository {
         throw Exception('Профиль пользователя не найден');
       }
 
-      // Преобразование JSON-поля correct_dates в список DateTime
-      final List<DateTime> correctDates =
-          (profileData['correct_dates'] as List?)
-              ?.map((date) => DateTime.parse(date.toString()))
-              .toList() ??
-          [];
-
       // Формирование и возврат сущности профиля
       return ProfileEntity(
         id: authUser.id,

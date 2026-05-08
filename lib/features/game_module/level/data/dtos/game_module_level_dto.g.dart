@@ -11,8 +11,7 @@ _GameModuleLevelDto _$GameModuleLevelDtoFromJson(Map<String, dynamic> json) =>
       id: (json['id'] as num).toInt(),
       title: json['title'] as String,
       orderIndex: (json['order_index'] as num).toInt(),
-      theoryModuleId: (json['theory_module_id'] as num).toInt(),
-      totalQuestions: (json['totalQuestions'] as num).toInt(),
+      theoryModuleId: (json['theory_module_id'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$GameModuleLevelDtoToJson(_GameModuleLevelDto instance) =>
@@ -21,5 +20,4 @@ Map<String, dynamic> _$GameModuleLevelDtoToJson(_GameModuleLevelDto instance) =>
       'title': instance.title,
       'order_index': instance.orderIndex,
       'theory_module_id': instance.theoryModuleId,
-      'totalQuestions': instance.totalQuestions,
     };

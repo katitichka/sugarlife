@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:sugarlife/core/router/root_navigator.dart';
 import 'package:sugarlife/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:sugarlife/features/auth/presentation/view/login_screen.dart';
 import 'package:sugarlife/features/auth/presentation/view/splash_screen.dart';
@@ -16,6 +17,7 @@ import 'package:sugarlife/features/theory_module/presentation/ui/theory_screen_p
 import 'package:sugarlife/features/widgets/app_scaffold.dart';
 
 final appRoute = GoRouter(
+  navigatorKey: rootNavigatorKey,
   initialLocation: '/splash',
   routes: [
     GoRoute(

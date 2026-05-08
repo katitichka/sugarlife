@@ -9,8 +9,8 @@ abstract class GameModuleQuestionDtoMapper {
     final questionType = QuestionType.parseLoose(dto.questionsType);
     
     List<int>? correctAnswerIndices;
-    if (questionType == QuestionType.multipleSelect && dto.correctAnswer != null) {
-      correctAnswerIndices = dto.correctAnswer!
+    if (questionType == QuestionType.multipleSelect) {
+      correctAnswerIndices = dto.correctAnswer
           .split(',')
           .map((e) => int.tryParse(e.trim()))
           .whereType<int>()

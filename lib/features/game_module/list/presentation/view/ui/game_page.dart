@@ -1,7 +1,7 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:sugarlife/core/router/root_navigator.dart';
 import 'package:sugarlife/core/theme/app_color.dart';
 import 'package:sugarlife/features/achievement/presentation/bloc/achievement_bloc.dart';
 import 'package:sugarlife/features/achievement/presentation/view/achievement_reward_dialog.dart';
@@ -103,25 +103,28 @@ class _GamePageState extends State<GamePage> {
         _lastHandledAchievementId == achievement.id) {
       return;
     }
-    if (!(ModalRoute.of(context)?.isCurrent ?? true)) {
-      return;
-    }
 
     _isAchievementDialogVisible = true;
     try {
-      await Future<void>.delayed(const Duration(milliseconds: 700));
-      if (!mounted || !(ModalRoute.of(context)?.isCurrent ?? true)) {
-        return;
-      }
+      // Ждём завершения анимации перехода (~300 мс).
+      // ModalRoute.of(context)?.isCurrent не используется намеренно:
+      // внутри StatefulShellRoute вложенный навигатор ветки возвращает
+      // некорректный результат при pop с дочернего маршрута.
+      // Защита от дублей — _isAchievementDialogVisible + _lastHandledAchievementId.
+      await Future<void>.delayed(const Duration(milliseconds: 500));
+      if (!mounted) return;
+
+      final rootCtx = rootNavigatorKey.currentContext;
+      final dialogContext =
+          (rootCtx != null && rootCtx.mounted) ? rootCtx : context;
+      if (!dialogContext.mounted) return;
 
       await showDialog<void>(
-        context: context,
+        context: dialogContext,
         barrierDismissible: false,
         builder: (_) => AchievementRewardDialog(achievement: achievement),
       );
-      if (!mounted) {
-        return;
-      }
+      if (!mounted) return;
 
       _lastHandledAchievementId = achievement.id;
       context.read<AchievementBloc>().add(
@@ -177,7 +180,7 @@ class _GamePageState extends State<GamePage> {
         ),
         BlocListener<AchievementBloc, AchievementState>(
           listenWhen: (previous, current) =>
-              previous.pendingAchievement?.id != current.pendingAchievement?.id,
+              previous.pendingSyncToken != current.pendingSyncToken,
           listener: (context, state) {
             _showAchievementDialog(state);
           },
@@ -318,6 +321,17 @@ class _GamePageState extends State<GamePage> {
                         achievementBloc.add(
                           const AchievementEvent.loadAchievements(),
                         );
+                        // Доп. вызов: Bloc мог не уведомить слушателей, если состояние
+                        // по сути то же; после checkPending токен всегда меняется.
+                        WidgetsBinding.instance.addPostFrameCallback((_) async {
+                          await Future<void>.delayed(
+                            const Duration(milliseconds: 150),
+                          );
+                          if (!mounted) return;
+                          await _showAchievementDialog(
+                            context.read<AchievementBloc>().state,
+                          );
+                        });
                       }
                     }
                   : null,

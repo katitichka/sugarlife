@@ -24,9 +24,21 @@ class GameModuleListBloc
       switch (event) {
         case _Receive():
           await _onReceive(emit: emit);
-        case _LevelCompleted():
-          // Обновляем прогресс на карте; экран результата показывается внутри уровня.
-          add(const GameModuleListEvent.receive());
+        case _LevelCompleted(
+          :final levelId,
+          :final stars,
+          :final correctAnswers,
+        ):
+          // 1. Оптимистичное обновление — сразу отражаем результат в UI,
+          //    не дожидаясь ответа от Supabase.
+          _applyOptimisticProgress(
+            emit: emit,
+            levelId: levelId,
+            stars: stars,
+            correctAnswers: correctAnswers,
+          );
+          // 2. Тихая синхронизация с сервером в фоне.
+          await _onSilentRefresh(emit: emit);
       }
     });
   }
@@ -41,7 +53,9 @@ class GameModuleListBloc
     );
     try {
       final levels = await _gameModuleLevelListRepository.getAllLevels();
-      final allLevelsProgress = await _gameProgressRepository.getAllLevelsProgress();
+      final allLevelsProgress = await _gameProgressRepository
+          .getAllLevelsProgress()
+          .timeout(const Duration(seconds: 15));
       emit(
         GameModuleListState.receiveSuccess(
           levels: levels,
@@ -50,6 +64,51 @@ class GameModuleListBloc
       );
     } catch (e) {
       emit(GameModuleListState.receiveFailed(message: 'Ошибка: $e'));
+    }
+  }
+
+  /// Немедленно обновляет progressMap в текущем состоянии локальными данными,
+  /// не делая запроса к сети. Состояние обновляется синхронно — пользователь
+  /// видит пройденный уровень сразу при возврате на GamePage.
+  void _applyOptimisticProgress({
+    required Emitter<GameModuleListState> emit,
+    required int levelId,
+    required int stars,
+    required int correctAnswers,
+  }) {
+    final current = state;
+    if (current is! ReceiveSuccess) return;
+    final updatedMap = Map<int, LevelProgressEntity>.from(current.progressMap);
+    updatedMap[levelId] = LevelProgressEntity(
+      levelId: levelId,
+      isCompleted: stars > 0,
+      stars: stars,
+      lastPlayedAt: DateTime.now(),
+      correctAnswers: correctAnswers,
+    );
+    emit(ReceiveSuccess(levels: current.levels, progressMap: updatedMap));
+  }
+
+  /// Обновляет данные без перехода в receiveInProgress.
+  /// Используется после завершения уровня — GamePage остаётся
+  /// в текущем состоянии (не показывает спиннер) и обновляется,
+  /// когда данные придут.
+  Future<void> _onSilentRefresh({
+    required Emitter<GameModuleListState> emit,
+  }) async {
+    try {
+      final levels = await _gameModuleLevelListRepository.getAllLevels();
+      final allLevelsProgress = await _gameProgressRepository
+          .getAllLevelsProgress()
+          .timeout(const Duration(seconds: 15));
+      emit(
+        GameModuleListState.receiveSuccess(
+          levels: levels,
+          progressMap: allLevelsProgress,
+        ),
+      );
+    } catch (_) {
+      // Молча игнорируем — текущее состояние экрана не трогаем.
     }
   }
 }

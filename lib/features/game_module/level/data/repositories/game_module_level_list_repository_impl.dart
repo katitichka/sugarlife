@@ -1,4 +1,6 @@
 ﻿import 'package:sugarlife/core/cache/app_cache_service.dart';
+import 'package:sugarlife/features/game_module/level/data/dtos/game_module_level_dto.dart';
+import 'package:sugarlife/features/game_module/level/data/mappers/game_module_level_mapper.dart';
 import 'package:sugarlife/features/game_module/level/domain/entities/game_module_level_entity.dart';
 import 'package:sugarlife/features/game_module/level/domain/repositories/game_module_level_list_repository.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -33,7 +35,11 @@ class GameModuleLevelListRepositoryImpl
       return [];
     }
 
-    final levelIds = response.map((row) => _asInt(row['id'])).toList();
+    final dtos = response
+        .map((row) => GameModuleLevelDto.fromJson(Map<String, dynamic>.from(row)))
+        .toList();
+
+    final levelIds = dtos.map((dto) => dto.id).toList();
     final questionCountByLevel = <int, int>{
       for (final id in levelIds) id: 0,
     };
@@ -48,17 +54,7 @@ class GameModuleLevelListRepositoryImpl
       questionCountByLevel[lid] = (questionCountByLevel[lid] ?? 0) + 1;
     }
 
-    final levels = response
-        .map(
-          (levelJson) => GameModuleLevelEntity(
-            id: _asInt(levelJson['id']),
-            title: levelJson['title'] as String,
-            orderIndex: _asInt(levelJson['order_index']),
-            theoryModuleId: _asInt(levelJson['theory_module_id'] ?? 1),
-            totalQuestions: questionCountByLevel[_asInt(levelJson['id'])] ?? 0,
-          ),
-        )
-        .toList();
+    final levels = GameModuleLevelMapper.toEntityList(dtos, questionCountByLevel);
 
     _cache.saveLevels(levels);
     return levels;
@@ -85,11 +81,9 @@ class GameModuleLevelListRepositoryImpl
         .select('id')
         .eq('level_id', levelId);
 
-    final level = GameModuleLevelEntity(
-      id: _asInt(response['id']),
-      title: response['title'] as String,
-      orderIndex: _asInt(response['order_index']),
-      theoryModuleId: _asInt(response['theory_module_id'] ?? 1),
+    final dto = GameModuleLevelDto.fromJson(Map<String, dynamic>.from(response));
+    final level = GameModuleLevelMapper.toEntity(
+      dto,
       totalQuestions: questions.length,
     );
 

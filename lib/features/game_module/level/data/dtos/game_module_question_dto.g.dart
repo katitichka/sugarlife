@@ -16,7 +16,6 @@ _GameModuleQuestionDto _$GameModuleQuestionDtoFromJson(
   explanation: json['explanation'] as String,
   orderIndex: (json['order_index'] as num).toInt(),
   levelId: (json['level_id'] as num).toInt(),
-  ageCategory: json['age_category'] as String,
   correctAnswer: json['correct_answer'] as String,
 );
 
@@ -30,6 +29,5 @@ Map<String, dynamic> _$GameModuleQuestionDtoToJson(
   'explanation': instance.explanation,
   'order_index': instance.orderIndex,
   'level_id': instance.levelId,
-  'age_category': instance.ageCategory,
   'correct_answer': instance.correctAnswer,
 };

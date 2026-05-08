@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sugarlife/core/assets/app_assets.dart';
@@ -321,23 +322,8 @@ class _ProfilePageState extends State<ProfilePage> {
                                   padding: const EdgeInsets.only(right: 8),
                                   child: ClipRRect(
                                     borderRadius: BorderRadius.circular(14),
-                                    child: CachedNetworkImage(
-                                      imageUrl: achievement.iconUrl,
-                                      width: 58,
-                                      height: 58,
-                                      fit: BoxFit.cover,
-                                      errorWidget: (_, __, ___) => Image.asset(
-                                        AppAssets.achievementPlaceholder,
-                                        width: 58,
-                                        height: 58,
-                                        fit: BoxFit.cover,
-                                      ),
-                                      placeholder: (_, __) => Image.asset(
-                                        AppAssets.achievementPlaceholder,
-                                        width: 58,
-                                        height: 58,
-                                        fit: BoxFit.cover,
-                                      ),
+                                    child: _AchievementIcon(
+                                      url: achievement.iconUrl,
                                     ),
                                   ),
                                 );
@@ -373,6 +359,40 @@ class _AchievementPlaceholderCard extends StatelessWidget {
           fit: BoxFit.cover,
         ),
       ),
+    );
+  }
+}
+
+class _AchievementIcon extends StatelessWidget {
+  const _AchievementIcon({required this.url});
+
+  final String url;
+
+  static Widget _placeholder() => Image.asset(
+    AppAssets.achievementPlaceholder,
+    width: 58,
+    height: 58,
+    fit: BoxFit.cover,
+  );
+
+  @override
+  Widget build(BuildContext context) {
+    if (url.toLowerCase().endsWith('.svg')) {
+      return SvgPicture.network(
+        url,
+        width: 58,
+        height: 58,
+        fit: BoxFit.cover,
+        placeholderBuilder: (_) => _placeholder(),
+      );
+    }
+    return CachedNetworkImage(
+      imageUrl: url,
+      width: 58,
+      height: 58,
+      fit: BoxFit.cover,
+      placeholder: (_, __) => _placeholder(),
+      errorWidget: (_, __, ___) => _placeholder(),
     );
   }
 }

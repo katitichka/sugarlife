@@ -1,5 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:sugarlife/features/achievement/domain/entities/achievement_entity.dart';
 import 'package:sugarlife/features/achievement/domain/repositories/achievement_repository.dart';
 import 'package:sugarlife/features/game_module/level/domain/entities/game_module_question_entity.dart';
 import 'package:sugarlife/features/game_module/level/domain/repositories/game_module_level_repository.dart';
@@ -266,8 +267,11 @@ class GameModuleLevelBloc
         stars: stars,
         correctAnswers: correctCount,
       );
+      AchievementEntity? unlockedAchievement;
       if (stars > 0) {
-        await _checkAndUnlockAchievement(levelId: questions.first.levelId);
+        unlockedAchievement = await _checkAndUnlockAchievement(
+          levelId: questions.first.levelId,
+        );
       }
       _gameModuleListBloc.add(
         GameModuleListEvent.levelCompleted(
@@ -283,12 +287,15 @@ class GameModuleLevelBloc
           correctAnswers: correctCount,
           totalQuestions: questions.length,
           stars: stars,
+          unlockedAchievement: unlockedAchievement,
         ),
       );
     }
   }
 
-  Future<void> _checkAndUnlockAchievement({required int levelId}) async {
+  Future<AchievementEntity?> _checkAndUnlockAchievement({
+    required int levelId,
+  }) async {
     try {
       final currentLevel = await _gameModuleLevelListRepository.getLevelById(
         levelId: levelId,
@@ -303,7 +310,7 @@ class GameModuleLevelBloc
             ..sort((a, b) => a.orderIndex.compareTo(b.orderIndex));
 
       if (moduleLevels.isEmpty) {
-        return;
+        return null;
       }
 
       final progressMap = await _levelProgressRepository.getAllLevelsProgress();
@@ -316,7 +323,7 @@ class GameModuleLevelBloc
         'Модуль ${currentLevel.theoryModuleId} полностью пройден: $isModuleCompleted',
       );
       if (!isModuleCompleted) {
-        return;
+        return null;
       }
 
       final achievement = await _achievementRepository
@@ -326,8 +333,10 @@ class GameModuleLevelBloc
       if (achievement != null) {
         print('Выдано достижение ${achievement.id}: ${achievement.name}');
       }
+      return achievement;
     } catch (e) {
       print('Ошибка проверки/выдачи достижения: $e');
+      return null;
     }
   }
 

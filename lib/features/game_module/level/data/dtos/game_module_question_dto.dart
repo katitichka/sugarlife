@@ -13,7 +13,6 @@ sealed class GameModuleQuestionDto with _$GameModuleQuestionDto {
     required String explanation,
     @JsonKey(name: 'order_index') required int orderIndex,
     @JsonKey(name: 'level_id') required int levelId,
-    @JsonKey(name: 'age_category') required String ageCategory,
     @JsonKey(name: 'correct_answer') required String correctAnswer,
   }) = _GameModuleQuestionDto;
   factory GameModuleQuestionDto.fromJson(Map<String, Object?> json) =>

@@ -310,7 +310,10 @@ as int,
 /// @nodoc
 mixin _$AchievementState {
 
- List<AchievementEntity> get achievements; AchievementEntity? get pendingAchievement;
+ List<AchievementEntity> get achievements; AchievementEntity? get pendingAchievement;/// Увеличивается при каждой проверке pending из хранилища, чтобы слушатели
+/// срабатывали даже если [pendingAchievement] по значению не изменился
+/// (Bloc не шлёт уведомление при `state == previousState`).
+ int get pendingSyncToken;
 /// Create a copy of AchievementState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -321,16 +324,16 @@ $AchievementStateCopyWith<AchievementState> get copyWith => _$AchievementStateCo
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is AchievementState&&const DeepCollectionEquality().equals(other.achievements, achievements)&&(identical(other.pendingAchievement, pendingAchievement) || other.pendingAchievement == pendingAchievement));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is AchievementState&&const DeepCollectionEquality().equals(other.achievements, achievements)&&(identical(other.pendingAchievement, pendingAchievement) || other.pendingAchievement == pendingAchievement)&&(identical(other.pendingSyncToken, pendingSyncToken) || other.pendingSyncToken == pendingSyncToken));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(achievements),pendingAchievement);
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(achievements),pendingAchievement,pendingSyncToken);
 
 @override
 String toString() {
-  return 'AchievementState(achievements: $achievements, pendingAchievement: $pendingAchievement)';
+  return 'AchievementState(achievements: $achievements, pendingAchievement: $pendingAchievement, pendingSyncToken: $pendingSyncToken)';
 }
 
 
@@ -341,7 +344,7 @@ abstract mixin class $AchievementStateCopyWith<$Res>  {
   factory $AchievementStateCopyWith(AchievementState value, $Res Function(AchievementState) _then) = _$AchievementStateCopyWithImpl;
 @useResult
 $Res call({
- List<AchievementEntity> achievements, AchievementEntity? pendingAchievement
+ List<AchievementEntity> achievements, AchievementEntity? pendingAchievement, int pendingSyncToken
 });
 
 
@@ -358,11 +361,12 @@ class _$AchievementStateCopyWithImpl<$Res>
 
 /// Create a copy of AchievementState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? achievements = null,Object? pendingAchievement = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? achievements = null,Object? pendingAchievement = freezed,Object? pendingSyncToken = null,}) {
   return _then(_self.copyWith(
 achievements: null == achievements ? _self.achievements : achievements // ignore: cast_nullable_to_non_nullable
 as List<AchievementEntity>,pendingAchievement: freezed == pendingAchievement ? _self.pendingAchievement : pendingAchievement // ignore: cast_nullable_to_non_nullable
-as AchievementEntity?,
+as AchievementEntity?,pendingSyncToken: null == pendingSyncToken ? _self.pendingSyncToken : pendingSyncToken // ignore: cast_nullable_to_non_nullable
+as int,
   ));
 }
 /// Create a copy of AchievementState
@@ -456,10 +460,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( List<AchievementEntity> achievements,  AchievementEntity? pendingAchievement)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( List<AchievementEntity> achievements,  AchievementEntity? pendingAchievement,  int pendingSyncToken)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _AchievementState() when $default != null:
-return $default(_that.achievements,_that.pendingAchievement);case _:
+return $default(_that.achievements,_that.pendingAchievement,_that.pendingSyncToken);case _:
   return orElse();
 
 }
@@ -477,10 +481,10 @@ return $default(_that.achievements,_that.pendingAchievement);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( List<AchievementEntity> achievements,  AchievementEntity? pendingAchievement)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( List<AchievementEntity> achievements,  AchievementEntity? pendingAchievement,  int pendingSyncToken)  $default,) {final _that = this;
 switch (_that) {
 case _AchievementState():
-return $default(_that.achievements,_that.pendingAchievement);}
+return $default(_that.achievements,_that.pendingAchievement,_that.pendingSyncToken);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -494,10 +498,10 @@ return $default(_that.achievements,_that.pendingAchievement);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( List<AchievementEntity> achievements,  AchievementEntity? pendingAchievement)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( List<AchievementEntity> achievements,  AchievementEntity? pendingAchievement,  int pendingSyncToken)?  $default,) {final _that = this;
 switch (_that) {
 case _AchievementState() when $default != null:
-return $default(_that.achievements,_that.pendingAchievement);case _:
+return $default(_that.achievements,_that.pendingAchievement,_that.pendingSyncToken);case _:
   return null;
 
 }
@@ -509,7 +513,7 @@ return $default(_that.achievements,_that.pendingAchievement);case _:
 
 
 class _AchievementState implements AchievementState {
-  const _AchievementState({final  List<AchievementEntity> achievements = const [], this.pendingAchievement}): _achievements = achievements;
+  const _AchievementState({final  List<AchievementEntity> achievements = const [], this.pendingAchievement, this.pendingSyncToken = 0}): _achievements = achievements;
   
 
  final  List<AchievementEntity> _achievements;
@@ -520,6 +524,10 @@ class _AchievementState implements AchievementState {
 }
 
 @override final  AchievementEntity? pendingAchievement;
+/// Увеличивается при каждой проверке pending из хранилища, чтобы слушатели
+/// срабатывали даже если [pendingAchievement] по значению не изменился
+/// (Bloc не шлёт уведомление при `state == previousState`).
+@override@JsonKey() final  int pendingSyncToken;
 
 /// Create a copy of AchievementState
 /// with the given fields replaced by the non-null parameter values.
@@ -531,16 +539,16 @@ _$AchievementStateCopyWith<_AchievementState> get copyWith => __$AchievementStat
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _AchievementState&&const DeepCollectionEquality().equals(other._achievements, _achievements)&&(identical(other.pendingAchievement, pendingAchievement) || other.pendingAchievement == pendingAchievement));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _AchievementState&&const DeepCollectionEquality().equals(other._achievements, _achievements)&&(identical(other.pendingAchievement, pendingAchievement) || other.pendingAchievement == pendingAchievement)&&(identical(other.pendingSyncToken, pendingSyncToken) || other.pendingSyncToken == pendingSyncToken));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_achievements),pendingAchievement);
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_achievements),pendingAchievement,pendingSyncToken);
 
 @override
 String toString() {
-  return 'AchievementState(achievements: $achievements, pendingAchievement: $pendingAchievement)';
+  return 'AchievementState(achievements: $achievements, pendingAchievement: $pendingAchievement, pendingSyncToken: $pendingSyncToken)';
 }
 
 
@@ -551,7 +559,7 @@ abstract mixin class _$AchievementStateCopyWith<$Res> implements $AchievementSta
   factory _$AchievementStateCopyWith(_AchievementState value, $Res Function(_AchievementState) _then) = __$AchievementStateCopyWithImpl;
 @override @useResult
 $Res call({
- List<AchievementEntity> achievements, AchievementEntity? pendingAchievement
+ List<AchievementEntity> achievements, AchievementEntity? pendingAchievement, int pendingSyncToken
 });
 
 
@@ -568,11 +576,12 @@ class __$AchievementStateCopyWithImpl<$Res>
 
 /// Create a copy of AchievementState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? achievements = null,Object? pendingAchievement = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? achievements = null,Object? pendingAchievement = freezed,Object? pendingSyncToken = null,}) {
   return _then(_AchievementState(
 achievements: null == achievements ? _self._achievements : achievements // ignore: cast_nullable_to_non_nullable
 as List<AchievementEntity>,pendingAchievement: freezed == pendingAchievement ? _self.pendingAchievement : pendingAchievement // ignore: cast_nullable_to_non_nullable
-as AchievementEntity?,
+as AchievementEntity?,pendingSyncToken: null == pendingSyncToken ? _self.pendingSyncToken : pendingSyncToken // ignore: cast_nullable_to_non_nullable
+as int,
   ));
 }
 

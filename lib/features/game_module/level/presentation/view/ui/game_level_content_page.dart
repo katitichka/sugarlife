@@ -1,6 +1,10 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:sugarlife/core/router/root_navigator.dart';
+import 'package:sugarlife/features/achievement/domain/entities/achievement_entity.dart';
+import 'package:sugarlife/features/achievement/presentation/bloc/achievement_bloc.dart';
+import 'package:sugarlife/features/achievement/presentation/view/achievement_reward_dialog.dart';
 import 'package:sugarlife/features/game_module/level/presentation/bloc/game_module_level_bloc.dart';
 import 'package:sugarlife/features/game_module/level/presentation/view/ui/game_level_result_page.dart';
 import 'package:sugarlife/features/game_module/level/presentation/view/ui/game_level_start_level_page.dart';
@@ -34,6 +38,7 @@ class GameLevelContentPage extends StatelessWidget {
             :final correctAnswers,
             :final totalQuestions,
             :final stars,
+            :final unlockedAchievement,
           ):
             return GameLevelResultPage(
               correctAnswers: correctAnswers,
@@ -43,7 +48,10 @@ class GameLevelContentPage extends StatelessWidget {
                 if (correctAnswers == 0) {
                   context.go('/game/level/$levelId');
                 } else {
-                  context.pop(true);
+                  _finishLevelWithAchievementCard(
+                    context,
+                    unlockedOnThisRun: unlockedAchievement,
+                  );
                 }
               },
             );
@@ -72,4 +80,62 @@ class _ErrorPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(body: Center(child: Text('Ошибка: $message')));
   }
+}
+
+/// Карточку показываем до `pop`: [AchievementBloc] + prefs могут не успеть
+/// синхронизироваться; при закрытии модуля передаём [unlockedOnThisRun] из блока.
+Future<void> _finishLevelWithAchievementCard(
+  BuildContext context, {
+  AchievementEntity? unlockedOnThisRun,
+}) async {
+  final achievementBloc = context.read<AchievementBloc>();
+
+  Future<void> showReward(AchievementEntity achievement) async {
+    final rootCtx = rootNavigatorKey.currentContext;
+    final dialogContext =
+        (rootCtx != null && rootCtx.mounted) ? rootCtx : context;
+    if (!dialogContext.mounted) return;
+    await showDialog<void>(
+      context: dialogContext,
+      barrierDismissible: false,
+      builder: (_) => AchievementRewardDialog(achievement: achievement),
+    );
+  }
+
+  if (unlockedOnThisRun != null) {
+    await showReward(unlockedOnThisRun);
+    if (!context.mounted) return;
+    achievementBloc.add(
+      AchievementEvent.markPendingAchievementShown(
+        achievementId: unlockedOnThisRun.id,
+      ),
+    );
+    achievementBloc.add(const AchievementEvent.loadAchievements());
+    achievementBloc.add(const AchievementEvent.checkPendingAchievement());
+    if (!context.mounted) return;
+    context.pop(true);
+    return;
+  }
+
+  final beforeToken = achievementBloc.state.pendingSyncToken;
+  achievementBloc.add(const AchievementEvent.checkPendingAchievement());
+  try {
+    await achievementBloc.stream.firstWhere(
+      (s) => s.pendingSyncToken != beforeToken,
+    );
+  } catch (_) {}
+
+  if (!context.mounted) return;
+  final pending = achievementBloc.state.pendingAchievement;
+  if (pending != null) {
+    await showReward(pending);
+    if (!context.mounted) return;
+    achievementBloc.add(
+      AchievementEvent.markPendingAchievementShown(achievementId: pending.id),
+    );
+    achievementBloc.add(const AchievementEvent.loadAchievements());
+  }
+
+  if (!context.mounted) return;
+  context.pop(true);
 }

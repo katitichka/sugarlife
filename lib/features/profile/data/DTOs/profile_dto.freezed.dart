@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$ProfileDto {
 
- String get id; String get name; int get age; String get gender;
+ String get id; String get username;@JsonKey(name: 'current_avatar_id') int get currentAvatarId; int? get level;@JsonKey(name: 'created_at') String? get createdAt;
 /// Create a copy of ProfileDto
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $ProfileDtoCopyWith<ProfileDto> get copyWith => _$ProfileDtoCopyWithImpl<Profile
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ProfileDto&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.age, age) || other.age == age)&&(identical(other.gender, gender) || other.gender == gender));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ProfileDto&&(identical(other.id, id) || other.id == id)&&(identical(other.username, username) || other.username == username)&&(identical(other.currentAvatarId, currentAvatarId) || other.currentAvatarId == currentAvatarId)&&(identical(other.level, level) || other.level == level)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,age,gender);
+int get hashCode => Object.hash(runtimeType,id,username,currentAvatarId,level,createdAt);
 
 @override
 String toString() {
-  return 'ProfileDto(id: $id, name: $name, age: $age, gender: $gender)';
+  return 'ProfileDto(id: $id, username: $username, currentAvatarId: $currentAvatarId, level: $level, createdAt: $createdAt)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $ProfileDtoCopyWith<$Res>  {
   factory $ProfileDtoCopyWith(ProfileDto value, $Res Function(ProfileDto) _then) = _$ProfileDtoCopyWithImpl;
 @useResult
 $Res call({
- String id, String name, int age, String gender
+ String id, String username,@JsonKey(name: 'current_avatar_id') int currentAvatarId, int? level,@JsonKey(name: 'created_at') String? createdAt
 });
 
 
@@ -65,13 +65,14 @@ class _$ProfileDtoCopyWithImpl<$Res>
 
 /// Create a copy of ProfileDto
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? age = null,Object? gender = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? username = null,Object? currentAvatarId = null,Object? level = freezed,Object? createdAt = freezed,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
-as String,age: null == age ? _self.age : age // ignore: cast_nullable_to_non_nullable
-as int,gender: null == gender ? _self.gender : gender // ignore: cast_nullable_to_non_nullable
-as String,
+as String,username: null == username ? _self.username : username // ignore: cast_nullable_to_non_nullable
+as String,currentAvatarId: null == currentAvatarId ? _self.currentAvatarId : currentAvatarId // ignore: cast_nullable_to_non_nullable
+as int,level: freezed == level ? _self.level : level // ignore: cast_nullable_to_non_nullable
+as int?,createdAt: freezed == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 
@@ -153,10 +154,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name,  int age,  String gender)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String username, @JsonKey(name: 'current_avatar_id')  int currentAvatarId,  int? level, @JsonKey(name: 'created_at')  String? createdAt)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _ProfileDto() when $default != null:
-return $default(_that.id,_that.name,_that.age,_that.gender);case _:
+return $default(_that.id,_that.username,_that.currentAvatarId,_that.level,_that.createdAt);case _:
   return orElse();
 
 }
@@ -174,10 +175,10 @@ return $default(_that.id,_that.name,_that.age,_that.gender);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name,  int age,  String gender)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String username, @JsonKey(name: 'current_avatar_id')  int currentAvatarId,  int? level, @JsonKey(name: 'created_at')  String? createdAt)  $default,) {final _that = this;
 switch (_that) {
 case _ProfileDto():
-return $default(_that.id,_that.name,_that.age,_that.gender);}
+return $default(_that.id,_that.username,_that.currentAvatarId,_that.level,_that.createdAt);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -191,10 +192,10 @@ return $default(_that.id,_that.name,_that.age,_that.gender);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name,  int age,  String gender)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String username, @JsonKey(name: 'current_avatar_id')  int currentAvatarId,  int? level, @JsonKey(name: 'created_at')  String? createdAt)?  $default,) {final _that = this;
 switch (_that) {
 case _ProfileDto() when $default != null:
-return $default(_that.id,_that.name,_that.age,_that.gender);case _:
+return $default(_that.id,_that.username,_that.currentAvatarId,_that.level,_that.createdAt);case _:
   return null;
 
 }
@@ -206,13 +207,14 @@ return $default(_that.id,_that.name,_that.age,_that.gender);case _:
 @JsonSerializable()
 
 class _ProfileDto implements ProfileDto {
-  const _ProfileDto({required this.id, required this.name, required this.age, required this.gender});
+  const _ProfileDto({required this.id, required this.username, @JsonKey(name: 'current_avatar_id') required this.currentAvatarId, this.level, @JsonKey(name: 'created_at') this.createdAt});
   factory _ProfileDto.fromJson(Map<String, dynamic> json) => _$ProfileDtoFromJson(json);
 
 @override final  String id;
-@override final  String name;
-@override final  int age;
-@override final  String gender;
+@override final  String username;
+@override@JsonKey(name: 'current_avatar_id') final  int currentAvatarId;
+@override final  int? level;
+@override@JsonKey(name: 'created_at') final  String? createdAt;
 
 /// Create a copy of ProfileDto
 /// with the given fields replaced by the non-null parameter values.
@@ -227,16 +229,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ProfileDto&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.age, age) || other.age == age)&&(identical(other.gender, gender) || other.gender == gender));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ProfileDto&&(identical(other.id, id) || other.id == id)&&(identical(other.username, username) || other.username == username)&&(identical(other.currentAvatarId, currentAvatarId) || other.currentAvatarId == currentAvatarId)&&(identical(other.level, level) || other.level == level)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,age,gender);
+int get hashCode => Object.hash(runtimeType,id,username,currentAvatarId,level,createdAt);
 
 @override
 String toString() {
-  return 'ProfileDto(id: $id, name: $name, age: $age, gender: $gender)';
+  return 'ProfileDto(id: $id, username: $username, currentAvatarId: $currentAvatarId, level: $level, createdAt: $createdAt)';
 }
 
 
@@ -247,7 +249,7 @@ abstract mixin class _$ProfileDtoCopyWith<$Res> implements $ProfileDtoCopyWith<$
   factory _$ProfileDtoCopyWith(_ProfileDto value, $Res Function(_ProfileDto) _then) = __$ProfileDtoCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String name, int age, String gender
+ String id, String username,@JsonKey(name: 'current_avatar_id') int currentAvatarId, int? level,@JsonKey(name: 'created_at') String? createdAt
 });
 
 
@@ -264,13 +266,14 @@ class __$ProfileDtoCopyWithImpl<$Res>
 
 /// Create a copy of ProfileDto
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? age = null,Object? gender = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? username = null,Object? currentAvatarId = null,Object? level = freezed,Object? createdAt = freezed,}) {
   return _then(_ProfileDto(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
-as String,age: null == age ? _self.age : age // ignore: cast_nullable_to_non_nullable
-as int,gender: null == gender ? _self.gender : gender // ignore: cast_nullable_to_non_nullable
-as String,
+as String,username: null == username ? _self.username : username // ignore: cast_nullable_to_non_nullable
+as String,currentAvatarId: null == currentAvatarId ? _self.currentAvatarId : currentAvatarId // ignore: cast_nullable_to_non_nullable
+as int,level: freezed == level ? _self.level : level // ignore: cast_nullable_to_non_nullable
+as int?,createdAt: freezed == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 
