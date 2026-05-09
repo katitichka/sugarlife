@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sugarlife/core/theme/app_color.dart';
 import 'package:sugarlife/features/theory_module/domain/entities/theory_module_entity.dart';
 import 'package:sugarlife/features/theory_module/presentation/bloc/theory_module_bloc.dart';
 import 'package:sugarlife/shared/ui/main_app_bar.dart';
@@ -12,6 +13,7 @@ class TheoryScreenPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: MainAppBar(title: 'Теоретический модуль'),
+      backgroundColor: AppColors.white,
       body: BlocBuilder<TheoryModuleBloc, TheoryModuleState>(
         builder: (context, state) {
           switch (state) {
@@ -25,7 +27,6 @@ class TheoryScreenPage extends StatelessWidget {
                 return const Center(child: Text('Модуль не найден'));
               }
               return SingleChildScrollView(
-                padding: const EdgeInsets.all(15),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -65,10 +66,9 @@ class TheoryScreenPage extends StatelessWidget {
     );
   }
 
-  String _imageAssetForModule(int id) {
-    // Пока все модули используют локальную картинку,
-    // позже можно добавить разные изображения по id.
-    return 'assets/images/theory1.png';
+ String _imageAssetForModule(int id) {
+    // Для moduleId 1 → module1.png, 2 → module2.png и т.д.
+    return 'assets/modules/module$id.png';
   }
 
   TheoryModuleEntity? _findModuleById(

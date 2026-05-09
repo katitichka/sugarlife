@@ -13,7 +13,9 @@ import 'package:sugarlife/features/profile/domain/entities/level_progress_entity
 class LevelPositionCalculator {
   static const int stepX = 80;
   static const int stepY = 100;
+
   const LevelPositionCalculator();
+
   Offset calculatePosition(int index, double startY, double centerX) {
     final remainder = index % 4;
     final double x;
@@ -26,40 +28,17 @@ class LevelPositionCalculator {
     } else {
       x = centerX;
     }
-
     final y = startY - index * stepY;
     return Offset(x, y);
   }
 }
 
-/// Вертикальные и горизонтальные константы карты уровней в [GamePage].
 class _GameMapMetrics {
   _GameMapMetrics._();
-
-  static const topPadding = 110.0;
-  static const bottomPadding = 70.0;
+  static const topPadding = 50;
+  static const bottomPadding = 0;
   static const circleSize = 60.0;
-  static const moduleDividerHeight = 40.0;
-  static const gapAroundModuleDivider = 10.0;
-  static const stackTopMargin = 8.0;
-  static const scrollPaddingTop = 50.0;
-  static const scrollPaddingBottom = 60.0;
-
-  /// Доп. высота контента Stack (как в исходной формуле `contentHeight`).
   static const contentHeightExtra = 50.0;
-  static const dividerHorizontalInset = 16.0;
-
-  /// Высота блока «отступ — дивайдер — отступ» над верхом круга.
-  static double get dividerBlockAboveCircle =>
-      gapAroundModuleDivider * 2 + moduleDividerHeight;
-
-  /// Доп. вертикальный зазор на границе зигзага 4→1 относительно шага [LevelPositionCalculator.stepY].
-  static double get moduleExtraGap =>
-      circleSize +
-      gapAroundModuleDivider +
-      moduleDividerHeight +
-      gapAroundModuleDivider -
-      LevelPositionCalculator.stepY;
 }
 
 class GamePage extends StatefulWidget {
@@ -75,7 +54,6 @@ class _GamePageState extends State<GamePage> {
   bool _isAchievementDialogVisible = false;
   int? _lastHandledAchievementId;
 
-  /// Снизу вверх: сортировка по theory, затем по order.
   static List<GameModuleLevelEntity> _orderedLevels(
     List<GameModuleLevelEntity> levels,
   ) {
@@ -103,29 +81,21 @@ class _GamePageState extends State<GamePage> {
         _lastHandledAchievementId == achievement.id) {
       return;
     }
-
     _isAchievementDialogVisible = true;
     try {
-      // Ждём завершения анимации перехода (~300 мс).
-      // ModalRoute.of(context)?.isCurrent не используется намеренно:
-      // внутри StatefulShellRoute вложенный навигатор ветки возвращает
-      // некорректный результат при pop с дочернего маршрута.
-      // Защита от дублей — _isAchievementDialogVisible + _lastHandledAchievementId.
       await Future<void>.delayed(const Duration(milliseconds: 500));
       if (!mounted) return;
-
       final rootCtx = rootNavigatorKey.currentContext;
-      final dialogContext =
-          (rootCtx != null && rootCtx.mounted) ? rootCtx : context;
+      final dialogContext = (rootCtx != null && rootCtx.mounted)
+          ? rootCtx
+          : context;
       if (!dialogContext.mounted) return;
-
       await showDialog<void>(
         context: dialogContext,
         barrierDismissible: false,
         builder: (_) => AchievementRewardDialog(achievement: achievement),
       );
       if (!mounted) return;
-
       _lastHandledAchievementId = achievement.id;
       context.read<AchievementBloc>().add(
         AchievementEvent.markPendingAchievementShown(
@@ -191,7 +161,6 @@ class _GamePageState extends State<GamePage> {
           if (state is ReceiveSuccess) {
             return _buildGameContent(state.levels, state.progressMap);
           }
-
           if (state is ReceiveFailed) {
             return Center(child: Text('Ошибка: ${state.message}'));
           }
@@ -210,17 +179,8 @@ class _GamePageState extends State<GamePage> {
       return const SizedBox.shrink();
     }
 
-    // Порядковый номер модуля для подписи (1, 2, …), не id из БД.
-    final displayModuleByTheoryId = <int, int>{};
-    var nextDisplay = 1;
-    for (final level in orderedLevels) {
-      displayModuleByTheoryId.putIfAbsent(level.theoryModuleId, () {
-        return nextDisplay++;
-      });
-    }
-
     final screenHeight = MediaQuery.of(context).size.height;
-    final centerX = MediaQuery.of(context).size.width / 2;
+    final centerX = MediaQuery.of(context).size.width / 2 - 28;
     const calculator = LevelPositionCalculator();
 
     positions = List.generate(
@@ -228,54 +188,67 @@ class _GamePageState extends State<GamePage> {
       (i) => calculator.calculatePosition(i, screenHeight, centerX),
     );
 
-    // Сдвиг Y после каждого полного зигзага (4→1): доп. место под дивайдер.
-    var cycleBreaks = 0;
-    final adjustedYs = <double>[];
-    for (var i = 0; i < orderedLevels.length; i++) {
-      if (i > 0 && i % 4 == 0) {
-        cycleBreaks++;
-      }
-      adjustedYs.add(
-        positions[i].dy - cycleBreaks * _GameMapMetrics.moduleExtraGap,
-      );
-    }
+    final minY = positions.map((p) => p.dy).reduce((a, b) => a < b ? a : b);
+    final maxY = positions.map((p) => p.dy).reduce((a, b) => a > b ? a : b);
 
-    final minY = adjustedYs.reduce((a, b) => a < b ? a : b);
-    final maxY = adjustedYs.reduce((a, b) => a > b ? a : b);
-
-    final baseLevelTop = List<double>.generate(
+    final baseLevelTop = List.generate(
       orderedLevels.length,
-      (i) => _GameMapMetrics.topPadding + adjustedYs[i] - minY,
+      (i) => _GameMapMetrics.topPadding + positions[i].dy - minY,
     );
-
-    final lastIndex = orderedLevels.length - 1;
-    var topShift = 0.0;
-    final rawTopDividerTop =
-        baseLevelTop[lastIndex] - _GameMapMetrics.dividerBlockAboveCircle;
-    if (rawTopDividerTop < _GameMapMetrics.stackTopMargin) {
-      topShift = _GameMapMetrics.stackTopMargin - rawTopDividerTop;
-    }
 
     final children = <Widget>[];
 
-    void addHorizontalModuleDivider(double top, int displayModuleNumber) {
-      children.add(
-        Positioned(
-          top: top,
-          left: _GameMapMetrics.dividerHorizontalInset,
-          right: _GameMapMetrics.dividerHorizontalInset,
-          child: SizedBox(
-            height: _GameMapMetrics.moduleDividerHeight,
-            child: _ModuleDivider(displayModuleNumber: displayModuleNumber),
-          ),
-        ),
-      );
-    }
+    int dividerNumber = 1;
 
     for (var i = 0; i < orderedLevels.length; i++) {
       final pos = positions[i];
-      final levelTop = baseLevelTop[i] + topShift;
+      final levelTop = baseLevelTop[i];
       final level = orderedLevels[i];
+
+      if (i > 0 &&
+          level.theoryModuleId != orderedLevels[i - 1].theoryModuleId) {
+        final prevLevelTop = baseLevelTop[i - 1];
+        final dividerY = (prevLevelTop + levelTop) / 2;
+
+        children.add(
+          Positioned(
+            left: 0,
+            right: 0,
+            top: dividerY + 20,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Expanded(
+                  child: Divider(
+                    color: AppColors.white,
+                    thickness: 1.5,
+                    endIndent: 12,
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Text(
+                    'Модуль $dividerNumber',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      color: AppColors.white,
+                    ),
+                  ),
+                ),
+                const Expanded(
+                  child: Divider(
+                    color: AppColors.white,
+                    thickness: 1.5,
+                    indent: 12,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+        dividerNumber++;
+      }
 
       final bool isAccessible;
       if (i == 0) {
@@ -283,7 +256,6 @@ class _GamePageState extends State<GamePage> {
       } else {
         final prevId = orderedLevels[i - 1].id;
         final p = progressMap[prevId];
-        // Следующий уровень доступен только если предыдущий пройден минимум на 1 звезду.
         isAccessible = p != null && (p.stars ?? 0) > 0;
       }
 
@@ -321,8 +293,6 @@ class _GamePageState extends State<GamePage> {
                         achievementBloc.add(
                           const AchievementEvent.loadAchievements(),
                         );
-                        // Доп. вызов: Bloc мог не уведомить слушателей, если состояние
-                        // по сути то же; после checkPending токен всегда меняется.
                         WidgetsBinding.instance.addPostFrameCallback((_) async {
                           await Future<void>.delayed(
                             const Duration(milliseconds: 150),
@@ -335,28 +305,64 @@ class _GamePageState extends State<GamePage> {
                       }
                     }
                   : null,
-              child: Center(child: Text('${level.orderIndex}')),
+              child: Center(
+                child: Text(
+                  '${level.orderIndex}',
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
             ),
           ),
         ),
       );
-      //TODO
-      if (i > 0 && i % 4 == 0) {
-        final prevLevelTop = baseLevelTop[i - 1] + topShift;
-        final dividerTop =
-            prevLevelTop +
-            _GameMapMetrics.circleSize +
-            _GameMapMetrics.gapAroundModuleDivider;
-        final display = displayModuleByTheoryId[level.theoryModuleId]!;
-        addHorizontalModuleDivider(dividerTop, display);
-      }
     }
 
-    final lastLevelTop = baseLevelTop[lastIndex] + topShift;
-    addHorizontalModuleDivider(
-      lastLevelTop - _GameMapMetrics.dividerBlockAboveCircle,
-      displayModuleByTheoryId[orderedLevels[lastIndex].theoryModuleId]!,
-    );
+    // Разделитель после последнего модуля
+    if (orderedLevels.isNotEmpty) {
+      final lastLevelTop = baseLevelTop[orderedLevels.length - 1];
+      final lastDividerY = lastLevelTop + _GameMapMetrics.circleSize - 90;
+
+      children.add(
+        Positioned(
+          left: 0,
+          right: 0,
+          top: lastDividerY,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Expanded(
+                child: Divider(
+                  color: AppColors.white,
+                  thickness: 1.5,
+                  endIndent: 12,
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Text(
+                  'Модуль $dividerNumber',
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.white,
+                  ),
+                ),
+              ),
+              const Expanded(
+                child: Divider(
+                  color: AppColors.white,
+                  thickness: 1.5,
+                  indent: 12,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
 
     final contentHeight =
         maxY -
@@ -364,7 +370,8 @@ class _GamePageState extends State<GamePage> {
         _GameMapMetrics.topPadding +
         _GameMapMetrics.bottomPadding +
         _GameMapMetrics.contentHeightExtra +
-        topShift;
+        80;
+
     return Stack(
       children: [
         SingleChildScrollView(
@@ -373,7 +380,7 @@ class _GamePageState extends State<GamePage> {
             padding: const EdgeInsets.only(top: 50, bottom: 60),
             child: SizedBox(
               height: contentHeight,
-              child: Stack(children: children),
+              child: Stack(clipBehavior: Clip.none, children: children),
             ),
           ),
         ),
@@ -386,7 +393,7 @@ class _GamePageState extends State<GamePage> {
               width: 92,
               height: 52,
               fit: BoxFit.contain,
-            ), //TODO: сделать svg 
+            ),
             onPressed: () {
               showDialog(
                 context: context,
@@ -395,35 +402,6 @@ class _GamePageState extends State<GamePage> {
               );
             },
           ),
-        ),
-      ],
-    );
-  }
-}
-
-class _ModuleDivider extends StatelessWidget {
-  const _ModuleDivider({required this.displayModuleNumber});
-
-  final int displayModuleNumber;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        const Expanded(
-          child: Divider(color: AppColors.white, thickness: 1.5, endIndent: 12),
-        ),
-        Text(
-          'Модуль $displayModuleNumber',
-          textAlign: TextAlign.center,
-          style: const TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-            color: AppColors.white,
-          ),
-        ),
-        const Expanded(
-          child: Divider(color: AppColors.white, thickness: 1.5, indent: 12),
         ),
       ],
     );

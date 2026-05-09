@@ -97,7 +97,7 @@ class _GameQuestionPageState extends State<GameQuestionPage> {
                   selectedBoolAnswer: _selectedBoolAnswer,
                   selectedMultipleSelectAnswer: _selectedMultipleSelectAnswer,
                 ),
-
+                  
                 _buildButton(
                   context,
                   isAnswerInProgress,

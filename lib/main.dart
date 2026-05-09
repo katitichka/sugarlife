@@ -5,6 +5,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  
   await dotenv.load(fileName: ".env");
   
   final supabaseUrl = dotenv.env['SUPABASE_URL']!;
@@ -15,4 +16,5 @@ Future<void> main() async {
     debug: true,
   );
   app(Supabase.instance.client);
+
 }

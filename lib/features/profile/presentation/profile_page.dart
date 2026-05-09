@@ -11,7 +11,7 @@ import 'package:sugarlife/features/characters/domain/entitites/character_entity.
 import 'package:sugarlife/features/characters/presentation/ui/choose_character_page.dart';
 import 'package:sugarlife/features/profile/domain/entities/profile_entity.dart';
 import 'package:sugarlife/features/profile/domain/repositories/profile_repository.dart';
-import 'package:sugarlife/features/widgets/remote_avatar_image.dart';
+import 'package:sugarlife/shared/ui/character_network_avatar.dart';
 import 'package:sugarlife/shared/ui/main_app_bar.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -265,23 +265,12 @@ class _ProfilePageState extends State<ProfilePage> {
                                 shape: BoxShape.circle,
                               ),
                               child: ClipOval(
-                                child: RemoteAvatarImage(
-                                  url: url,
-                                  width: 150,
-                                  height: 150,
+                                child: CharacterNetworkAvatar(
+                                  imageUrl: url,
+                                  size: 150,
                                   fit: BoxFit.cover,
-                                  placeholder: const Center(
-                                    child: CircularProgressIndicator(
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                  errorWidget: const Center(
-                                    child: Icon(
-                                      Icons.error_outline,
-                                      color: Colors.white,
-                                      size: 48,
-                                    ),
-                                  ),
+                                  loadingIndicatorColor: Colors.white,
+                                  errorIconColor: Colors.white,
                                 ),
                               ),
                             );
@@ -305,7 +294,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         builder: (context, achievementState) {
                           final achievements = achievementState.achievements;
                           final itemCount = achievements.isEmpty
-                              ? 5
+                              ? 3
                               : achievements.length;
                           return SizedBox(
                             height: 66,

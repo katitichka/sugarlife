@@ -4,7 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:sugarlife/core/theme/app_color.dart';
 import 'package:sugarlife/features/characters/domain/entitites/character_entity.dart';
 import 'package:sugarlife/features/profile/domain/repositories/profile_repository.dart';
-import 'package:sugarlife/features/widgets/remote_avatar_image.dart';
+import 'package:sugarlife/shared/ui/character_network_avatar.dart';
 
 class ChooseCharacterPage extends StatefulWidget {
   final int currentAvatarId;
@@ -108,15 +108,18 @@ class _ChooseCharacterPageState extends State<ChooseCharacterPage> {
                       child: Column(
                         children: [
                           Expanded(
-                            child: RemoteAvatarImage(
-                              url: character.imageUrl,
-                              width: double.infinity,
-                              height: double.infinity,
-                              fit: BoxFit.scaleDown,
-                              placeholder: const Center(
-                                child: CircularProgressIndicator(),
-                              ),
-                              errorWidget: const Icon(Icons.error),
+                            child: LayoutBuilder(
+                              builder: (context, constraints) {
+                                final dim = constraints.biggest.shortestSide;
+                                return Center(
+                                  child: CharacterNetworkAvatar(
+                                    imageUrl: character.imageUrl,
+                                    size: dim > 0 ? dim : 72,
+                                    fit: BoxFit.contain,
+                                    loadingIndicatorColor: AppColors.blue,
+                                  ),
+                                );
+                              },
                             ),
                           ),
                           SizedBox(height: 8),

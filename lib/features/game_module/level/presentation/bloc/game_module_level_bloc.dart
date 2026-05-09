@@ -252,6 +252,9 @@ class GameModuleLevelBloc
       );
     } else {
       final correctCount = answers.values.where((correct) => correct).length;
+      print('=== РАСЧЁТ ЗВЁЗД ===');
+print('correctCount: $correctCount');
+print('answers: $answers');
       int stars;
       if (correctCount >= 3) {
         stars = 3;

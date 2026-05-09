@@ -1,3 +1,4 @@
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sugarlife/features/auth/domain/repositories/auth_repository.dart';
 import 'package:sugarlife/features/profile/domain/entities/profile_entity.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -85,6 +86,12 @@ class AuthRepositoryImpl implements AuthRepository {
     } catch (e) {
       print('Ошибка выхода: $e');
       rethrow;
+    }
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.clear();
+    } catch (e) {
+      print('Ошибка очистки локального кеша: $e');
     }
   }
 

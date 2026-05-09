@@ -23,7 +23,12 @@ class ProfileRepositoryImpl implements ProfileRepository {
     if (lower.startsWith('http://') || lower.startsWith('https://')) {
       return t;
     }
-    final path = t.startsWith('/') ? t.substring(1) : t;
+    var path = t.startsWith('/') ? t.substring(1) : t;
+    // Если в пути уже указан bucket как префикс — убираем, иначе getPublicUrl дублирует папку.
+    final bucketPrefix = '$_characterSvgBucket/';
+    if (path.toLowerCase().startsWith(bucketPrefix)) {
+      path = path.substring(bucketPrefix.length);
+    }
     return _supabase.storage.from(_characterSvgBucket).getPublicUrl(path);
   }
 
