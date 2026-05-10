@@ -49,9 +49,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           loading: () => setState(() {
             _isLoading = true;
           }),
-          authenticated: (_) {
-            context.go('/login');
-          },
+          authenticated: (_) => context.go('/game'),
           unauthenticated: () => setState(() {
             _isLoading = false;
           }),
