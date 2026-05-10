@@ -4,4 +4,5 @@ abstract interface class GameModuleLevelRepository {
   Future<List<GameModuleQuestionEntity>> getQuestionsForLevel({
     required int levelId,
   });
+  Future<String?> getCharacterImageUrl(int characterId);
 }

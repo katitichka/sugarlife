@@ -2,7 +2,6 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:sugarlife/core/assets/app_assets.dart';
 import 'package:sugarlife/core/theme/app_color.dart';
 import 'package:sugarlife/features/achievement/domain/entities/achievement_entity.dart';
 
@@ -70,13 +69,13 @@ class _AchievementRewardDialogState extends State<AchievementRewardDialog> {
                                 alignment: Alignment.center,
                                 transform: Matrix4.identity()..rotateY(math.pi),
                                 child: _CardFace(
-                                  imagePath: AppAssets.achievementOpenCup,
+                                  imagePath: 'assets/achievements/open_cup.png',
                                   title: widget.achievement.name,
                                   subtitle: widget.achievement.description,
                                 ),
                               )
                             : const _CardFace(
-                                imagePath: AppAssets.achievementClosedCard,
+                                imagePath: 'assets/achievements/closed_card.png',
                                 title: 'Нажми, чтобы открыть',
                                 subtitle: 'Твоя новая награда уже здесь',
                               ),

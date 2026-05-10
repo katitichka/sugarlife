@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:sugarlife/core/assets/app_assets.dart';
 import 'package:sugarlife/core/theme/app_color.dart';
 import 'package:sugarlife/features/achievement/presentation/bloc/achievement_bloc.dart';
 import 'package:sugarlife/features/auth/presentation/bloc/auth_bloc.dart';
@@ -342,7 +341,7 @@ class _AchievementPlaceholderCard extends StatelessWidget {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(14),
         child: Image.asset(
-          AppAssets.achievementPlaceholder,
+          'assets/achievements/placeholder.png',
           width: 58,
           height: 58,
           fit: BoxFit.cover,
@@ -358,7 +357,7 @@ class _AchievementIcon extends StatelessWidget {
   final String url;
 
   static Widget _placeholder() => Image.asset(
-    AppAssets.achievementPlaceholder,
+    'assets/achievements/placeholder.png',
     width: 58,
     height: 58,
     fit: BoxFit.cover,

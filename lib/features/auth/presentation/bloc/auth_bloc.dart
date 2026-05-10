@@ -86,7 +86,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       if (isUniqueEmail) {
         emit(
           const AuthState.failure(
-            message: 'Аккаунт с такой почтой уже существует',
+            message: 'Аккаунт с таким email уже существует',
           ),
         );
         return;

@@ -27,6 +27,7 @@ abstract class GameModuleQuestionDtoMapper {
       levelId: dto.levelId,
       correctAnswer: dto.correctAnswer,
       correctAnswerIndices: correctAnswerIndices,
+      characterId: dto.characterId,
     );
   }
 }

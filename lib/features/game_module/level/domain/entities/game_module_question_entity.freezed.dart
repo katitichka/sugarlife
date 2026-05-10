@@ -15,7 +15,8 @@ T _$identity<T>(T value) => value;
 mixin _$GameModuleQuestionEntity {
 
  int get id; String get question; QuestionType get questionType; List<String> get answers; String get explanation; int get orderIndex; int get levelId; String? get correctAnswer;// для multiple_choice, true_false, fill_blank
- List<int>? get correctAnswerIndices;
+ List<int>? get correctAnswerIndices;// для multiple_select
+ int? get characterId;
 /// Create a copy of GameModuleQuestionEntity
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -26,16 +27,16 @@ $GameModuleQuestionEntityCopyWith<GameModuleQuestionEntity> get copyWith => _$Ga
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is GameModuleQuestionEntity&&(identical(other.id, id) || other.id == id)&&(identical(other.question, question) || other.question == question)&&(identical(other.questionType, questionType) || other.questionType == questionType)&&const DeepCollectionEquality().equals(other.answers, answers)&&(identical(other.explanation, explanation) || other.explanation == explanation)&&(identical(other.orderIndex, orderIndex) || other.orderIndex == orderIndex)&&(identical(other.levelId, levelId) || other.levelId == levelId)&&(identical(other.correctAnswer, correctAnswer) || other.correctAnswer == correctAnswer)&&const DeepCollectionEquality().equals(other.correctAnswerIndices, correctAnswerIndices));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is GameModuleQuestionEntity&&(identical(other.id, id) || other.id == id)&&(identical(other.question, question) || other.question == question)&&(identical(other.questionType, questionType) || other.questionType == questionType)&&const DeepCollectionEquality().equals(other.answers, answers)&&(identical(other.explanation, explanation) || other.explanation == explanation)&&(identical(other.orderIndex, orderIndex) || other.orderIndex == orderIndex)&&(identical(other.levelId, levelId) || other.levelId == levelId)&&(identical(other.correctAnswer, correctAnswer) || other.correctAnswer == correctAnswer)&&const DeepCollectionEquality().equals(other.correctAnswerIndices, correctAnswerIndices)&&(identical(other.characterId, characterId) || other.characterId == characterId));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,id,question,questionType,const DeepCollectionEquality().hash(answers),explanation,orderIndex,levelId,correctAnswer,const DeepCollectionEquality().hash(correctAnswerIndices));
+int get hashCode => Object.hash(runtimeType,id,question,questionType,const DeepCollectionEquality().hash(answers),explanation,orderIndex,levelId,correctAnswer,const DeepCollectionEquality().hash(correctAnswerIndices),characterId);
 
 @override
 String toString() {
-  return 'GameModuleQuestionEntity(id: $id, question: $question, questionType: $questionType, answers: $answers, explanation: $explanation, orderIndex: $orderIndex, levelId: $levelId, correctAnswer: $correctAnswer, correctAnswerIndices: $correctAnswerIndices)';
+  return 'GameModuleQuestionEntity(id: $id, question: $question, questionType: $questionType, answers: $answers, explanation: $explanation, orderIndex: $orderIndex, levelId: $levelId, correctAnswer: $correctAnswer, correctAnswerIndices: $correctAnswerIndices, characterId: $characterId)';
 }
 
 
@@ -46,7 +47,7 @@ abstract mixin class $GameModuleQuestionEntityCopyWith<$Res>  {
   factory $GameModuleQuestionEntityCopyWith(GameModuleQuestionEntity value, $Res Function(GameModuleQuestionEntity) _then) = _$GameModuleQuestionEntityCopyWithImpl;
 @useResult
 $Res call({
- int id, String question, QuestionType questionType, List<String> answers, String explanation, int orderIndex, int levelId, String? correctAnswer, List<int>? correctAnswerIndices
+ int id, String question, QuestionType questionType, List<String> answers, String explanation, int orderIndex, int levelId, String? correctAnswer, List<int>? correctAnswerIndices, int? characterId
 });
 
 
@@ -63,7 +64,7 @@ class _$GameModuleQuestionEntityCopyWithImpl<$Res>
 
 /// Create a copy of GameModuleQuestionEntity
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? question = null,Object? questionType = null,Object? answers = null,Object? explanation = null,Object? orderIndex = null,Object? levelId = null,Object? correctAnswer = freezed,Object? correctAnswerIndices = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? question = null,Object? questionType = null,Object? answers = null,Object? explanation = null,Object? orderIndex = null,Object? levelId = null,Object? correctAnswer = freezed,Object? correctAnswerIndices = freezed,Object? characterId = freezed,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int,question: null == question ? _self.question : question // ignore: cast_nullable_to_non_nullable
@@ -74,7 +75,8 @@ as String,orderIndex: null == orderIndex ? _self.orderIndex : orderIndex // igno
 as int,levelId: null == levelId ? _self.levelId : levelId // ignore: cast_nullable_to_non_nullable
 as int,correctAnswer: freezed == correctAnswer ? _self.correctAnswer : correctAnswer // ignore: cast_nullable_to_non_nullable
 as String?,correctAnswerIndices: freezed == correctAnswerIndices ? _self.correctAnswerIndices : correctAnswerIndices // ignore: cast_nullable_to_non_nullable
-as List<int>?,
+as List<int>?,characterId: freezed == characterId ? _self.characterId : characterId // ignore: cast_nullable_to_non_nullable
+as int?,
   ));
 }
 
@@ -156,10 +158,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int id,  String question,  QuestionType questionType,  List<String> answers,  String explanation,  int orderIndex,  int levelId,  String? correctAnswer,  List<int>? correctAnswerIndices)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int id,  String question,  QuestionType questionType,  List<String> answers,  String explanation,  int orderIndex,  int levelId,  String? correctAnswer,  List<int>? correctAnswerIndices,  int? characterId)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _GameModuleQuestionEntity() when $default != null:
-return $default(_that.id,_that.question,_that.questionType,_that.answers,_that.explanation,_that.orderIndex,_that.levelId,_that.correctAnswer,_that.correctAnswerIndices);case _:
+return $default(_that.id,_that.question,_that.questionType,_that.answers,_that.explanation,_that.orderIndex,_that.levelId,_that.correctAnswer,_that.correctAnswerIndices,_that.characterId);case _:
   return orElse();
 
 }
@@ -177,10 +179,10 @@ return $default(_that.id,_that.question,_that.questionType,_that.answers,_that.e
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int id,  String question,  QuestionType questionType,  List<String> answers,  String explanation,  int orderIndex,  int levelId,  String? correctAnswer,  List<int>? correctAnswerIndices)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int id,  String question,  QuestionType questionType,  List<String> answers,  String explanation,  int orderIndex,  int levelId,  String? correctAnswer,  List<int>? correctAnswerIndices,  int? characterId)  $default,) {final _that = this;
 switch (_that) {
 case _GameModuleQuestionEntity():
-return $default(_that.id,_that.question,_that.questionType,_that.answers,_that.explanation,_that.orderIndex,_that.levelId,_that.correctAnswer,_that.correctAnswerIndices);}
+return $default(_that.id,_that.question,_that.questionType,_that.answers,_that.explanation,_that.orderIndex,_that.levelId,_that.correctAnswer,_that.correctAnswerIndices,_that.characterId);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -194,10 +196,10 @@ return $default(_that.id,_that.question,_that.questionType,_that.answers,_that.e
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int id,  String question,  QuestionType questionType,  List<String> answers,  String explanation,  int orderIndex,  int levelId,  String? correctAnswer,  List<int>? correctAnswerIndices)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int id,  String question,  QuestionType questionType,  List<String> answers,  String explanation,  int orderIndex,  int levelId,  String? correctAnswer,  List<int>? correctAnswerIndices,  int? characterId)?  $default,) {final _that = this;
 switch (_that) {
 case _GameModuleQuestionEntity() when $default != null:
-return $default(_that.id,_that.question,_that.questionType,_that.answers,_that.explanation,_that.orderIndex,_that.levelId,_that.correctAnswer,_that.correctAnswerIndices);case _:
+return $default(_that.id,_that.question,_that.questionType,_that.answers,_that.explanation,_that.orderIndex,_that.levelId,_that.correctAnswer,_that.correctAnswerIndices,_that.characterId);case _:
   return null;
 
 }
@@ -209,7 +211,7 @@ return $default(_that.id,_that.question,_that.questionType,_that.answers,_that.e
 
 
 class _GameModuleQuestionEntity extends GameModuleQuestionEntity {
-  const _GameModuleQuestionEntity({required this.id, required this.question, required this.questionType, required final  List<String> answers, required this.explanation, required this.orderIndex, required this.levelId, this.correctAnswer, final  List<int>? correctAnswerIndices}): _answers = answers,_correctAnswerIndices = correctAnswerIndices,super._();
+  const _GameModuleQuestionEntity({required this.id, required this.question, required this.questionType, required final  List<String> answers, required this.explanation, required this.orderIndex, required this.levelId, this.correctAnswer, final  List<int>? correctAnswerIndices, this.characterId}): _answers = answers,_correctAnswerIndices = correctAnswerIndices,super._();
   
 
 @override final  int id;
@@ -237,6 +239,8 @@ class _GameModuleQuestionEntity extends GameModuleQuestionEntity {
   return EqualUnmodifiableListView(value);
 }
 
+// для multiple_select
+@override final  int? characterId;
 
 /// Create a copy of GameModuleQuestionEntity
 /// with the given fields replaced by the non-null parameter values.
@@ -248,16 +252,16 @@ _$GameModuleQuestionEntityCopyWith<_GameModuleQuestionEntity> get copyWith => __
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _GameModuleQuestionEntity&&(identical(other.id, id) || other.id == id)&&(identical(other.question, question) || other.question == question)&&(identical(other.questionType, questionType) || other.questionType == questionType)&&const DeepCollectionEquality().equals(other._answers, _answers)&&(identical(other.explanation, explanation) || other.explanation == explanation)&&(identical(other.orderIndex, orderIndex) || other.orderIndex == orderIndex)&&(identical(other.levelId, levelId) || other.levelId == levelId)&&(identical(other.correctAnswer, correctAnswer) || other.correctAnswer == correctAnswer)&&const DeepCollectionEquality().equals(other._correctAnswerIndices, _correctAnswerIndices));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _GameModuleQuestionEntity&&(identical(other.id, id) || other.id == id)&&(identical(other.question, question) || other.question == question)&&(identical(other.questionType, questionType) || other.questionType == questionType)&&const DeepCollectionEquality().equals(other._answers, _answers)&&(identical(other.explanation, explanation) || other.explanation == explanation)&&(identical(other.orderIndex, orderIndex) || other.orderIndex == orderIndex)&&(identical(other.levelId, levelId) || other.levelId == levelId)&&(identical(other.correctAnswer, correctAnswer) || other.correctAnswer == correctAnswer)&&const DeepCollectionEquality().equals(other._correctAnswerIndices, _correctAnswerIndices)&&(identical(other.characterId, characterId) || other.characterId == characterId));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,id,question,questionType,const DeepCollectionEquality().hash(_answers),explanation,orderIndex,levelId,correctAnswer,const DeepCollectionEquality().hash(_correctAnswerIndices));
+int get hashCode => Object.hash(runtimeType,id,question,questionType,const DeepCollectionEquality().hash(_answers),explanation,orderIndex,levelId,correctAnswer,const DeepCollectionEquality().hash(_correctAnswerIndices),characterId);
 
 @override
 String toString() {
-  return 'GameModuleQuestionEntity(id: $id, question: $question, questionType: $questionType, answers: $answers, explanation: $explanation, orderIndex: $orderIndex, levelId: $levelId, correctAnswer: $correctAnswer, correctAnswerIndices: $correctAnswerIndices)';
+  return 'GameModuleQuestionEntity(id: $id, question: $question, questionType: $questionType, answers: $answers, explanation: $explanation, orderIndex: $orderIndex, levelId: $levelId, correctAnswer: $correctAnswer, correctAnswerIndices: $correctAnswerIndices, characterId: $characterId)';
 }
 
 
@@ -268,7 +272,7 @@ abstract mixin class _$GameModuleQuestionEntityCopyWith<$Res> implements $GameMo
   factory _$GameModuleQuestionEntityCopyWith(_GameModuleQuestionEntity value, $Res Function(_GameModuleQuestionEntity) _then) = __$GameModuleQuestionEntityCopyWithImpl;
 @override @useResult
 $Res call({
- int id, String question, QuestionType questionType, List<String> answers, String explanation, int orderIndex, int levelId, String? correctAnswer, List<int>? correctAnswerIndices
+ int id, String question, QuestionType questionType, List<String> answers, String explanation, int orderIndex, int levelId, String? correctAnswer, List<int>? correctAnswerIndices, int? characterId
 });
 
 
@@ -285,7 +289,7 @@ class __$GameModuleQuestionEntityCopyWithImpl<$Res>
 
 /// Create a copy of GameModuleQuestionEntity
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? question = null,Object? questionType = null,Object? answers = null,Object? explanation = null,Object? orderIndex = null,Object? levelId = null,Object? correctAnswer = freezed,Object? correctAnswerIndices = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? question = null,Object? questionType = null,Object? answers = null,Object? explanation = null,Object? orderIndex = null,Object? levelId = null,Object? correctAnswer = freezed,Object? correctAnswerIndices = freezed,Object? characterId = freezed,}) {
   return _then(_GameModuleQuestionEntity(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int,question: null == question ? _self.question : question // ignore: cast_nullable_to_non_nullable
@@ -296,7 +300,8 @@ as String,orderIndex: null == orderIndex ? _self.orderIndex : orderIndex // igno
 as int,levelId: null == levelId ? _self.levelId : levelId // ignore: cast_nullable_to_non_nullable
 as int,correctAnswer: freezed == correctAnswer ? _self.correctAnswer : correctAnswer // ignore: cast_nullable_to_non_nullable
 as String?,correctAnswerIndices: freezed == correctAnswerIndices ? _self._correctAnswerIndices : correctAnswerIndices // ignore: cast_nullable_to_non_nullable
-as List<int>?,
+as List<int>?,characterId: freezed == characterId ? _self.characterId : characterId // ignore: cast_nullable_to_non_nullable
+as int?,
   ));
 }
 

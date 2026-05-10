@@ -16,6 +16,7 @@ sealed class GameModuleQuestionEntity with _$GameModuleQuestionEntity {
     required int levelId,
     final String? correctAnswer, // для multiple_choice, true_false, fill_blank
     final List<int>? correctAnswerIndices, // для multiple_select
+    final int? characterId,
   }) = _GameModuleQuestionEntity;
 
   bool isAnswerCorrect(dynamic userAnswer) {

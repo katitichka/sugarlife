@@ -14,14 +14,17 @@ abstract final class GameModuleQuestionSupabaseMapper {
     final orderIndex = (row['order_index'] as num?)?.toInt() ?? 0;
     final levelId = (row['level_id'] as num).toInt();
     final correctRaw = row['correct_answer'];
+    
     final correctAnswerIndices = type == QuestionType.multipleSelect
         ? _parseMultipleSelectIndices(correctRaw)
         : null;
+    final characterId = row['character_id'] as int?;
     final correctAnswer = _normalizeCorrectAnswer(
       type: type,
       raw: correctRaw,
       answers: answers,
     );
+    
 
     return GameModuleQuestionEntity(
       id: id,
@@ -33,6 +36,7 @@ abstract final class GameModuleQuestionSupabaseMapper {
       levelId: levelId,
       correctAnswer: correctAnswer,
       correctAnswerIndices: correctAnswerIndices,
+      characterId: characterId,
     );
   }
 

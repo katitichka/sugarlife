@@ -22,7 +22,7 @@ class GameModuleLevelRepositoryImpl implements GameModuleLevelRepository {
     final response = await _supabase
         .from('questions')
         .select(
-          'id, question, question_type, answers, explanation, order_index, level_id, correct_answer',
+          'id, question, question_type, answers, explanation, order_index, level_id, correct_answer, character_id',
         )
         .eq('level_id', levelId)
         .order('order_index', ascending: true);
@@ -39,4 +39,18 @@ class GameModuleLevelRepositoryImpl implements GameModuleLevelRepository {
     _cache.saveQuestionsForLevel(levelId, questions);
     return questions;
   }
+
+  @override
+  Future<String?> getCharacterImageUrl(int characterId) async {
+  final response = await _supabase
+      .from('characters')
+      .select('image_url')
+      .eq('id', characterId)
+      .maybeSingle();
+  final imageUrl = response?['image_url'] as String?;
+  if (imageUrl == null) return null;
+  
+  // Формируем полный URL из имени файла
+  return _supabase.storage.from('characters').getPublicUrl(imageUrl);
+}
 }

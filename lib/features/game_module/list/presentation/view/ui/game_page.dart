@@ -1,5 +1,6 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sugarlife/core/router/root_navigator.dart';
 import 'package:sugarlife/core/theme/app_color.dart';
@@ -388,11 +389,23 @@ class _GamePageState extends State<GamePage> {
           top: 20,
           right: 10,
           child: IconButton(
-            icon: Image.asset(
-              'assets/icons/daily1.png',
-              width: 92,
-              height: 52,
-              fit: BoxFit.contain,
+            icon: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.white.withOpacity(0.2),
+                    blurRadius: 5,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: SvgPicture.asset(
+                'assets/icons/daily_icon.svg',
+                width: 82,
+                height: 45,
+                fit: BoxFit.contain,
+              ),
             ),
             onPressed: () {
               showDialog(

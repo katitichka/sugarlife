@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$GameModuleQuestionDto {
 
- int get id; String get question;@JsonKey(name: 'question_type') String get questionsType; List<String> get answers; String get explanation;@JsonKey(name: 'order_index') int get orderIndex;@JsonKey(name: 'level_id') int get levelId;@JsonKey(name: 'correct_answer') String get correctAnswer;
+ int get id; String get question;@JsonKey(name: 'question_type') String get questionsType; List<String> get answers; String get explanation;@JsonKey(name: 'order_index') int get orderIndex;@JsonKey(name: 'level_id') int get levelId;@JsonKey(name: 'correct_answer') String get correctAnswer;@JsonKey(name: 'character_id') int? get characterId;
 /// Create a copy of GameModuleQuestionDto
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $GameModuleQuestionDtoCopyWith<GameModuleQuestionDto> get copyWith => _$GameModu
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is GameModuleQuestionDto&&(identical(other.id, id) || other.id == id)&&(identical(other.question, question) || other.question == question)&&(identical(other.questionsType, questionsType) || other.questionsType == questionsType)&&const DeepCollectionEquality().equals(other.answers, answers)&&(identical(other.explanation, explanation) || other.explanation == explanation)&&(identical(other.orderIndex, orderIndex) || other.orderIndex == orderIndex)&&(identical(other.levelId, levelId) || other.levelId == levelId)&&(identical(other.correctAnswer, correctAnswer) || other.correctAnswer == correctAnswer));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is GameModuleQuestionDto&&(identical(other.id, id) || other.id == id)&&(identical(other.question, question) || other.question == question)&&(identical(other.questionsType, questionsType) || other.questionsType == questionsType)&&const DeepCollectionEquality().equals(other.answers, answers)&&(identical(other.explanation, explanation) || other.explanation == explanation)&&(identical(other.orderIndex, orderIndex) || other.orderIndex == orderIndex)&&(identical(other.levelId, levelId) || other.levelId == levelId)&&(identical(other.correctAnswer, correctAnswer) || other.correctAnswer == correctAnswer)&&(identical(other.characterId, characterId) || other.characterId == characterId));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,question,questionsType,const DeepCollectionEquality().hash(answers),explanation,orderIndex,levelId,correctAnswer);
+int get hashCode => Object.hash(runtimeType,id,question,questionsType,const DeepCollectionEquality().hash(answers),explanation,orderIndex,levelId,correctAnswer,characterId);
 
 @override
 String toString() {
-  return 'GameModuleQuestionDto(id: $id, question: $question, questionsType: $questionsType, answers: $answers, explanation: $explanation, orderIndex: $orderIndex, levelId: $levelId, correctAnswer: $correctAnswer)';
+  return 'GameModuleQuestionDto(id: $id, question: $question, questionsType: $questionsType, answers: $answers, explanation: $explanation, orderIndex: $orderIndex, levelId: $levelId, correctAnswer: $correctAnswer, characterId: $characterId)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $GameModuleQuestionDtoCopyWith<$Res>  {
   factory $GameModuleQuestionDtoCopyWith(GameModuleQuestionDto value, $Res Function(GameModuleQuestionDto) _then) = _$GameModuleQuestionDtoCopyWithImpl;
 @useResult
 $Res call({
- int id, String question,@JsonKey(name: 'question_type') String questionsType, List<String> answers, String explanation,@JsonKey(name: 'order_index') int orderIndex,@JsonKey(name: 'level_id') int levelId,@JsonKey(name: 'correct_answer') String correctAnswer
+ int id, String question,@JsonKey(name: 'question_type') String questionsType, List<String> answers, String explanation,@JsonKey(name: 'order_index') int orderIndex,@JsonKey(name: 'level_id') int levelId,@JsonKey(name: 'correct_answer') String correctAnswer,@JsonKey(name: 'character_id') int? characterId
 });
 
 
@@ -65,7 +65,7 @@ class _$GameModuleQuestionDtoCopyWithImpl<$Res>
 
 /// Create a copy of GameModuleQuestionDto
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? question = null,Object? questionsType = null,Object? answers = null,Object? explanation = null,Object? orderIndex = null,Object? levelId = null,Object? correctAnswer = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? question = null,Object? questionsType = null,Object? answers = null,Object? explanation = null,Object? orderIndex = null,Object? levelId = null,Object? correctAnswer = null,Object? characterId = freezed,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int,question: null == question ? _self.question : question // ignore: cast_nullable_to_non_nullable
@@ -75,7 +75,8 @@ as List<String>,explanation: null == explanation ? _self.explanation : explanati
 as String,orderIndex: null == orderIndex ? _self.orderIndex : orderIndex // ignore: cast_nullable_to_non_nullable
 as int,levelId: null == levelId ? _self.levelId : levelId // ignore: cast_nullable_to_non_nullable
 as int,correctAnswer: null == correctAnswer ? _self.correctAnswer : correctAnswer // ignore: cast_nullable_to_non_nullable
-as String,
+as String,characterId: freezed == characterId ? _self.characterId : characterId // ignore: cast_nullable_to_non_nullable
+as int?,
   ));
 }
 
@@ -157,10 +158,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int id,  String question, @JsonKey(name: 'question_type')  String questionsType,  List<String> answers,  String explanation, @JsonKey(name: 'order_index')  int orderIndex, @JsonKey(name: 'level_id')  int levelId, @JsonKey(name: 'correct_answer')  String correctAnswer)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int id,  String question, @JsonKey(name: 'question_type')  String questionsType,  List<String> answers,  String explanation, @JsonKey(name: 'order_index')  int orderIndex, @JsonKey(name: 'level_id')  int levelId, @JsonKey(name: 'correct_answer')  String correctAnswer, @JsonKey(name: 'character_id')  int? characterId)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _GameModuleQuestionDto() when $default != null:
-return $default(_that.id,_that.question,_that.questionsType,_that.answers,_that.explanation,_that.orderIndex,_that.levelId,_that.correctAnswer);case _:
+return $default(_that.id,_that.question,_that.questionsType,_that.answers,_that.explanation,_that.orderIndex,_that.levelId,_that.correctAnswer,_that.characterId);case _:
   return orElse();
 
 }
@@ -178,10 +179,10 @@ return $default(_that.id,_that.question,_that.questionsType,_that.answers,_that.
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int id,  String question, @JsonKey(name: 'question_type')  String questionsType,  List<String> answers,  String explanation, @JsonKey(name: 'order_index')  int orderIndex, @JsonKey(name: 'level_id')  int levelId, @JsonKey(name: 'correct_answer')  String correctAnswer)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int id,  String question, @JsonKey(name: 'question_type')  String questionsType,  List<String> answers,  String explanation, @JsonKey(name: 'order_index')  int orderIndex, @JsonKey(name: 'level_id')  int levelId, @JsonKey(name: 'correct_answer')  String correctAnswer, @JsonKey(name: 'character_id')  int? characterId)  $default,) {final _that = this;
 switch (_that) {
 case _GameModuleQuestionDto():
-return $default(_that.id,_that.question,_that.questionsType,_that.answers,_that.explanation,_that.orderIndex,_that.levelId,_that.correctAnswer);}
+return $default(_that.id,_that.question,_that.questionsType,_that.answers,_that.explanation,_that.orderIndex,_that.levelId,_that.correctAnswer,_that.characterId);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -195,10 +196,10 @@ return $default(_that.id,_that.question,_that.questionsType,_that.answers,_that.
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int id,  String question, @JsonKey(name: 'question_type')  String questionsType,  List<String> answers,  String explanation, @JsonKey(name: 'order_index')  int orderIndex, @JsonKey(name: 'level_id')  int levelId, @JsonKey(name: 'correct_answer')  String correctAnswer)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int id,  String question, @JsonKey(name: 'question_type')  String questionsType,  List<String> answers,  String explanation, @JsonKey(name: 'order_index')  int orderIndex, @JsonKey(name: 'level_id')  int levelId, @JsonKey(name: 'correct_answer')  String correctAnswer, @JsonKey(name: 'character_id')  int? characterId)?  $default,) {final _that = this;
 switch (_that) {
 case _GameModuleQuestionDto() when $default != null:
-return $default(_that.id,_that.question,_that.questionsType,_that.answers,_that.explanation,_that.orderIndex,_that.levelId,_that.correctAnswer);case _:
+return $default(_that.id,_that.question,_that.questionsType,_that.answers,_that.explanation,_that.orderIndex,_that.levelId,_that.correctAnswer,_that.characterId);case _:
   return null;
 
 }
@@ -210,7 +211,7 @@ return $default(_that.id,_that.question,_that.questionsType,_that.answers,_that.
 @JsonSerializable()
 
 class _GameModuleQuestionDto implements GameModuleQuestionDto {
-  const _GameModuleQuestionDto({required this.id, required this.question, @JsonKey(name: 'question_type') required this.questionsType, required final  List<String> answers, required this.explanation, @JsonKey(name: 'order_index') required this.orderIndex, @JsonKey(name: 'level_id') required this.levelId, @JsonKey(name: 'correct_answer') required this.correctAnswer}): _answers = answers;
+  const _GameModuleQuestionDto({required this.id, required this.question, @JsonKey(name: 'question_type') required this.questionsType, required final  List<String> answers, required this.explanation, @JsonKey(name: 'order_index') required this.orderIndex, @JsonKey(name: 'level_id') required this.levelId, @JsonKey(name: 'correct_answer') required this.correctAnswer, @JsonKey(name: 'character_id') this.characterId}): _answers = answers;
   factory _GameModuleQuestionDto.fromJson(Map<String, dynamic> json) => _$GameModuleQuestionDtoFromJson(json);
 
 @override final  int id;
@@ -227,6 +228,7 @@ class _GameModuleQuestionDto implements GameModuleQuestionDto {
 @override@JsonKey(name: 'order_index') final  int orderIndex;
 @override@JsonKey(name: 'level_id') final  int levelId;
 @override@JsonKey(name: 'correct_answer') final  String correctAnswer;
+@override@JsonKey(name: 'character_id') final  int? characterId;
 
 /// Create a copy of GameModuleQuestionDto
 /// with the given fields replaced by the non-null parameter values.
@@ -241,16 +243,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _GameModuleQuestionDto&&(identical(other.id, id) || other.id == id)&&(identical(other.question, question) || other.question == question)&&(identical(other.questionsType, questionsType) || other.questionsType == questionsType)&&const DeepCollectionEquality().equals(other._answers, _answers)&&(identical(other.explanation, explanation) || other.explanation == explanation)&&(identical(other.orderIndex, orderIndex) || other.orderIndex == orderIndex)&&(identical(other.levelId, levelId) || other.levelId == levelId)&&(identical(other.correctAnswer, correctAnswer) || other.correctAnswer == correctAnswer));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _GameModuleQuestionDto&&(identical(other.id, id) || other.id == id)&&(identical(other.question, question) || other.question == question)&&(identical(other.questionsType, questionsType) || other.questionsType == questionsType)&&const DeepCollectionEquality().equals(other._answers, _answers)&&(identical(other.explanation, explanation) || other.explanation == explanation)&&(identical(other.orderIndex, orderIndex) || other.orderIndex == orderIndex)&&(identical(other.levelId, levelId) || other.levelId == levelId)&&(identical(other.correctAnswer, correctAnswer) || other.correctAnswer == correctAnswer)&&(identical(other.characterId, characterId) || other.characterId == characterId));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,question,questionsType,const DeepCollectionEquality().hash(_answers),explanation,orderIndex,levelId,correctAnswer);
+int get hashCode => Object.hash(runtimeType,id,question,questionsType,const DeepCollectionEquality().hash(_answers),explanation,orderIndex,levelId,correctAnswer,characterId);
 
 @override
 String toString() {
-  return 'GameModuleQuestionDto(id: $id, question: $question, questionsType: $questionsType, answers: $answers, explanation: $explanation, orderIndex: $orderIndex, levelId: $levelId, correctAnswer: $correctAnswer)';
+  return 'GameModuleQuestionDto(id: $id, question: $question, questionsType: $questionsType, answers: $answers, explanation: $explanation, orderIndex: $orderIndex, levelId: $levelId, correctAnswer: $correctAnswer, characterId: $characterId)';
 }
 
 
@@ -261,7 +263,7 @@ abstract mixin class _$GameModuleQuestionDtoCopyWith<$Res> implements $GameModul
   factory _$GameModuleQuestionDtoCopyWith(_GameModuleQuestionDto value, $Res Function(_GameModuleQuestionDto) _then) = __$GameModuleQuestionDtoCopyWithImpl;
 @override @useResult
 $Res call({
- int id, String question,@JsonKey(name: 'question_type') String questionsType, List<String> answers, String explanation,@JsonKey(name: 'order_index') int orderIndex,@JsonKey(name: 'level_id') int levelId,@JsonKey(name: 'correct_answer') String correctAnswer
+ int id, String question,@JsonKey(name: 'question_type') String questionsType, List<String> answers, String explanation,@JsonKey(name: 'order_index') int orderIndex,@JsonKey(name: 'level_id') int levelId,@JsonKey(name: 'correct_answer') String correctAnswer,@JsonKey(name: 'character_id') int? characterId
 });
 
 
@@ -278,7 +280,7 @@ class __$GameModuleQuestionDtoCopyWithImpl<$Res>
 
 /// Create a copy of GameModuleQuestionDto
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? question = null,Object? questionsType = null,Object? answers = null,Object? explanation = null,Object? orderIndex = null,Object? levelId = null,Object? correctAnswer = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? question = null,Object? questionsType = null,Object? answers = null,Object? explanation = null,Object? orderIndex = null,Object? levelId = null,Object? correctAnswer = null,Object? characterId = freezed,}) {
   return _then(_GameModuleQuestionDto(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int,question: null == question ? _self.question : question // ignore: cast_nullable_to_non_nullable
@@ -288,7 +290,8 @@ as List<String>,explanation: null == explanation ? _self.explanation : explanati
 as String,orderIndex: null == orderIndex ? _self.orderIndex : orderIndex // ignore: cast_nullable_to_non_nullable
 as int,levelId: null == levelId ? _self.levelId : levelId // ignore: cast_nullable_to_non_nullable
 as int,correctAnswer: null == correctAnswer ? _self.correctAnswer : correctAnswer // ignore: cast_nullable_to_non_nullable
-as String,
+as String,characterId: freezed == characterId ? _self.characterId : characterId // ignore: cast_nullable_to_non_nullable
+as int?,
   ));
 }
 

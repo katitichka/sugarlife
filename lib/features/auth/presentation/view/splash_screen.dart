@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
-import 'package:sugarlife/core/assets/app_assets.dart';
 import 'package:sugarlife/core/theme/app_color.dart';
 import 'package:sugarlife/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:sugarlife/features/widgets/animated_loading_dots.dart';
@@ -54,7 +53,7 @@ class _SplashScreenState extends State<SplashScreen> {
           fit: StackFit.expand,
           children: [
             Image.asset(
-              AppAssets.splashBackground,
+              'assets/images/splash_background.png',
               fit: BoxFit.cover,
               width: double.infinity,
               height: double.infinity,

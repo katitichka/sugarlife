@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:sugarlife/core/enum/question_type.dart';
 import 'package:sugarlife/core/theme/app_color.dart';
 import 'package:sugarlife/features/game_module/level/domain/entities/game_module_question_entity.dart';
+import 'package:sugarlife/features/game_module/level/domain/repositories/game_module_level_repository.dart';
 import 'package:sugarlife/features/game_module/level/presentation/bloc/game_module_level_bloc.dart';
 import 'package:sugarlife/shared/ui/main_app_bar.dart';
 
@@ -18,6 +20,7 @@ class _GameQuestionPageState extends State<GameQuestionPage> {
   bool? _selectedBoolAnswer;
   List<int>? _selectedMultipleSelectAnswer;
   int? _lastQuestionId;
+
 
   @override
   void didChangeDependencies() {
@@ -51,8 +54,7 @@ class _GameQuestionPageState extends State<GameQuestionPage> {
     final isAnswered = state is ReceiveSuccess ? state.isAnswered : true;
     final isAnswerInProgress = state is AnswerInProgress;
     final selectionLocked =
-        isAnswerInProgress ||
-        (state is ReceiveSuccess && state.isAnswered);
+        isAnswerInProgress || (state is ReceiveSuccess && state.isAnswered);
     if (currentQuestion == null && !isAnswerInProgress) {
       return const SizedBox.shrink();
     }
@@ -77,7 +79,7 @@ class _GameQuestionPageState extends State<GameQuestionPage> {
             Column(
               children: [
                 SizedBox(height: 100),
-                _buildQuestionHeader(currentQuestion),
+                _buildQuestionHeader(currentQuestion, context),
                 _buildAnswer(
                   currentQuestion,
                   selectionLocked: selectionLocked,
@@ -97,7 +99,7 @@ class _GameQuestionPageState extends State<GameQuestionPage> {
                   selectedBoolAnswer: _selectedBoolAnswer,
                   selectedMultipleSelectAnswer: _selectedMultipleSelectAnswer,
                 ),
-                  
+
                 _buildButton(
                   context,
                   isAnswerInProgress,
@@ -121,21 +123,50 @@ class _GameQuestionPageState extends State<GameQuestionPage> {
   }
 }
 
-Widget _buildQuestionHeader(GameModuleQuestionEntity question) {
+Widget _buildQuestionHeader(GameModuleQuestionEntity question,  BuildContext context,) {
+  final repository = context.read<GameModuleLevelRepository>();
   return Padding(
     padding: const EdgeInsets.symmetric(horizontal: 16),
     child: Row(
       children: [
-        // Аватар персонажа
-        Image.asset(
-          'assets/characters/orange.png',
-          width: 80,
-          height: 80,
-          fit: BoxFit.cover,
+        FutureBuilder<String?>(
+          future: _getCharacterImage(repository, question.characterId),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const SizedBox(
+                width: 80,
+                height: 80,
+                child: Center(child: CircularProgressIndicator()),
+              );
+            }
+            
+            if (snapshot.hasData && snapshot.data != null) {
+              return SvgPicture.network(
+                snapshot.data!,
+                width: 80,
+                height: 80,
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => const SizedBox(
+                  width: 80,
+                  height: 80,
+                  child: Center(
+                    child: Icon(Icons.error, color: Colors.red),
+                  ),
+                ),
+              );
+            }
+            
+             // Если персонаж не найден, показываем заглушку
+            return const SizedBox(
+              width: 80,
+              height: 80,
+              child: Center(
+                child: Icon(Icons.person, color: Colors.grey),
+              ),
+            );
+          },
         ),
         const SizedBox(width: 12),
-
-        // Текст вопроса
         Expanded(
           child: Text(
             question.question,
@@ -151,6 +182,26 @@ Widget _buildQuestionHeader(GameModuleQuestionEntity question) {
   );
 }
 
+Future<String?> _getCharacterImage(
+  GameModuleLevelRepository repository,
+  int? characterId,
+) async {
+  if (characterId == null) {
+    print('❌ characterId = null');
+    return null;
+  }
+  
+  print('🔍 Загружаю персонажа с ID: $characterId');
+  
+  try {
+    final url = await repository.getCharacterImageUrl(characterId);
+    print('✅ Загружен URL: $url');
+    return url;
+  } catch (e) {
+    print('❌ Ошибка загрузки персонажа: $e');
+    return null;
+  }
+}
 Widget _buildExplantationOverlay(BuildContext context, AnswerInProgress state) {
   return Container(
     padding: EdgeInsets.all(24),
@@ -536,16 +587,14 @@ class _FillBlankWidgetState extends State<FillBlankWidget> {
           const SizedBox(height: 8),
           Text(
             'Введите слово или фразу в поле выше',
-            style: TextStyle(
-              fontSize: 12,
-              color: Colors.grey.shade600,
-            ),
+            style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
           ),
         ],
       ),
     );
   }
 }
+
 class MultipleSelectWidget extends StatefulWidget {
   final GameModuleQuestionEntity question;
   final bool selectionLocked;
