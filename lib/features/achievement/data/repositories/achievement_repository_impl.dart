@@ -17,10 +17,9 @@ class AchievementRepositoryImpl implements AchievementRepository {
   AchievementEntity _mapAchievement(Map<String, dynamic> json) {
     return AchievementEntity(
       id: _asInt(json['id']),
-      moduleId: _asInt(json['module_id']),
       name: (json['name'] as String? ?? '').trim(),
       description: (json['description'] as String? ?? '').trim(),
-      iconUrl: _resolveIconUrl((json['icon_url'] as String? ?? '').trim()),
+      imageUrl: _resolveimageUrl((json['image_url'] as String? ?? '').trim()),
     );
   }
 
@@ -34,7 +33,7 @@ class AchievementRepositoryImpl implements AchievementRepository {
     throw FormatException('Expected int-compatible value, got $value');
   }
 
-  String _resolveIconUrl(String raw) {
+  String _resolveimageUrl(String raw) {
     if (raw.isEmpty) {
       return raw;
     }
@@ -69,33 +68,8 @@ class AchievementRepositoryImpl implements AchievementRepository {
 
     final response = await _supabase
         .from('achievements')
-        .select('id, module_id, name, description, icon_url')
+        .select('id, module_id, name, description, image_url')
         .eq('id', id)
-        .maybeSingle();
-    if (response == null) {
-      return null;
-    }
-
-    final achievement = _mapAchievement(Map<String, dynamic>.from(response));
-    _cache.saveAchievement(achievement);
-    return achievement;
-  }
-
-  Future<AchievementEntity?> _getAchievementByModuleId(int moduleId) async {
-    final cached = _cache.achievementsById.values
-        .cast<AchievementEntity?>()
-        .firstWhere(
-          (achievement) => achievement?.moduleId == moduleId,
-          orElse: () => null,
-        );
-    if (cached != null) {
-      return cached;
-    }
-
-    final response = await _supabase
-        .from('achievements')
-        .select('id, module_id, name, description, icon_url')
-        .eq('module_id', moduleId)
         .maybeSingle();
     if (response == null) {
       return null;
@@ -130,9 +104,10 @@ class AchievementRepositoryImpl implements AchievementRepository {
     final achievementIds = relations
         .map((row) => _asInt(row['achievement_id']))
         .toList();
+
     final achievementsResponse = await _supabase
         .from('achievements')
-        .select('id, module_id, name, description, icon_url')
+        .select('id, module_id, name, description, image_url')
         .inFilter('id', achievementIds)
         .order('id');
 
@@ -144,77 +119,75 @@ class AchievementRepositoryImpl implements AchievementRepository {
   }
 
   @override
-  Future<AchievementEntity?> tryUnlockAchievementForModule({
-    required int theoryModuleId,
-  }) async {
-    final userId = _supabase.auth.currentUser?.id;
-    if (userId == null) {
-      return null;
-    }
+Future<AchievementEntity?> unlockRandomAchievement() async {
+  final userId = _supabase.auth.currentUser?.id;
+  if (userId == null) {
+    return null;
+  }
 
-    final achievement = await _getAchievementByModuleId(theoryModuleId);
-    if (achievement == null) {
-      print('Достижение для модуля $theoryModuleId не найдено');
-      return null;
-    }
+  final allAchievementsResponse = await _supabase
+      .from('achievements')
+      .select('id, module_id, name, description, image_url');
 
-    final existingRelation = await _supabase
+  final allAchievements = allAchievementsResponse
+      .map((row) => _mapAchievement(Map<String, dynamic>.from(row)))
+      .toList();
+
+  if (allAchievements.isEmpty) {
+    print('Нет достижений в БД');
+    return null;
+  }
+  
+  final userAchievements = await getUserAchievements();
+  final unlockedIds = userAchievements.map((a) => a.id).toSet();
+  
+  final available = allAchievements
+      .where((a) => !unlockedIds.contains(a.id))
+      .toList();
+      
+  if (available.isEmpty) {
+    print('Все достижения уже получены');
+    return null;
+  }
+
+  final randomIndex = DateTime.now().millisecondsSinceEpoch % available.length;
+  final achievement = available[randomIndex];
+
+  // Сохраняем в БД с обработкой ошибок
+  try {
+    await _supabase.from('user_achievement').insert({
+      'user_id': userId,
+      'achievement_id': achievement.id,
+    });
+  } catch (e) {
+    // Проверяем, возможно запись уже есть (дубль)
+    final relationAfterFailure = await _supabase
         .from('user_achievement')
         .select('achievement_id')
         .eq('user_id', userId)
         .eq('achievement_id', achievement.id)
         .maybeSingle();
-    if (existingRelation != null) {
-      final shownIds = await _getShownAchievementIds();
-      if (!shownIds.contains(achievement.id)) {
-        final prefs = await _prefs;
-        await prefs.setInt(_pendingAchievementKey, achievement.id);
-        print(
-          'Достижение ${achievement.id} уже в БД, pending восстановлен для показа карточки',
-        );
-        return achievement;
-      }
-      print('Достижение ${achievement.id} уже было выдано');
-      return null;
+    if (relationAfterFailure == null) {
+      rethrow;
     }
-
-    try {
-      await _supabase.from('user_achievement').insert({
-        'user_id': userId,
-        'achievement_id': achievement.id,
-      });
-    } catch (e) {
-      // Сеть могла оборваться после успешного INSERT на сервере.
-      // Проверяем факт записи и продолжаем, если связь уже создана.
-      final relationAfterFailure = await _supabase
-          .from('user_achievement')
-          .select('achievement_id')
-          .eq('user_id', userId)
-          .eq('achievement_id', achievement.id)
-          .maybeSingle();
-      if (relationAfterFailure == null) {
-        rethrow;
-      }
-      print(
-        'INSERT вернул ошибку ($e), но запись достижения ${achievement.id} уже есть в БД',
-      );
-    }
-
-    print('Сохранено достижение ${achievement.id} для пользователя $userId');
-
-    final prefs = await _prefs;
-    await prefs.setInt(_pendingAchievementKey, achievement.id);
-
-    final cached = List<AchievementEntity>.from(
-      _cache.achievements ?? const [],
-    );
-    cached.removeWhere((item) => item.id == achievement.id);
-    cached.add(achievement);
-    cached.sort((a, b) => a.id.compareTo(b.id));
-    _cache.saveAchievements(cached);
-
-    return achievement;
+    print('INSERT вернул ошибку ($e), но запись уже есть в БД');
   }
+  
+  print('Выдано достижение ${achievement.id}: ${achievement.name}');
+
+  final prefs = await _prefs;
+  await prefs.setInt(_pendingAchievementKey, achievement.id);
+
+  final cached = List<AchievementEntity>.from(
+    _cache.achievements ?? const [],
+  );
+  cached.removeWhere((item) => item.id == achievement.id);
+  cached.add(achievement);
+  cached.sort((a, b) => a.id.compareTo(b.id));
+  _cache.saveAchievements(cached);
+
+  return achievement;
+}
 
   @override
   Future<AchievementEntity?> getPendingAchievement() async {

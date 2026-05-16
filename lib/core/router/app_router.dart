@@ -6,7 +6,7 @@ import 'package:sugarlife/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:sugarlife/features/auth/presentation/view/login_screen.dart';
 import 'package:sugarlife/features/auth/presentation/view/splash_screen.dart';
 import 'package:sugarlife/features/auth/presentation/view/register_screen.dart';
-import 'package:sugarlife/features/characters/presentation/ui/choose_character_page.dart';
+import 'package:sugarlife/features/avatars/presentation/view/choose_avatar_page.dart';
 import 'package:sugarlife/features/game_module/level/presentation/game_module_level_provider.dart';
 import 'package:sugarlife/features/game_module/level/presentation/view/ui/game_level_page.dart';
 import 'package:sugarlife/features/game_module/list/presentation/view/ui/game_page.dart';
@@ -40,7 +40,7 @@ final appRoute = GoRouter(
       name: 'chooseCharacter',
       builder: (context, state) {
         final currentAvatarId = state.extra as int;
-        return ChooseCharacterPage(currentAvatarId: currentAvatarId);
+        return ChooseAvatarPage(currentAvatarId: currentAvatarId);
       },
     ),
     // После авторизации

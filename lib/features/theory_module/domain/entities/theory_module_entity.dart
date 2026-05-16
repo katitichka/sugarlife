@@ -14,6 +14,5 @@ sealed class TheoryModuleEntity with _$TheoryModuleEntity {
     required Color color,
     required int orderIndex,
     required String characterImageUrl,
-    String? content,
   }) = _TheoryModuleEntity;
 }

@@ -1,7 +1,7 @@
 import 'package:sugarlife/core/cache/app_cache_service.dart';
-import 'package:sugarlife/features/characters/data/dtos/character_dto.dart';
-import 'package:sugarlife/features/characters/data/mappers/character_dto_mapper.dart';
-import 'package:sugarlife/features/characters/domain/entitites/character_entity.dart';
+import 'package:sugarlife/features/avatars/data/dtos/avatar_dto.dart';
+import 'package:sugarlife/features/avatars/data/mappers/avatar_mapper.dart';
+import 'package:sugarlife/features/avatars/domain/entities/avatar_entity.dart';
 import 'package:sugarlife/features/profile/domain/repositories/profile_repository.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -11,9 +11,9 @@ class ProfileRepositoryImpl implements ProfileRepository {
 
   ProfileRepositoryImpl(this._supabase, this._cache);
 
-  /// Bucket в Supabase Storage, где лежат SVG (`characters.image_url` — путь от корня bucket).
+  /// Bucket в Supabase Storage, где лежат SVG (`avatars.image_url` — путь от корня bucket).
   /// При другом имени bucket в проекте Supabase замените значение.
-  static const String _characterSvgBucket = 'avatars';
+  static const String _avatarsSvgBucket = 'avatars';
 
   /// В БД часто хранится только путь в Storage; для сети нужен полный public URL.
   String _publicSvgUrl(String raw) {
@@ -25,18 +25,18 @@ class ProfileRepositoryImpl implements ProfileRepository {
     }
     var path = t.startsWith('/') ? t.substring(1) : t;
     // Если в пути уже указан bucket как префикс — убираем, иначе getPublicUrl дублирует папку.
-    final bucketPrefix = '$_characterSvgBucket/';
+    final bucketPrefix = '$_avatarsSvgBucket/';
     if (path.toLowerCase().startsWith(bucketPrefix)) {
       path = path.substring(bucketPrefix.length);
     }
-    return _supabase.storage.from(_characterSvgBucket).getPublicUrl(path);
+    return _supabase.storage.from(_avatarsSvgBucket).getPublicUrl(path);
   }
 
   @override
   Future<String> getAvatarUrl(int avatarId) async {
-    final characters = _cache.characters;
-    if (characters != null) {
-      for (final c in characters) {
+    final avatars = _cache.avatars;
+    if (avatars != null) {
+      for (final c in avatars) {
         if (c.id == avatarId) {
           return _publicSvgUrl(c.imageUrl);
         }
@@ -44,7 +44,7 @@ class ProfileRepositoryImpl implements ProfileRepository {
     }
 
     final response = await _supabase
-        .from('characters')
+        .from('avatars')
         .select('image_url')
         .eq('id', avatarId)
         .single();
@@ -78,25 +78,33 @@ class ProfileRepositoryImpl implements ProfileRepository {
   }
 
   @override
-  Future<List<CharacterEntity>> getAllCharacters() async {
-    final cachedCharacters = _cache.characters;
-    if (cachedCharacters != null) {
-      return cachedCharacters;
-    }
-
-    final response = await _supabase
-        .from('characters')
-        .select('id, name, image_url');
-    final characters = response.map((row) {
-      final map = Map<String, dynamic>.from(row);
-      final raw = map['image_url'];
-      if (raw is String && raw.isNotEmpty) {
-        map['image_url'] = _publicSvgUrl(raw);
-      }
-      final dto = CharacterDto.fromJson(map);
-      return CharacterDtoMapper.toEntity(dto: dto);
-    }).toList();
-    _cache.saveCharacters(characters);
-    return characters;
+Future<List<AvatarEntity>> getAllAvatars() async {
+  // Проверяем кэш
+  final cachedAvatars = _cache.avatars;
+  if (cachedAvatars != null) {
+    print('✅ Возвращаем аватары из кэша: ${cachedAvatars.length}');
+    return cachedAvatars;
   }
+
+  print('❌ Кэш пуст, загружаем из Supabase');
+  final response = await _supabase
+      .from('avatars')
+      .select('id, image_url')
+      .order('id');
+
+  final avatars = response.map((row) {
+    final map = Map<String, dynamic>.from(row);
+    final raw = map['image_url'];
+    if (raw is String && raw.isNotEmpty) {
+      map['image_url'] = _publicSvgUrl(raw);
+    }
+    final dto = AvatarDto.fromJson(map);
+    return AvatarDtoMapper.toEntity(dto: dto);
+  }).toList();
+
+  // Сохраняем в кэш
+  _cache.saveAvatars(avatars);
+  print('💾 Сохранили аватары в кэш: ${avatars.length}');
+  return avatars;
+}
 }

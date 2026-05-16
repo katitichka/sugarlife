@@ -14,7 +14,6 @@ abstract class TheoryModuleDtoMapper {
       color: _convertColor(dto.colorHex),
       orderIndex: dto.orderIndex,
       characterId: dto.characterId,
-      content: dto.content,
     );
   }
 

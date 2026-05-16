@@ -43,7 +43,7 @@ class TheoryScreenPage extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.only(bottom: 20),
                       child: Image.asset(
-                        _imageAssetForModule(moduleId),
+                        'assets/modules/module$moduleId.png',
                         width: double.infinity,
                         fit: BoxFit.contain,
                         errorBuilder: (context, error, stackTrace) => Container(
@@ -66,10 +66,6 @@ class TheoryScreenPage extends StatelessWidget {
     );
   }
 
- String _imageAssetForModule(int id) {
-    // Для moduleId 1 → module1.png, 2 → module2.png и т.д.
-    return 'assets/modules/module$id.png';
-  }
 
   TheoryModuleEntity? _findModuleById(
     List<TheoryModuleEntity> modules,

@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$GameModuleLevelDto {
 
- int get id; String get title;@JsonKey(name: 'order_index') int get orderIndex;@JsonKey(name: 'theory_module_id') int? get theoryModuleId;
+ int get id;@JsonKey(name: 'order_index') int get orderIndex;@JsonKey(name: 'theory_module_id') int? get theoryModuleId;
 /// Create a copy of GameModuleLevelDto
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $GameModuleLevelDtoCopyWith<GameModuleLevelDto> get copyWith => _$GameModuleLeve
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is GameModuleLevelDto&&(identical(other.id, id) || other.id == id)&&(identical(other.title, title) || other.title == title)&&(identical(other.orderIndex, orderIndex) || other.orderIndex == orderIndex)&&(identical(other.theoryModuleId, theoryModuleId) || other.theoryModuleId == theoryModuleId));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is GameModuleLevelDto&&(identical(other.id, id) || other.id == id)&&(identical(other.orderIndex, orderIndex) || other.orderIndex == orderIndex)&&(identical(other.theoryModuleId, theoryModuleId) || other.theoryModuleId == theoryModuleId));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,title,orderIndex,theoryModuleId);
+int get hashCode => Object.hash(runtimeType,id,orderIndex,theoryModuleId);
 
 @override
 String toString() {
-  return 'GameModuleLevelDto(id: $id, title: $title, orderIndex: $orderIndex, theoryModuleId: $theoryModuleId)';
+  return 'GameModuleLevelDto(id: $id, orderIndex: $orderIndex, theoryModuleId: $theoryModuleId)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $GameModuleLevelDtoCopyWith<$Res>  {
   factory $GameModuleLevelDtoCopyWith(GameModuleLevelDto value, $Res Function(GameModuleLevelDto) _then) = _$GameModuleLevelDtoCopyWithImpl;
 @useResult
 $Res call({
- int id, String title,@JsonKey(name: 'order_index') int orderIndex,@JsonKey(name: 'theory_module_id') int? theoryModuleId
+ int id,@JsonKey(name: 'order_index') int orderIndex,@JsonKey(name: 'theory_module_id') int? theoryModuleId
 });
 
 
@@ -65,11 +65,10 @@ class _$GameModuleLevelDtoCopyWithImpl<$Res>
 
 /// Create a copy of GameModuleLevelDto
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? title = null,Object? orderIndex = null,Object? theoryModuleId = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? orderIndex = null,Object? theoryModuleId = freezed,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as int,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
-as String,orderIndex: null == orderIndex ? _self.orderIndex : orderIndex // ignore: cast_nullable_to_non_nullable
+as int,orderIndex: null == orderIndex ? _self.orderIndex : orderIndex // ignore: cast_nullable_to_non_nullable
 as int,theoryModuleId: freezed == theoryModuleId ? _self.theoryModuleId : theoryModuleId // ignore: cast_nullable_to_non_nullable
 as int?,
   ));
@@ -153,10 +152,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int id,  String title, @JsonKey(name: 'order_index')  int orderIndex, @JsonKey(name: 'theory_module_id')  int? theoryModuleId)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int id, @JsonKey(name: 'order_index')  int orderIndex, @JsonKey(name: 'theory_module_id')  int? theoryModuleId)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _GameModuleLevelDto() when $default != null:
-return $default(_that.id,_that.title,_that.orderIndex,_that.theoryModuleId);case _:
+return $default(_that.id,_that.orderIndex,_that.theoryModuleId);case _:
   return orElse();
 
 }
@@ -174,10 +173,10 @@ return $default(_that.id,_that.title,_that.orderIndex,_that.theoryModuleId);case
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int id,  String title, @JsonKey(name: 'order_index')  int orderIndex, @JsonKey(name: 'theory_module_id')  int? theoryModuleId)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int id, @JsonKey(name: 'order_index')  int orderIndex, @JsonKey(name: 'theory_module_id')  int? theoryModuleId)  $default,) {final _that = this;
 switch (_that) {
 case _GameModuleLevelDto():
-return $default(_that.id,_that.title,_that.orderIndex,_that.theoryModuleId);}
+return $default(_that.id,_that.orderIndex,_that.theoryModuleId);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -191,10 +190,10 @@ return $default(_that.id,_that.title,_that.orderIndex,_that.theoryModuleId);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int id,  String title, @JsonKey(name: 'order_index')  int orderIndex, @JsonKey(name: 'theory_module_id')  int? theoryModuleId)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int id, @JsonKey(name: 'order_index')  int orderIndex, @JsonKey(name: 'theory_module_id')  int? theoryModuleId)?  $default,) {final _that = this;
 switch (_that) {
 case _GameModuleLevelDto() when $default != null:
-return $default(_that.id,_that.title,_that.orderIndex,_that.theoryModuleId);case _:
+return $default(_that.id,_that.orderIndex,_that.theoryModuleId);case _:
   return null;
 
 }
@@ -206,11 +205,10 @@ return $default(_that.id,_that.title,_that.orderIndex,_that.theoryModuleId);case
 @JsonSerializable()
 
 class _GameModuleLevelDto implements GameModuleLevelDto {
-  const _GameModuleLevelDto({required this.id, required this.title, @JsonKey(name: 'order_index') required this.orderIndex, @JsonKey(name: 'theory_module_id') this.theoryModuleId});
+  const _GameModuleLevelDto({required this.id, @JsonKey(name: 'order_index') required this.orderIndex, @JsonKey(name: 'theory_module_id') this.theoryModuleId});
   factory _GameModuleLevelDto.fromJson(Map<String, dynamic> json) => _$GameModuleLevelDtoFromJson(json);
 
 @override final  int id;
-@override final  String title;
 @override@JsonKey(name: 'order_index') final  int orderIndex;
 @override@JsonKey(name: 'theory_module_id') final  int? theoryModuleId;
 
@@ -227,16 +225,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _GameModuleLevelDto&&(identical(other.id, id) || other.id == id)&&(identical(other.title, title) || other.title == title)&&(identical(other.orderIndex, orderIndex) || other.orderIndex == orderIndex)&&(identical(other.theoryModuleId, theoryModuleId) || other.theoryModuleId == theoryModuleId));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _GameModuleLevelDto&&(identical(other.id, id) || other.id == id)&&(identical(other.orderIndex, orderIndex) || other.orderIndex == orderIndex)&&(identical(other.theoryModuleId, theoryModuleId) || other.theoryModuleId == theoryModuleId));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,title,orderIndex,theoryModuleId);
+int get hashCode => Object.hash(runtimeType,id,orderIndex,theoryModuleId);
 
 @override
 String toString() {
-  return 'GameModuleLevelDto(id: $id, title: $title, orderIndex: $orderIndex, theoryModuleId: $theoryModuleId)';
+  return 'GameModuleLevelDto(id: $id, orderIndex: $orderIndex, theoryModuleId: $theoryModuleId)';
 }
 
 
@@ -247,7 +245,7 @@ abstract mixin class _$GameModuleLevelDtoCopyWith<$Res> implements $GameModuleLe
   factory _$GameModuleLevelDtoCopyWith(_GameModuleLevelDto value, $Res Function(_GameModuleLevelDto) _then) = __$GameModuleLevelDtoCopyWithImpl;
 @override @useResult
 $Res call({
- int id, String title,@JsonKey(name: 'order_index') int orderIndex,@JsonKey(name: 'theory_module_id') int? theoryModuleId
+ int id,@JsonKey(name: 'order_index') int orderIndex,@JsonKey(name: 'theory_module_id') int? theoryModuleId
 });
 
 
@@ -264,11 +262,10 @@ class __$GameModuleLevelDtoCopyWithImpl<$Res>
 
 /// Create a copy of GameModuleLevelDto
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? title = null,Object? orderIndex = null,Object? theoryModuleId = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? orderIndex = null,Object? theoryModuleId = freezed,}) {
   return _then(_GameModuleLevelDto(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as int,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
-as String,orderIndex: null == orderIndex ? _self.orderIndex : orderIndex // ignore: cast_nullable_to_non_nullable
+as int,orderIndex: null == orderIndex ? _self.orderIndex : orderIndex // ignore: cast_nullable_to_non_nullable
 as int,theoryModuleId: freezed == theoryModuleId ? _self.theoryModuleId : theoryModuleId // ignore: cast_nullable_to_non_nullable
 as int?,
   ));

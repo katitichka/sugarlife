@@ -1,4 +1,4 @@
-import 'package:sugarlife/features/characters/domain/entitites/character_entity.dart';
+import 'package:sugarlife/features/avatars/domain/entities/avatar_entity.dart';
 import 'package:sugarlife/features/achievement/domain/entities/achievement_entity.dart';
 import 'package:sugarlife/features/game_module/level/domain/entities/game_module_level_entity.dart';
 import 'package:sugarlife/features/game_module/level/domain/entities/game_module_question_entity.dart';
@@ -9,13 +9,13 @@ class AppCacheService {
   final Map<int, List<GameModuleQuestionEntity>> _questionsByLevel = {};
   List<TheoryModuleEntity>? _theoryModules;
   final Map<int, TheoryModuleEntity> _theoryModuleById = {};
-  List<CharacterEntity>? _characters;
+  List<AvatarEntity>? _avatars;
   List<AchievementEntity>? _achievements;
   final Map<int, AchievementEntity> _achievementsById = {};
 
   List<GameModuleLevelEntity>? get levels => _levels;
   List<TheoryModuleEntity>? get theoryModules => _theoryModules;
-  List<CharacterEntity>? get characters => _characters;
+  List<AvatarEntity>? get avatars => _avatars;
   List<AchievementEntity>? get achievements => _achievements;
   Map<int, AchievementEntity> get achievementsById =>
       Map.unmodifiable(_achievementsById);
@@ -65,8 +65,8 @@ class AppCacheService {
     _theoryModules = List.unmodifiable(modules);
   }
 
-  void saveCharacters(List<CharacterEntity> characters) {
-    _characters = List.unmodifiable(characters);
+  void saveAvatars(List<AvatarEntity> avatars) {
+    _avatars = List.unmodifiable(avatars);
   }
 
   void saveAchievements(List<AchievementEntity> achievements) {
@@ -100,7 +100,7 @@ class AppCacheService {
     _questionsByLevel.clear();
     _theoryModules = null;
     _theoryModuleById.clear();
-    _characters = null;
+    _avatars = null;
     _achievements = null;
     _achievementsById.clear();
   }

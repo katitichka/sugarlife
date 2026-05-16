@@ -6,11 +6,10 @@ import 'package:go_router/go_router.dart';
 import 'package:sugarlife/core/theme/app_color.dart';
 import 'package:sugarlife/features/achievement/presentation/bloc/achievement_bloc.dart';
 import 'package:sugarlife/features/auth/presentation/bloc/auth_bloc.dart';
-import 'package:sugarlife/features/characters/domain/entitites/character_entity.dart';
-import 'package:sugarlife/features/characters/presentation/ui/choose_character_page.dart';
+import 'package:sugarlife/features/avatars/domain/entities/avatar_entity.dart';
+import 'package:sugarlife/features/avatars/presentation/view/choose_avatar_page.dart';
 import 'package:sugarlife/features/profile/domain/entities/profile_entity.dart';
 import 'package:sugarlife/features/profile/domain/repositories/profile_repository.dart';
-import 'package:sugarlife/shared/ui/character_network_avatar.dart';
 import 'package:sugarlife/shared/ui/main_app_bar.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -86,7 +85,7 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   void _showAvatarSelectionSheet(ProfileEntity currentProfile) async {
-    final result = await showDialog<CharacterEntity>(
+    final result = await showDialog<AvatarEntity>(
       context: context,
       barrierDismissible: true,
       builder: (context) => Dialog(
@@ -97,7 +96,7 @@ class _ProfilePageState extends State<ProfilePage> {
           child: SizedBox(
             height: MediaQuery.of(context).size.height * 0.80,
             width: MediaQuery.of(context).size.width * 0.9,
-            child: ChooseCharacterPage(
+            child: ChooseAvatarPage(
               currentAvatarId: currentProfile.currentAvatarId,
             ),
           ),
@@ -260,16 +259,32 @@ class _ProfilePageState extends State<ProfilePage> {
                             }
                             final url = snapshot.data!;
                             return Container(
-                              decoration: const BoxDecoration(
+                              decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                              ),
+                                border: Border.all(
+                                  color: AppColors.blue,
+                                  width: 3,
+                                ),
+                              ),// TODO
                               child: ClipOval(
-                                child: CharacterNetworkAvatar(
-                                  imageUrl: url,
-                                  size: 150,
+                                child: SvgPicture.network(
+                                  url,
+                                  width: 150,
+                                  height: 150,
                                   fit: BoxFit.cover,
-                                  loadingIndicatorColor: Colors.white,
-                                  errorIconColor: Colors.white,
+                                  placeholderBuilder: (context) => const Center(
+                                    child: CircularProgressIndicator(
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  errorBuilder: (context, error, stackTrace) =>
+                                      const Center(
+                                        child: Icon(
+                                          Icons.error_outline,
+                                          color: Colors.white,
+                                          size: 48,
+                                        ),
+                                      ),
                                 ),
                               ),
                             );
@@ -311,7 +326,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                   child: ClipRRect(
                                     borderRadius: BorderRadius.circular(14),
                                     child: _AchievementIcon(
-                                      url: achievement.iconUrl,
+                                      url: achievement.imageUrl,
                                     ),
                                   ),
                                 );

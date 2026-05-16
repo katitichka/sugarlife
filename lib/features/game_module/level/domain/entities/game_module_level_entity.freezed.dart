@@ -14,7 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$GameModuleLevelEntity {
 
- int get id; String get title; int get orderIndex; int get theoryModuleId; int get totalQuestions;
+ int get id; int get orderIndex; int get theoryModuleId; int get totalQuestions;
 /// Create a copy of GameModuleLevelEntity
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +25,16 @@ $GameModuleLevelEntityCopyWith<GameModuleLevelEntity> get copyWith => _$GameModu
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is GameModuleLevelEntity&&(identical(other.id, id) || other.id == id)&&(identical(other.title, title) || other.title == title)&&(identical(other.orderIndex, orderIndex) || other.orderIndex == orderIndex)&&(identical(other.theoryModuleId, theoryModuleId) || other.theoryModuleId == theoryModuleId)&&(identical(other.totalQuestions, totalQuestions) || other.totalQuestions == totalQuestions));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is GameModuleLevelEntity&&(identical(other.id, id) || other.id == id)&&(identical(other.orderIndex, orderIndex) || other.orderIndex == orderIndex)&&(identical(other.theoryModuleId, theoryModuleId) || other.theoryModuleId == theoryModuleId)&&(identical(other.totalQuestions, totalQuestions) || other.totalQuestions == totalQuestions));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,id,title,orderIndex,theoryModuleId,totalQuestions);
+int get hashCode => Object.hash(runtimeType,id,orderIndex,theoryModuleId,totalQuestions);
 
 @override
 String toString() {
-  return 'GameModuleLevelEntity(id: $id, title: $title, orderIndex: $orderIndex, theoryModuleId: $theoryModuleId, totalQuestions: $totalQuestions)';
+  return 'GameModuleLevelEntity(id: $id, orderIndex: $orderIndex, theoryModuleId: $theoryModuleId, totalQuestions: $totalQuestions)';
 }
 
 
@@ -45,7 +45,7 @@ abstract mixin class $GameModuleLevelEntityCopyWith<$Res>  {
   factory $GameModuleLevelEntityCopyWith(GameModuleLevelEntity value, $Res Function(GameModuleLevelEntity) _then) = _$GameModuleLevelEntityCopyWithImpl;
 @useResult
 $Res call({
- int id, String title, int orderIndex, int theoryModuleId, int totalQuestions
+ int id, int orderIndex, int theoryModuleId, int totalQuestions
 });
 
 
@@ -62,11 +62,10 @@ class _$GameModuleLevelEntityCopyWithImpl<$Res>
 
 /// Create a copy of GameModuleLevelEntity
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? title = null,Object? orderIndex = null,Object? theoryModuleId = null,Object? totalQuestions = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? orderIndex = null,Object? theoryModuleId = null,Object? totalQuestions = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as int,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
-as String,orderIndex: null == orderIndex ? _self.orderIndex : orderIndex // ignore: cast_nullable_to_non_nullable
+as int,orderIndex: null == orderIndex ? _self.orderIndex : orderIndex // ignore: cast_nullable_to_non_nullable
 as int,theoryModuleId: null == theoryModuleId ? _self.theoryModuleId : theoryModuleId // ignore: cast_nullable_to_non_nullable
 as int,totalQuestions: null == totalQuestions ? _self.totalQuestions : totalQuestions // ignore: cast_nullable_to_non_nullable
 as int,
@@ -151,10 +150,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int id,  String title,  int orderIndex,  int theoryModuleId,  int totalQuestions)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int id,  int orderIndex,  int theoryModuleId,  int totalQuestions)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _GameModuleLevelEntity() when $default != null:
-return $default(_that.id,_that.title,_that.orderIndex,_that.theoryModuleId,_that.totalQuestions);case _:
+return $default(_that.id,_that.orderIndex,_that.theoryModuleId,_that.totalQuestions);case _:
   return orElse();
 
 }
@@ -172,10 +171,10 @@ return $default(_that.id,_that.title,_that.orderIndex,_that.theoryModuleId,_that
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int id,  String title,  int orderIndex,  int theoryModuleId,  int totalQuestions)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int id,  int orderIndex,  int theoryModuleId,  int totalQuestions)  $default,) {final _that = this;
 switch (_that) {
 case _GameModuleLevelEntity():
-return $default(_that.id,_that.title,_that.orderIndex,_that.theoryModuleId,_that.totalQuestions);}
+return $default(_that.id,_that.orderIndex,_that.theoryModuleId,_that.totalQuestions);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -189,10 +188,10 @@ return $default(_that.id,_that.title,_that.orderIndex,_that.theoryModuleId,_that
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int id,  String title,  int orderIndex,  int theoryModuleId,  int totalQuestions)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int id,  int orderIndex,  int theoryModuleId,  int totalQuestions)?  $default,) {final _that = this;
 switch (_that) {
 case _GameModuleLevelEntity() when $default != null:
-return $default(_that.id,_that.title,_that.orderIndex,_that.theoryModuleId,_that.totalQuestions);case _:
+return $default(_that.id,_that.orderIndex,_that.theoryModuleId,_that.totalQuestions);case _:
   return null;
 
 }
@@ -204,11 +203,10 @@ return $default(_that.id,_that.title,_that.orderIndex,_that.theoryModuleId,_that
 
 
 class _GameModuleLevelEntity implements GameModuleLevelEntity {
-  const _GameModuleLevelEntity({required this.id, required this.title, required this.orderIndex, required this.theoryModuleId, required this.totalQuestions});
+  const _GameModuleLevelEntity({required this.id, required this.orderIndex, required this.theoryModuleId, required this.totalQuestions});
   
 
 @override final  int id;
-@override final  String title;
 @override final  int orderIndex;
 @override final  int theoryModuleId;
 @override final  int totalQuestions;
@@ -223,16 +221,16 @@ _$GameModuleLevelEntityCopyWith<_GameModuleLevelEntity> get copyWith => __$GameM
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _GameModuleLevelEntity&&(identical(other.id, id) || other.id == id)&&(identical(other.title, title) || other.title == title)&&(identical(other.orderIndex, orderIndex) || other.orderIndex == orderIndex)&&(identical(other.theoryModuleId, theoryModuleId) || other.theoryModuleId == theoryModuleId)&&(identical(other.totalQuestions, totalQuestions) || other.totalQuestions == totalQuestions));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _GameModuleLevelEntity&&(identical(other.id, id) || other.id == id)&&(identical(other.orderIndex, orderIndex) || other.orderIndex == orderIndex)&&(identical(other.theoryModuleId, theoryModuleId) || other.theoryModuleId == theoryModuleId)&&(identical(other.totalQuestions, totalQuestions) || other.totalQuestions == totalQuestions));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,id,title,orderIndex,theoryModuleId,totalQuestions);
+int get hashCode => Object.hash(runtimeType,id,orderIndex,theoryModuleId,totalQuestions);
 
 @override
 String toString() {
-  return 'GameModuleLevelEntity(id: $id, title: $title, orderIndex: $orderIndex, theoryModuleId: $theoryModuleId, totalQuestions: $totalQuestions)';
+  return 'GameModuleLevelEntity(id: $id, orderIndex: $orderIndex, theoryModuleId: $theoryModuleId, totalQuestions: $totalQuestions)';
 }
 
 
@@ -243,7 +241,7 @@ abstract mixin class _$GameModuleLevelEntityCopyWith<$Res> implements $GameModul
   factory _$GameModuleLevelEntityCopyWith(_GameModuleLevelEntity value, $Res Function(_GameModuleLevelEntity) _then) = __$GameModuleLevelEntityCopyWithImpl;
 @override @useResult
 $Res call({
- int id, String title, int orderIndex, int theoryModuleId, int totalQuestions
+ int id, int orderIndex, int theoryModuleId, int totalQuestions
 });
 
 
@@ -260,11 +258,10 @@ class __$GameModuleLevelEntityCopyWithImpl<$Res>
 
 /// Create a copy of GameModuleLevelEntity
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? title = null,Object? orderIndex = null,Object? theoryModuleId = null,Object? totalQuestions = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? orderIndex = null,Object? theoryModuleId = null,Object? totalQuestions = null,}) {
   return _then(_GameModuleLevelEntity(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as int,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
-as String,orderIndex: null == orderIndex ? _self.orderIndex : orderIndex // ignore: cast_nullable_to_non_nullable
+as int,orderIndex: null == orderIndex ? _self.orderIndex : orderIndex // ignore: cast_nullable_to_non_nullable
 as int,theoryModuleId: null == theoryModuleId ? _self.theoryModuleId : theoryModuleId // ignore: cast_nullable_to_non_nullable
 as int,totalQuestions: null == totalQuestions ? _self.totalQuestions : totalQuestions // ignore: cast_nullable_to_non_nullable
 as int,

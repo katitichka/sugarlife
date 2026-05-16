@@ -17,35 +17,17 @@ class TheoryModuleDataProviderImpl implements TheoryModuleDataProvider {
       return response
           .map<TheoryModuleDto>((rawData) => _convertToDto(rawData))
           .toList();
-          
     } catch (e) {
       throw Exception('Failed to fetch modules: $e');
-    }
-  }
-
-  @override
-  Future<TheoryModuleDto> getModuleById({required int id}) async {
-    try {
-      final response = await _supabase
-          .from('theory_module')
-          .select('*, characters(image_url)')
-          .eq('id', id)
-          .single();
-      return _convertToDto(response);
-    } catch (e) {
-      throw Exception('Failed to fetch module with id $id: $e');
     }
   }
 
   TheoryModuleDto _convertToDto(Map<String, dynamic> rawData) {
     final characters = rawData['characters'] as Map<String, dynamic>;
     final characterImageUrl = characters['image_url'] as String;
-    
 
     final jsonForDto = Map<String, dynamic>.from(rawData);
-    jsonForDto['character_image_url'] = characterImageUrl; 
-    
-    // Удаление вложенного characters 
+    jsonForDto['character_image_url'] = characterImageUrl;
     jsonForDto.remove('characters');
 
     return TheoryModuleDto.fromJson(jsonForDto);

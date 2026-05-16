@@ -1,4 +1,3 @@
-
 import 'package:sugarlife/core/cache/app_cache_service.dart';
 import 'package:sugarlife/features/theory_module/data/mappers/theory_module_dto_mapper.dart';
 import 'package:sugarlife/features/theory_module/data/providers/theory_module_data_provider.dart';
@@ -30,16 +29,4 @@ class TheoryModuleRepositoryImpl implements TheoryModuleRepository {
     return modules;
   }
 
-  @override
-  Future<TheoryModuleEntity> getModuleById({required int id}) async {
-    final cachedModule = _cache.getTheoryModuleById(id);
-    if (cachedModule != null && cachedModule.content != null) {
-      return cachedModule;
-    }
-
-    final dto = await _dataProvider.getModuleById(id: id);
-    final module = TheoryModuleDtoMapper.toEntity(dto: dto);
-    _cache.saveTheoryModule(module);
-    return module;
-  }
 }

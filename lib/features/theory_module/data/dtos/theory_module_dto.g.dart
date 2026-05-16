@@ -15,7 +15,6 @@ _TheoryModuleDto _$TheoryModuleDtoFromJson(Map<String, dynamic> json) =>
       colorHex: json['color_hex'] as String,
       orderIndex: (json['order_index'] as num).toInt(),
       characterImageUrl: json['character_image_url'] as String,
-      content: json['content'] as String?,
     );
 
 Map<String, dynamic> _$TheoryModuleDtoToJson(_TheoryModuleDto instance) =>
@@ -27,5 +26,4 @@ Map<String, dynamic> _$TheoryModuleDtoToJson(_TheoryModuleDto instance) =>
       'color_hex': instance.colorHex,
       'order_index': instance.orderIndex,
       'character_image_url': instance.characterImageUrl,
-      'content': instance.content,
     };

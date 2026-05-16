@@ -329,10 +329,7 @@ print('answers: $answers');
         return null;
       }
 
-      final achievement = await _achievementRepository
-          .tryUnlockAchievementForModule(
-            theoryModuleId: currentLevel.theoryModuleId,
-          );
+      final achievement = await _achievementRepository.unlockRandomAchievement();
       if (achievement != null) {
         print('Выдано достижение ${achievement.id}: ${achievement.name}');
       }

@@ -27,7 +27,7 @@ class GameModuleLevelListRepositoryImpl
 
     final response = await _supabase
         .from('levels')
-        .select('id, title, order_index, theory_module_id')
+        .select('id, order_index, theory_module_id')
         .order('theory_module_id')
         .order('order_index');
 
@@ -72,7 +72,7 @@ class GameModuleLevelListRepositoryImpl
 
     final response = await _supabase
         .from('levels')
-        .select('id, title, order_index, theory_module_id')
+        .select('id, order_index, theory_module_id')
         .eq('id', levelId)
         .single();
 

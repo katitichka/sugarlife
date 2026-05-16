@@ -6,9 +6,8 @@ part 'achievement_entity.freezed.dart';
 sealed class AchievementEntity with _$AchievementEntity {
   const factory AchievementEntity({
     required int id,
-    required int moduleId,
     required String name,
     required String description,
-    required String iconUrl,
+    required String imageUrl,
   }) = _AchievementEntity;
 }

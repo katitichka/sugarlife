@@ -7,7 +7,6 @@ part 'game_module_level_dto.g.dart';
 sealed class GameModuleLevelDto with _$GameModuleLevelDto {
   const factory GameModuleLevelDto({
     required int id,
-    required String title,
     @JsonKey(name: 'order_index') required int orderIndex,
     @JsonKey(name: 'theory_module_id') int? theoryModuleId,
   }) = _GameModuleLevelDto;

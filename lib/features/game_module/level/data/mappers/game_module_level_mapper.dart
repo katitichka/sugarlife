@@ -8,7 +8,6 @@ abstract class GameModuleLevelMapper {
   }) {
     return GameModuleLevelEntity(
       id: dto.id,
-      title: dto.title,
       orderIndex: dto.orderIndex,
       theoryModuleId: dto.theoryModuleId ?? 1,
       totalQuestions: totalQuestions,

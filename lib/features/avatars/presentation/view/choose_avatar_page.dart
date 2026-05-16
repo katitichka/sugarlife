@@ -1,44 +1,44 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sugarlife/core/theme/app_color.dart';
-import 'package:sugarlife/features/characters/domain/entitites/character_entity.dart';
+import 'package:sugarlife/features/avatars/domain/entities/avatar_entity.dart';
 import 'package:sugarlife/features/profile/domain/repositories/profile_repository.dart';
-import 'package:sugarlife/shared/ui/character_network_avatar.dart';
 
-class ChooseCharacterPage extends StatefulWidget {
+class ChooseAvatarPage extends StatefulWidget {
   final int currentAvatarId;
 
-  const ChooseCharacterPage({required this.currentAvatarId, super.key});
+  const ChooseAvatarPage({required this.currentAvatarId, super.key});
 
   @override
-  State<ChooseCharacterPage> createState() => _ChooseCharacterPageState();
+  State<ChooseAvatarPage> createState() => _ChooseAvatarPageState();
 }
 
-class _ChooseCharacterPageState extends State<ChooseCharacterPage> {
-  List<CharacterEntity> _characters = [];
+class _ChooseAvatarPageState extends State<ChooseAvatarPage> {
+  List<AvatarEntity> _avatars = [];
   int? _selectedId;
   bool _isLoading = true;
 
   void initState() {
     super.initState();
-    _loadCharacters();
+    _loadAvatars();
   }
 
-  Future<void> _loadCharacters() async {
+  Future<void> _loadAvatars() async {
     print('Начинаю загрузку персонажей...');
     try {
       final repository = context.read<ProfileRepository>();
-      final characters = await repository.getAllCharacters();
-      print("Characters: $characters");
+      final avatars = await repository.getAllAvatars();
+      print("Characters: $avatars");
       setState(() {
-        _characters = characters;
-        _selectedId = widget.currentAvatarId;
+        _avatars = avatars;
+        _selectedId = null;
         _isLoading = false;
       });
     } catch (e) {
       setState(() {
-        print('Ошибка загрузки персонажей: $e');
+        print('Ошибка загрузки аватаров: $e');
         _isLoading = false;
       });
     }
@@ -90,13 +90,13 @@ class _ChooseCharacterPageState extends State<ChooseCharacterPage> {
                   crossAxisCount: 3,
                   childAspectRatio: 1,
                 ),
-                itemCount: _characters.length,
+                itemCount: _avatars.length,
                 itemBuilder: (context, index) {
-                  final character = _characters[index];
-                  final isSelected = character.id == _selectedId;
+                  final avatar = _avatars[index];
+                  final isSelected = avatar.id == _selectedId;
 
                   return GestureDetector(
-                    onTap: () => setState(() => _selectedId = character.id),
+                    onTap: () => setState(() => _selectedId = avatar.id),
                     child: Container(
                       margin: EdgeInsets.all(8),
                       decoration: BoxDecoration(
@@ -105,40 +105,34 @@ class _ChooseCharacterPageState extends State<ChooseCharacterPage> {
                             : null,
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: Column(
-                        children: [
-                          Expanded(
-                            child: LayoutBuilder(
-                              builder: (context, constraints) {
-                                final dim = constraints.biggest.shortestSide;
-                                return Center(
-                                  child: CharacterNetworkAvatar(
-                                    imageUrl: character.imageUrl,
-                                    size: dim > 0 ? dim : 72,
-                                    fit: BoxFit.contain,
-                                    loadingIndicatorColor: AppColors.blue,
-                                  ),
-                                );
-                              },
-                            ),
+                      child: Opacity(
+                        opacity: _selectedId == null ? 1.0 : (isSelected ? 1.0 : 0.5),
+                        child: SvgPicture.network(
+                          avatar.imageUrl,
+                          width: double.infinity,
+                          height: double.infinity,
+                          fit: BoxFit.contain,
+                          placeholderBuilder: (context) => const Center(
+                            child: CircularProgressIndicator(),
                           ),
-                          SizedBox(height: 8),
-                          Text(character.name),
-                        ],
+                          errorBuilder: (context, error, stackTrace) =>
+                              const Icon(Icons.error),
+                        ),
                       ),
                     ),
                   );
                 },
               ),
             ),
+            const SizedBox(height: 24),
             ElevatedButton(
               onPressed:
-                  _selectedId != null && _selectedId != widget.currentAvatarId
+                  _selectedId != null 
                   ? () {
-                      final selectedCharacter = _characters.firstWhere(
+                      final selectedAvatar = _avatars.firstWhere(
                         (c) => c.id == _selectedId,
                       );
-                      Navigator.pop(context, selectedCharacter);
+                      Navigator.pop(context, selectedAvatar);
                     }
                   : null,
               style: ElevatedButton.styleFrom(
