@@ -26,6 +26,10 @@ sealed class GameModuleLevelState with _$GameModuleLevelState {
     required LevelProgressEntity? progress,
     required Map<int,bool> answers,
   }) = AnswerInProgress;
+  const factory GameModuleLevelState.completingLevel() = CompletingLevel;
+  const factory GameModuleLevelState.levelCompletionFailed({
+    required String message,
+  }) = LevelCompletionFailed;
   const factory GameModuleLevelState.levelCompleted({
     required int levelId,
     required int correctAnswers,

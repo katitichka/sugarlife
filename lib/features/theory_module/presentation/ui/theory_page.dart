@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sugarlife/core/theme/app_color.dart';
 import 'package:sugarlife/features/theory_module/presentation/bloc/theory_module_bloc.dart';
+import 'package:sugarlife/shared/ui/app_error_view.dart';
 import 'package:sugarlife/shared/ui/main_app_bar.dart';
 
 class TheoryPage extends StatelessWidget {
@@ -19,7 +20,13 @@ class TheoryPage extends StatelessWidget {
             case ReceiveInProgress():
               return const _LoadingPage();
             case ReceiveFailed(:final message):
-              return _ErrorPage(message: message);
+              return AppErrorView(
+                message: message,
+                wrapInScaffold: false,
+                onRetry: () => context.read<TheoryModuleBloc>().add(
+                  TheoryModuleEvent.receive(),
+                ),
+              );
             case ReceiveSuccess():
               final modules = state.theoryModules;
               return ListView.builder(
@@ -61,12 +68,3 @@ class _LoadingPage extends StatelessWidget {
   }
 }
 
-class _ErrorPage extends StatelessWidget {
-  final String message;
-  const _ErrorPage({required this.message});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(body: Center(child: Text('Ошибка: $message')));
-  }
-}

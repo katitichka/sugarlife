@@ -16,6 +16,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final _passwordController = TextEditingController();
   String? _emailError;
   String? _passwordError;
+  String? _serverError;
   bool _isLoading = false;
 
   @override
@@ -48,7 +49,7 @@ class _LoginScreenState extends State<LoginScreen> {
           unauthenticated: () => setState(() => _isLoading = false),
           failure: (message) {
             setState(() {
-              _emailError = message;
+              _serverError = message;
               _isLoading = false;
             });
           },
@@ -109,6 +110,14 @@ class _LoginScreenState extends State<LoginScreen> {
                   errorText: _passwordError,
                 ),
               ),
+              if (_serverError != null) ...[
+                const SizedBox(height: 12),
+                Text(
+                  _serverError!,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Colors.red.shade700, fontSize: 14),
+                ),
+              ],
               SizedBox(height: 50),
               TextButton(
                 onPressed: () => context.go('/register'),
@@ -135,6 +144,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           _passwordError = _passwordController.text.isEmpty
                               ? 'Введите пароль'
                               : null;
+                          _serverError = null;
                         });
 
                         // Если есть ошибки — не отправляем

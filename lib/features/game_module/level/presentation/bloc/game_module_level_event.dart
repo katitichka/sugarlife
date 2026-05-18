@@ -10,6 +10,7 @@ sealed class GameModuleLevelEvent with _$GameModuleLevelEvent {
   required List<int> selectedIndices,
 }) = _AnswerMultipleSelect;
   const factory GameModuleLevelEvent.nextQuestion() = _NextQuestion;
+  const factory GameModuleLevelEvent.retryCompleteLevel() = _RetryCompleteLevel;
   const factory GameModuleLevelEvent.retryLevel() = _RetryLevel;
   const factory GameModuleLevelEvent.startLevel() = _StartLevel;
 }

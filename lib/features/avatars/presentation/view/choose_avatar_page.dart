@@ -2,9 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:sugarlife/core/errors/error_mapper.dart';
+import 'package:sugarlife/core/errors/error_messages.dart';
+import 'package:sugarlife/core/errors/load_with_retry.dart';
 import 'package:sugarlife/core/theme/app_color.dart';
 import 'package:sugarlife/features/avatars/domain/entities/avatar_entity.dart';
 import 'package:sugarlife/features/profile/domain/repositories/profile_repository.dart';
+import 'package:sugarlife/shared/ui/app_error_view.dart';
 
 class ChooseAvatarPage extends StatefulWidget {
   final int currentAvatarId;
@@ -19,35 +23,68 @@ class _ChooseAvatarPageState extends State<ChooseAvatarPage> {
   List<AvatarEntity> _avatars = [];
   int? _selectedId;
   bool _isLoading = true;
+  String? _loadError;
 
+  @override
   void initState() {
     super.initState();
     _loadAvatars();
   }
 
   Future<void> _loadAvatars() async {
-    print('Начинаю загрузку персонажей...');
+    setState(() {
+      _isLoading = true;
+      _loadError = null;
+    });
     try {
       final repository = context.read<ProfileRepository>();
-      final avatars = await repository.getAllAvatars();
-      print("Characters: $avatars");
+      final avatars = await loadWithRetry(repository.getAllAvatars);
+      if (!mounted) return;
+      await _precacheAvatarImages(context, avatars);
+      if (!mounted) return;
       setState(() {
         _avatars = avatars;
         _selectedId = null;
         _isLoading = false;
       });
     } catch (e) {
+      if (!mounted) return;
       setState(() {
-        print('Ошибка загрузки аватаров: $e');
+        _loadError = ErrorMapper.toUserMessage(
+          e,
+          loadContext: ErrorMessages.loadFailed,
+        );
         _isLoading = false;
       });
     }
   }
 
+  Future<void> _precacheAvatarImages(
+    BuildContext context,
+    List<AvatarEntity> avatars,
+  ) async {
+    await Future.wait(
+      avatars.map((avatar) {
+        final loader = SvgNetworkLoader(avatar.imageUrl);
+        return loader.loadBytes(context);
+      }),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
-      return Scaffold(body: Center(child: CircularProgressIndicator()));
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+
+    if (_loadError != null) {
+      return Scaffold(
+        body: AppErrorView(
+          message: _loadError!,
+          wrapInScaffold: false,
+          onRetry: _loadAvatars,
+        ),
+      );
     }
 
     return Scaffold(
@@ -112,9 +149,6 @@ class _ChooseAvatarPageState extends State<ChooseAvatarPage> {
                           width: double.infinity,
                           height: double.infinity,
                           fit: BoxFit.contain,
-                          placeholderBuilder: (context) => const Center(
-                            child: CircularProgressIndicator(),
-                          ),
                           errorBuilder: (context, error, stackTrace) =>
                               const Icon(Icons.error),
                         ),

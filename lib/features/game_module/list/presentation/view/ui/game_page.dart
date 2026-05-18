@@ -6,10 +6,12 @@ import 'package:sugarlife/core/router/root_navigator.dart';
 import 'package:sugarlife/core/theme/app_color.dart';
 import 'package:sugarlife/features/achievement/presentation/bloc/achievement_bloc.dart';
 import 'package:sugarlife/features/achievement/presentation/view/achievement_reward_dialog.dart';
+import 'package:sugarlife/shared/ui/achievement_image.dart';
 import 'package:sugarlife/features/daily_card/presentation/view/daily_card_screen.dart';
 import 'package:sugarlife/features/game_module/level/domain/entities/game_module_level_entity.dart';
 import 'package:sugarlife/features/game_module/list/presentation/bloc/game_module_list_bloc.dart';
 import 'package:sugarlife/features/profile/domain/entities/level_progress_entity.dart';
+import 'package:sugarlife/shared/ui/app_error_view.dart';
 
 class LevelPositionCalculator {
   static const int stepX = 80;
@@ -91,6 +93,10 @@ class _GamePageState extends State<GamePage> {
           ? rootCtx
           : context;
       if (!dialogContext.mounted) return;
+      try {
+        await AchievementImage.precache(achievement.imageUrl, dialogContext);
+      } catch (_) {}
+      if (!dialogContext.mounted) return;
       await showDialog<void>(
         context: dialogContext,
         barrierDismissible: false,
@@ -163,7 +169,12 @@ class _GamePageState extends State<GamePage> {
             return _buildGameContent(state.levels, state.progressMap);
           }
           if (state is ReceiveFailed) {
-            return Center(child: Text('Ошибка: ${state.message}'));
+            return AppErrorView(
+              message: state.message,
+              onRetry: () => context.read<GameModuleListBloc>().add(
+                GameModuleListEvent.receive(),
+              ),
+            );
           }
           return const Center(child: CircularProgressIndicator());
         },

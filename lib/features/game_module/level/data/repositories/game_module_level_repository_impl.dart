@@ -1,4 +1,5 @@
 import 'package:sugarlife/core/cache/app_cache_service.dart';
+import 'package:sugarlife/core/errors/load_with_retry.dart';
 import 'package:sugarlife/features/game_module/level/data/mappers/game_module_question_supabase_mapper.dart';
 import 'package:sugarlife/features/game_module/level/domain/entities/game_module_question_entity.dart';
 import 'package:sugarlife/features/game_module/level/domain/repositories/game_module_level_repository.dart';
@@ -41,16 +42,24 @@ class GameModuleLevelRepositoryImpl implements GameModuleLevelRepository {
   }
 
   @override
-  Future<String?> getCharacterImageUrl(int characterId) async {
-  final response = await _supabase
-      .from('characters')
-      .select('image_url')
-      .eq('id', characterId)
-      .maybeSingle();
-  final imageUrl = response?['image_url'] as String?;
-  if (imageUrl == null) return null;
-  
-  // Формируем полный URL из имени файла
-  return _supabase.storage.from('characters').getPublicUrl(imageUrl);
-}
+  Future<String?> getCharacterImageUrl(int characterId) {
+    return loadWithRetry(() => _fetchCharacterImageUrl(characterId));
+  }
+
+  Future<String?> _fetchCharacterImageUrl(int characterId) async {
+    final response = await _supabase
+        .from('characters')
+        .select('image_url')
+        .eq('id', characterId)
+        .maybeSingle();
+    final imageUrl = response?['image_url'] as String?;
+    if (imageUrl == null) return null;
+
+    if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
+      return imageUrl;
+    }
+
+    final path = imageUrl.startsWith('/') ? imageUrl.substring(1) : imageUrl;
+    return _supabase.storage.from('characters').getPublicUrl(path);
+  }
 }

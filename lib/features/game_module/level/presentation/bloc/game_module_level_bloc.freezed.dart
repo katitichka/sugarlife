@@ -55,7 +55,7 @@ extension GameModuleLevelEventPatterns on GameModuleLevelEvent {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( _Receive value)?  receive,TResult Function( _AnswerMultipleChoice value)?  answerMultipleChoice,TResult Function( _AnswerTrueFalse value)?  answerTrueFalse,TResult Function( _AnswerFillBlank value)?  answerFillBlank,TResult Function( _AnswerMultipleSelect value)?  answerMultipleSelect,TResult Function( _NextQuestion value)?  nextQuestion,TResult Function( _RetryLevel value)?  retryLevel,TResult Function( _StartLevel value)?  startLevel,required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( _Receive value)?  receive,TResult Function( _AnswerMultipleChoice value)?  answerMultipleChoice,TResult Function( _AnswerTrueFalse value)?  answerTrueFalse,TResult Function( _AnswerFillBlank value)?  answerFillBlank,TResult Function( _AnswerMultipleSelect value)?  answerMultipleSelect,TResult Function( _NextQuestion value)?  nextQuestion,TResult Function( _RetryCompleteLevel value)?  retryCompleteLevel,TResult Function( _RetryLevel value)?  retryLevel,TResult Function( _StartLevel value)?  startLevel,required TResult orElse(),}){
 final _that = this;
 switch (_that) {
 case _Receive() when receive != null:
@@ -64,7 +64,8 @@ return answerMultipleChoice(_that);case _AnswerTrueFalse() when answerTrueFalse 
 return answerTrueFalse(_that);case _AnswerFillBlank() when answerFillBlank != null:
 return answerFillBlank(_that);case _AnswerMultipleSelect() when answerMultipleSelect != null:
 return answerMultipleSelect(_that);case _NextQuestion() when nextQuestion != null:
-return nextQuestion(_that);case _RetryLevel() when retryLevel != null:
+return nextQuestion(_that);case _RetryCompleteLevel() when retryCompleteLevel != null:
+return retryCompleteLevel(_that);case _RetryLevel() when retryLevel != null:
 return retryLevel(_that);case _StartLevel() when startLevel != null:
 return startLevel(_that);case _:
   return orElse();
@@ -84,7 +85,7 @@ return startLevel(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( _Receive value)  receive,required TResult Function( _AnswerMultipleChoice value)  answerMultipleChoice,required TResult Function( _AnswerTrueFalse value)  answerTrueFalse,required TResult Function( _AnswerFillBlank value)  answerFillBlank,required TResult Function( _AnswerMultipleSelect value)  answerMultipleSelect,required TResult Function( _NextQuestion value)  nextQuestion,required TResult Function( _RetryLevel value)  retryLevel,required TResult Function( _StartLevel value)  startLevel,}){
+@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( _Receive value)  receive,required TResult Function( _AnswerMultipleChoice value)  answerMultipleChoice,required TResult Function( _AnswerTrueFalse value)  answerTrueFalse,required TResult Function( _AnswerFillBlank value)  answerFillBlank,required TResult Function( _AnswerMultipleSelect value)  answerMultipleSelect,required TResult Function( _NextQuestion value)  nextQuestion,required TResult Function( _RetryCompleteLevel value)  retryCompleteLevel,required TResult Function( _RetryLevel value)  retryLevel,required TResult Function( _StartLevel value)  startLevel,}){
 final _that = this;
 switch (_that) {
 case _Receive():
@@ -93,7 +94,8 @@ return answerMultipleChoice(_that);case _AnswerTrueFalse():
 return answerTrueFalse(_that);case _AnswerFillBlank():
 return answerFillBlank(_that);case _AnswerMultipleSelect():
 return answerMultipleSelect(_that);case _NextQuestion():
-return nextQuestion(_that);case _RetryLevel():
+return nextQuestion(_that);case _RetryCompleteLevel():
+return retryCompleteLevel(_that);case _RetryLevel():
 return retryLevel(_that);case _StartLevel():
 return startLevel(_that);}
 }
@@ -109,7 +111,7 @@ return startLevel(_that);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( _Receive value)?  receive,TResult? Function( _AnswerMultipleChoice value)?  answerMultipleChoice,TResult? Function( _AnswerTrueFalse value)?  answerTrueFalse,TResult? Function( _AnswerFillBlank value)?  answerFillBlank,TResult? Function( _AnswerMultipleSelect value)?  answerMultipleSelect,TResult? Function( _NextQuestion value)?  nextQuestion,TResult? Function( _RetryLevel value)?  retryLevel,TResult? Function( _StartLevel value)?  startLevel,}){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( _Receive value)?  receive,TResult? Function( _AnswerMultipleChoice value)?  answerMultipleChoice,TResult? Function( _AnswerTrueFalse value)?  answerTrueFalse,TResult? Function( _AnswerFillBlank value)?  answerFillBlank,TResult? Function( _AnswerMultipleSelect value)?  answerMultipleSelect,TResult? Function( _NextQuestion value)?  nextQuestion,TResult? Function( _RetryCompleteLevel value)?  retryCompleteLevel,TResult? Function( _RetryLevel value)?  retryLevel,TResult? Function( _StartLevel value)?  startLevel,}){
 final _that = this;
 switch (_that) {
 case _Receive() when receive != null:
@@ -118,7 +120,8 @@ return answerMultipleChoice(_that);case _AnswerTrueFalse() when answerTrueFalse 
 return answerTrueFalse(_that);case _AnswerFillBlank() when answerFillBlank != null:
 return answerFillBlank(_that);case _AnswerMultipleSelect() when answerMultipleSelect != null:
 return answerMultipleSelect(_that);case _NextQuestion() when nextQuestion != null:
-return nextQuestion(_that);case _RetryLevel() when retryLevel != null:
+return nextQuestion(_that);case _RetryCompleteLevel() when retryCompleteLevel != null:
+return retryCompleteLevel(_that);case _RetryLevel() when retryLevel != null:
 return retryLevel(_that);case _StartLevel() when startLevel != null:
 return startLevel(_that);case _:
   return null;
@@ -137,7 +140,7 @@ return startLevel(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( int levelId)?  receive,TResult Function( String answer)?  answerMultipleChoice,TResult Function( bool answer)?  answerTrueFalse,TResult Function( String answer)?  answerFillBlank,TResult Function( List<int> selectedIndices)?  answerMultipleSelect,TResult Function()?  nextQuestion,TResult Function()?  retryLevel,TResult Function()?  startLevel,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( int levelId)?  receive,TResult Function( String answer)?  answerMultipleChoice,TResult Function( bool answer)?  answerTrueFalse,TResult Function( String answer)?  answerFillBlank,TResult Function( List<int> selectedIndices)?  answerMultipleSelect,TResult Function()?  nextQuestion,TResult Function()?  retryCompleteLevel,TResult Function()?  retryLevel,TResult Function()?  startLevel,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Receive() when receive != null:
 return receive(_that.levelId);case _AnswerMultipleChoice() when answerMultipleChoice != null:
@@ -145,7 +148,8 @@ return answerMultipleChoice(_that.answer);case _AnswerTrueFalse() when answerTru
 return answerTrueFalse(_that.answer);case _AnswerFillBlank() when answerFillBlank != null:
 return answerFillBlank(_that.answer);case _AnswerMultipleSelect() when answerMultipleSelect != null:
 return answerMultipleSelect(_that.selectedIndices);case _NextQuestion() when nextQuestion != null:
-return nextQuestion();case _RetryLevel() when retryLevel != null:
+return nextQuestion();case _RetryCompleteLevel() when retryCompleteLevel != null:
+return retryCompleteLevel();case _RetryLevel() when retryLevel != null:
 return retryLevel();case _StartLevel() when startLevel != null:
 return startLevel();case _:
   return orElse();
@@ -165,7 +169,7 @@ return startLevel();case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( int levelId)  receive,required TResult Function( String answer)  answerMultipleChoice,required TResult Function( bool answer)  answerTrueFalse,required TResult Function( String answer)  answerFillBlank,required TResult Function( List<int> selectedIndices)  answerMultipleSelect,required TResult Function()  nextQuestion,required TResult Function()  retryLevel,required TResult Function()  startLevel,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( int levelId)  receive,required TResult Function( String answer)  answerMultipleChoice,required TResult Function( bool answer)  answerTrueFalse,required TResult Function( String answer)  answerFillBlank,required TResult Function( List<int> selectedIndices)  answerMultipleSelect,required TResult Function()  nextQuestion,required TResult Function()  retryCompleteLevel,required TResult Function()  retryLevel,required TResult Function()  startLevel,}) {final _that = this;
 switch (_that) {
 case _Receive():
 return receive(_that.levelId);case _AnswerMultipleChoice():
@@ -173,7 +177,8 @@ return answerMultipleChoice(_that.answer);case _AnswerTrueFalse():
 return answerTrueFalse(_that.answer);case _AnswerFillBlank():
 return answerFillBlank(_that.answer);case _AnswerMultipleSelect():
 return answerMultipleSelect(_that.selectedIndices);case _NextQuestion():
-return nextQuestion();case _RetryLevel():
+return nextQuestion();case _RetryCompleteLevel():
+return retryCompleteLevel();case _RetryLevel():
 return retryLevel();case _StartLevel():
 return startLevel();}
 }
@@ -189,7 +194,7 @@ return startLevel();}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( int levelId)?  receive,TResult? Function( String answer)?  answerMultipleChoice,TResult? Function( bool answer)?  answerTrueFalse,TResult? Function( String answer)?  answerFillBlank,TResult? Function( List<int> selectedIndices)?  answerMultipleSelect,TResult? Function()?  nextQuestion,TResult? Function()?  retryLevel,TResult? Function()?  startLevel,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( int levelId)?  receive,TResult? Function( String answer)?  answerMultipleChoice,TResult? Function( bool answer)?  answerTrueFalse,TResult? Function( String answer)?  answerFillBlank,TResult? Function( List<int> selectedIndices)?  answerMultipleSelect,TResult? Function()?  nextQuestion,TResult? Function()?  retryCompleteLevel,TResult? Function()?  retryLevel,TResult? Function()?  startLevel,}) {final _that = this;
 switch (_that) {
 case _Receive() when receive != null:
 return receive(_that.levelId);case _AnswerMultipleChoice() when answerMultipleChoice != null:
@@ -197,7 +202,8 @@ return answerMultipleChoice(_that.answer);case _AnswerTrueFalse() when answerTru
 return answerTrueFalse(_that.answer);case _AnswerFillBlank() when answerFillBlank != null:
 return answerFillBlank(_that.answer);case _AnswerMultipleSelect() when answerMultipleSelect != null:
 return answerMultipleSelect(_that.selectedIndices);case _NextQuestion() when nextQuestion != null:
-return nextQuestion();case _RetryLevel() when retryLevel != null:
+return nextQuestion();case _RetryCompleteLevel() when retryCompleteLevel != null:
+return retryCompleteLevel();case _RetryLevel() when retryLevel != null:
 return retryLevel();case _StartLevel() when startLevel != null:
 return startLevel();case _:
   return null;
@@ -578,6 +584,38 @@ String toString() {
 /// @nodoc
 
 
+class _RetryCompleteLevel implements GameModuleLevelEvent {
+  const _RetryCompleteLevel();
+  
+
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _RetryCompleteLevel);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'GameModuleLevelEvent.retryCompleteLevel()';
+}
+
+
+}
+
+
+
+
+/// @nodoc
+
+
 class _RetryLevel implements GameModuleLevelEvent {
   const _RetryLevel();
   
@@ -683,7 +721,7 @@ extension GameModuleLevelStatePatterns on GameModuleLevelState {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( _Initial value)?  initial,TResult Function( ReceiveInProgress value)?  receiveInProgress,TResult Function( ReceiveSuccess value)?  receiveSuccess,TResult Function( ReceiveFailed value)?  receiveFailed,TResult Function( AnswerInProgress value)?  answerInProgress,TResult Function( LevelCompleted value)?  levelCompleted,required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( _Initial value)?  initial,TResult Function( ReceiveInProgress value)?  receiveInProgress,TResult Function( ReceiveSuccess value)?  receiveSuccess,TResult Function( ReceiveFailed value)?  receiveFailed,TResult Function( AnswerInProgress value)?  answerInProgress,TResult Function( CompletingLevel value)?  completingLevel,TResult Function( LevelCompletionFailed value)?  levelCompletionFailed,TResult Function( LevelCompleted value)?  levelCompleted,required TResult orElse(),}){
 final _that = this;
 switch (_that) {
 case _Initial() when initial != null:
@@ -691,7 +729,9 @@ return initial(_that);case ReceiveInProgress() when receiveInProgress != null:
 return receiveInProgress(_that);case ReceiveSuccess() when receiveSuccess != null:
 return receiveSuccess(_that);case ReceiveFailed() when receiveFailed != null:
 return receiveFailed(_that);case AnswerInProgress() when answerInProgress != null:
-return answerInProgress(_that);case LevelCompleted() when levelCompleted != null:
+return answerInProgress(_that);case CompletingLevel() when completingLevel != null:
+return completingLevel(_that);case LevelCompletionFailed() when levelCompletionFailed != null:
+return levelCompletionFailed(_that);case LevelCompleted() when levelCompleted != null:
 return levelCompleted(_that);case _:
   return orElse();
 
@@ -710,7 +750,7 @@ return levelCompleted(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( _Initial value)  initial,required TResult Function( ReceiveInProgress value)  receiveInProgress,required TResult Function( ReceiveSuccess value)  receiveSuccess,required TResult Function( ReceiveFailed value)  receiveFailed,required TResult Function( AnswerInProgress value)  answerInProgress,required TResult Function( LevelCompleted value)  levelCompleted,}){
+@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( _Initial value)  initial,required TResult Function( ReceiveInProgress value)  receiveInProgress,required TResult Function( ReceiveSuccess value)  receiveSuccess,required TResult Function( ReceiveFailed value)  receiveFailed,required TResult Function( AnswerInProgress value)  answerInProgress,required TResult Function( CompletingLevel value)  completingLevel,required TResult Function( LevelCompletionFailed value)  levelCompletionFailed,required TResult Function( LevelCompleted value)  levelCompleted,}){
 final _that = this;
 switch (_that) {
 case _Initial():
@@ -718,7 +758,9 @@ return initial(_that);case ReceiveInProgress():
 return receiveInProgress(_that);case ReceiveSuccess():
 return receiveSuccess(_that);case ReceiveFailed():
 return receiveFailed(_that);case AnswerInProgress():
-return answerInProgress(_that);case LevelCompleted():
+return answerInProgress(_that);case CompletingLevel():
+return completingLevel(_that);case LevelCompletionFailed():
+return levelCompletionFailed(_that);case LevelCompleted():
 return levelCompleted(_that);}
 }
 /// A variant of `map` that fallback to returning `null`.
@@ -733,7 +775,7 @@ return levelCompleted(_that);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( _Initial value)?  initial,TResult? Function( ReceiveInProgress value)?  receiveInProgress,TResult? Function( ReceiveSuccess value)?  receiveSuccess,TResult? Function( ReceiveFailed value)?  receiveFailed,TResult? Function( AnswerInProgress value)?  answerInProgress,TResult? Function( LevelCompleted value)?  levelCompleted,}){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( _Initial value)?  initial,TResult? Function( ReceiveInProgress value)?  receiveInProgress,TResult? Function( ReceiveSuccess value)?  receiveSuccess,TResult? Function( ReceiveFailed value)?  receiveFailed,TResult? Function( AnswerInProgress value)?  answerInProgress,TResult? Function( CompletingLevel value)?  completingLevel,TResult? Function( LevelCompletionFailed value)?  levelCompletionFailed,TResult? Function( LevelCompleted value)?  levelCompleted,}){
 final _that = this;
 switch (_that) {
 case _Initial() when initial != null:
@@ -741,7 +783,9 @@ return initial(_that);case ReceiveInProgress() when receiveInProgress != null:
 return receiveInProgress(_that);case ReceiveSuccess() when receiveSuccess != null:
 return receiveSuccess(_that);case ReceiveFailed() when receiveFailed != null:
 return receiveFailed(_that);case AnswerInProgress() when answerInProgress != null:
-return answerInProgress(_that);case LevelCompleted() when levelCompleted != null:
+return answerInProgress(_that);case CompletingLevel() when completingLevel != null:
+return completingLevel(_that);case LevelCompletionFailed() when levelCompletionFailed != null:
+return levelCompletionFailed(_that);case LevelCompleted() when levelCompleted != null:
 return levelCompleted(_that);case _:
   return null;
 
@@ -759,14 +803,16 @@ return levelCompleted(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  initial,TResult Function( String message)?  receiveInProgress,TResult Function( List<GameModuleQuestionEntity> questions,  int currentIndex,  LevelProgressEntity? progress,  bool isAnswered,  Map<int, bool> answers)?  receiveSuccess,TResult Function( String message)?  receiveFailed,TResult Function( bool isCorrect,  String explanation,  String selectedAnswer,  String correctAnswer,  GameModuleQuestionEntity question,  int currentIndex,  List<GameModuleQuestionEntity> questions,  LevelProgressEntity? progress,  Map<int, bool> answers)?  answerInProgress,TResult Function( int levelId,  int correctAnswers,  int totalQuestions,  int stars,  AchievementEntity? unlockedAchievement)?  levelCompleted,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  initial,TResult Function( String message)?  receiveInProgress,TResult Function( List<GameModuleQuestionEntity> questions,  int currentIndex,  LevelProgressEntity? progress,  bool isAnswered,  Map<int, bool> answers)?  receiveSuccess,TResult Function( String message)?  receiveFailed,TResult Function( bool isCorrect,  String explanation,  String selectedAnswer,  String correctAnswer,  GameModuleQuestionEntity question,  int currentIndex,  List<GameModuleQuestionEntity> questions,  LevelProgressEntity? progress,  Map<int, bool> answers)?  answerInProgress,TResult Function()?  completingLevel,TResult Function( String message)?  levelCompletionFailed,TResult Function( int levelId,  int correctAnswers,  int totalQuestions,  int stars,  AchievementEntity? unlockedAchievement)?  levelCompleted,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Initial() when initial != null:
 return initial();case ReceiveInProgress() when receiveInProgress != null:
 return receiveInProgress(_that.message);case ReceiveSuccess() when receiveSuccess != null:
 return receiveSuccess(_that.questions,_that.currentIndex,_that.progress,_that.isAnswered,_that.answers);case ReceiveFailed() when receiveFailed != null:
 return receiveFailed(_that.message);case AnswerInProgress() when answerInProgress != null:
-return answerInProgress(_that.isCorrect,_that.explanation,_that.selectedAnswer,_that.correctAnswer,_that.question,_that.currentIndex,_that.questions,_that.progress,_that.answers);case LevelCompleted() when levelCompleted != null:
+return answerInProgress(_that.isCorrect,_that.explanation,_that.selectedAnswer,_that.correctAnswer,_that.question,_that.currentIndex,_that.questions,_that.progress,_that.answers);case CompletingLevel() when completingLevel != null:
+return completingLevel();case LevelCompletionFailed() when levelCompletionFailed != null:
+return levelCompletionFailed(_that.message);case LevelCompleted() when levelCompleted != null:
 return levelCompleted(_that.levelId,_that.correctAnswers,_that.totalQuestions,_that.stars,_that.unlockedAchievement);case _:
   return orElse();
 
@@ -785,14 +831,16 @@ return levelCompleted(_that.levelId,_that.correctAnswers,_that.totalQuestions,_t
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  initial,required TResult Function( String message)  receiveInProgress,required TResult Function( List<GameModuleQuestionEntity> questions,  int currentIndex,  LevelProgressEntity? progress,  bool isAnswered,  Map<int, bool> answers)  receiveSuccess,required TResult Function( String message)  receiveFailed,required TResult Function( bool isCorrect,  String explanation,  String selectedAnswer,  String correctAnswer,  GameModuleQuestionEntity question,  int currentIndex,  List<GameModuleQuestionEntity> questions,  LevelProgressEntity? progress,  Map<int, bool> answers)  answerInProgress,required TResult Function( int levelId,  int correctAnswers,  int totalQuestions,  int stars,  AchievementEntity? unlockedAchievement)  levelCompleted,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  initial,required TResult Function( String message)  receiveInProgress,required TResult Function( List<GameModuleQuestionEntity> questions,  int currentIndex,  LevelProgressEntity? progress,  bool isAnswered,  Map<int, bool> answers)  receiveSuccess,required TResult Function( String message)  receiveFailed,required TResult Function( bool isCorrect,  String explanation,  String selectedAnswer,  String correctAnswer,  GameModuleQuestionEntity question,  int currentIndex,  List<GameModuleQuestionEntity> questions,  LevelProgressEntity? progress,  Map<int, bool> answers)  answerInProgress,required TResult Function()  completingLevel,required TResult Function( String message)  levelCompletionFailed,required TResult Function( int levelId,  int correctAnswers,  int totalQuestions,  int stars,  AchievementEntity? unlockedAchievement)  levelCompleted,}) {final _that = this;
 switch (_that) {
 case _Initial():
 return initial();case ReceiveInProgress():
 return receiveInProgress(_that.message);case ReceiveSuccess():
 return receiveSuccess(_that.questions,_that.currentIndex,_that.progress,_that.isAnswered,_that.answers);case ReceiveFailed():
 return receiveFailed(_that.message);case AnswerInProgress():
-return answerInProgress(_that.isCorrect,_that.explanation,_that.selectedAnswer,_that.correctAnswer,_that.question,_that.currentIndex,_that.questions,_that.progress,_that.answers);case LevelCompleted():
+return answerInProgress(_that.isCorrect,_that.explanation,_that.selectedAnswer,_that.correctAnswer,_that.question,_that.currentIndex,_that.questions,_that.progress,_that.answers);case CompletingLevel():
+return completingLevel();case LevelCompletionFailed():
+return levelCompletionFailed(_that.message);case LevelCompleted():
 return levelCompleted(_that.levelId,_that.correctAnswers,_that.totalQuestions,_that.stars,_that.unlockedAchievement);}
 }
 /// A variant of `when` that fallback to returning `null`
@@ -807,14 +855,16 @@ return levelCompleted(_that.levelId,_that.correctAnswers,_that.totalQuestions,_t
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  initial,TResult? Function( String message)?  receiveInProgress,TResult? Function( List<GameModuleQuestionEntity> questions,  int currentIndex,  LevelProgressEntity? progress,  bool isAnswered,  Map<int, bool> answers)?  receiveSuccess,TResult? Function( String message)?  receiveFailed,TResult? Function( bool isCorrect,  String explanation,  String selectedAnswer,  String correctAnswer,  GameModuleQuestionEntity question,  int currentIndex,  List<GameModuleQuestionEntity> questions,  LevelProgressEntity? progress,  Map<int, bool> answers)?  answerInProgress,TResult? Function( int levelId,  int correctAnswers,  int totalQuestions,  int stars,  AchievementEntity? unlockedAchievement)?  levelCompleted,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  initial,TResult? Function( String message)?  receiveInProgress,TResult? Function( List<GameModuleQuestionEntity> questions,  int currentIndex,  LevelProgressEntity? progress,  bool isAnswered,  Map<int, bool> answers)?  receiveSuccess,TResult? Function( String message)?  receiveFailed,TResult? Function( bool isCorrect,  String explanation,  String selectedAnswer,  String correctAnswer,  GameModuleQuestionEntity question,  int currentIndex,  List<GameModuleQuestionEntity> questions,  LevelProgressEntity? progress,  Map<int, bool> answers)?  answerInProgress,TResult? Function()?  completingLevel,TResult? Function( String message)?  levelCompletionFailed,TResult? Function( int levelId,  int correctAnswers,  int totalQuestions,  int stars,  AchievementEntity? unlockedAchievement)?  levelCompleted,}) {final _that = this;
 switch (_that) {
 case _Initial() when initial != null:
 return initial();case ReceiveInProgress() when receiveInProgress != null:
 return receiveInProgress(_that.message);case ReceiveSuccess() when receiveSuccess != null:
 return receiveSuccess(_that.questions,_that.currentIndex,_that.progress,_that.isAnswered,_that.answers);case ReceiveFailed() when receiveFailed != null:
 return receiveFailed(_that.message);case AnswerInProgress() when answerInProgress != null:
-return answerInProgress(_that.isCorrect,_that.explanation,_that.selectedAnswer,_that.correctAnswer,_that.question,_that.currentIndex,_that.questions,_that.progress,_that.answers);case LevelCompleted() when levelCompleted != null:
+return answerInProgress(_that.isCorrect,_that.explanation,_that.selectedAnswer,_that.correctAnswer,_that.question,_that.currentIndex,_that.questions,_that.progress,_that.answers);case CompletingLevel() when completingLevel != null:
+return completingLevel();case LevelCompletionFailed() when levelCompletionFailed != null:
+return levelCompletionFailed(_that.message);case LevelCompleted() when levelCompleted != null:
 return levelCompleted(_that.levelId,_that.correctAnswers,_that.totalQuestions,_that.stars,_that.unlockedAchievement);case _:
   return null;
 
@@ -1198,6 +1248,104 @@ $LevelProgressEntityCopyWith<$Res>? get progress {
     return _then(_self.copyWith(progress: value));
   });
 }
+}
+
+/// @nodoc
+
+
+class CompletingLevel implements GameModuleLevelState {
+  const CompletingLevel();
+  
+
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is CompletingLevel);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'GameModuleLevelState.completingLevel()';
+}
+
+
+}
+
+
+
+
+/// @nodoc
+
+
+class LevelCompletionFailed implements GameModuleLevelState {
+  const LevelCompletionFailed({required this.message});
+  
+
+ final  String message;
+
+/// Create a copy of GameModuleLevelState
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$LevelCompletionFailedCopyWith<LevelCompletionFailed> get copyWith => _$LevelCompletionFailedCopyWithImpl<LevelCompletionFailed>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is LevelCompletionFailed&&(identical(other.message, message) || other.message == message));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,message);
+
+@override
+String toString() {
+  return 'GameModuleLevelState.levelCompletionFailed(message: $message)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $LevelCompletionFailedCopyWith<$Res> implements $GameModuleLevelStateCopyWith<$Res> {
+  factory $LevelCompletionFailedCopyWith(LevelCompletionFailed value, $Res Function(LevelCompletionFailed) _then) = _$LevelCompletionFailedCopyWithImpl;
+@useResult
+$Res call({
+ String message
+});
+
+
+
+
+}
+/// @nodoc
+class _$LevelCompletionFailedCopyWithImpl<$Res>
+    implements $LevelCompletionFailedCopyWith<$Res> {
+  _$LevelCompletionFailedCopyWithImpl(this._self, this._then);
+
+  final LevelCompletionFailed _self;
+  final $Res Function(LevelCompletionFailed) _then;
+
+/// Create a copy of GameModuleLevelState
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? message = null,}) {
+  return _then(LevelCompletionFailed(
+message: null == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+
 }
 
 /// @nodoc

@@ -1,5 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:sugarlife/core/errors/error_mapper.dart';
+import 'package:sugarlife/core/errors/error_messages.dart';
 import 'package:sugarlife/features/auth/domain/repositories/auth_repository.dart';
 import 'package:sugarlife/features/profile/domain/entities/profile_entity.dart';
 
@@ -45,7 +47,14 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         emit(AuthState.authenticated(profile: currentUser));
       }
     } catch (e) {
-      emit(AuthState.failure(message: 'Ошибка проверки авторизации: $e'));
+      emit(
+        AuthState.failure(
+          message: ErrorMapper.toUserMessage(
+            e,
+            authContext: ErrorMessages.authCheckFailed,
+          ),
+        ),
+      );
     }
   }
 
@@ -62,7 +71,14 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       );
       emit(AuthState.authenticated(profile: profile));
     } catch (e) {
-      emit(AuthState.failure(message: 'Ошибка авторизации: $e'));
+      emit(
+        AuthState.failure(
+          message: ErrorMapper.toUserMessage(
+            e,
+            authContext: ErrorMessages.authFailed,
+          ),
+        ),
+      );
     }
   }
 
@@ -98,7 +114,14 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       );
       emit(AuthState.authenticated(profile: profile));
     } catch (e) {
-      emit(AuthState.failure(message: 'Ошибка регистрации: $e'));
+      emit(
+        AuthState.failure(
+          message: ErrorMapper.toUserMessage(
+            e,
+            authContext: ErrorMessages.signUpFailed,
+          ),
+        ),
+      );
     }
   }
 
@@ -108,7 +131,14 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       await _authRepository.logout();
       emit(const AuthState.unauthenticated());
     } catch (e) {
-      emit(AuthState.failure(message: 'Ошибка выхода: $e'));
+      emit(
+        AuthState.failure(
+          message: ErrorMapper.toUserMessage(
+            e,
+            authContext: ErrorMessages.logoutFailed,
+          ),
+        ),
+      );
     }
   }
 

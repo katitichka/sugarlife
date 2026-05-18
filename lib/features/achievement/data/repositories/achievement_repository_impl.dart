@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sugarlife/core/cache/app_cache_service.dart';
 import 'package:sugarlife/features/achievement/domain/entities/achievement_entity.dart';
@@ -13,6 +15,8 @@ class AchievementRepositoryImpl implements AchievementRepository {
   static const String _shownAchievementsKey = 'shown_achievement_ids';
   static const String _pendingAchievementKey = 'pending_achievement_id';
   static const String _achievementsBucket = 'achievements';
+  static const String _achievementColumns =
+      'id, name, description, image_url';
 
   AchievementEntity _mapAchievement(Map<String, dynamic> json) {
     return AchievementEntity(
@@ -68,7 +72,7 @@ class AchievementRepositoryImpl implements AchievementRepository {
 
     final response = await _supabase
         .from('achievements')
-        .select('id, module_id, name, description, image_url')
+        .select(_achievementColumns)
         .eq('id', id)
         .maybeSingle();
     if (response == null) {
@@ -81,10 +85,14 @@ class AchievementRepositoryImpl implements AchievementRepository {
   }
 
   @override
-  Future<List<AchievementEntity>> getUserAchievements() async {
-    final cached = _cache.achievements;
-    if (cached != null) {
-      return cached;
+  Future<List<AchievementEntity>> getUserAchievements({
+    bool forceRefresh = false,
+  }) async {
+    if (!forceRefresh) {
+      final cached = _cache.achievements;
+      if (cached != null) {
+        return cached;
+      }
     }
 
     final userId = _supabase.auth.currentUser?.id;
@@ -107,7 +115,7 @@ class AchievementRepositoryImpl implements AchievementRepository {
 
     final achievementsResponse = await _supabase
         .from('achievements')
-        .select('id, module_id, name, description, image_url')
+        .select(_achievementColumns)
         .inFilter('id', achievementIds)
         .order('id');
 
@@ -118,76 +126,76 @@ class AchievementRepositoryImpl implements AchievementRepository {
     return achievements;
   }
 
-  @override
-Future<AchievementEntity?> unlockRandomAchievement() async {
-  final userId = _supabase.auth.currentUser?.id;
-  if (userId == null) {
-    return null;
-  }
-
-  final allAchievementsResponse = await _supabase
-      .from('achievements')
-      .select('id, module_id, name, description, image_url');
-
-  final allAchievements = allAchievementsResponse
-      .map((row) => _mapAchievement(Map<String, dynamic>.from(row)))
-      .toList();
-
-  if (allAchievements.isEmpty) {
-    print('Нет достижений в БД');
-    return null;
-  }
-  
-  final userAchievements = await getUserAchievements();
-  final unlockedIds = userAchievements.map((a) => a.id).toSet();
-  
-  final available = allAchievements
-      .where((a) => !unlockedIds.contains(a.id))
-      .toList();
-      
-  if (available.isEmpty) {
-    print('Все достижения уже получены');
-    return null;
-  }
-
-  final randomIndex = DateTime.now().millisecondsSinceEpoch % available.length;
-  final achievement = available[randomIndex];
-
-  // Сохраняем в БД с обработкой ошибок
-  try {
-    await _supabase.from('user_achievement').insert({
-      'user_id': userId,
-      'achievement_id': achievement.id,
-    });
-  } catch (e) {
-    // Проверяем, возможно запись уже есть (дубль)
-    final relationAfterFailure = await _supabase
+  Future<Set<int>> _getUnlockedAchievementIds(String userId) async {
+    final relations = await _supabase
         .from('user_achievement')
         .select('achievement_id')
-        .eq('user_id', userId)
-        .eq('achievement_id', achievement.id)
-        .maybeSingle();
-    if (relationAfterFailure == null) {
-      rethrow;
-    }
-    print('INSERT вернул ошибку ($e), но запись уже есть в БД');
+        .eq('user_id', userId);
+    return relations.map((row) => _asInt(row['achievement_id'])).toSet();
   }
-  
-  print('Выдано достижение ${achievement.id}: ${achievement.name}');
 
-  final prefs = await _prefs;
-  await prefs.setInt(_pendingAchievementKey, achievement.id);
+  @override
+  Future<AchievementEntity?> unlockRandomAchievement() async {
+    final userId = _supabase.auth.currentUser?.id;
+    if (userId == null) {
+      return null;
+    }
 
-  final cached = List<AchievementEntity>.from(
-    _cache.achievements ?? const [],
-  );
-  cached.removeWhere((item) => item.id == achievement.id);
-  cached.add(achievement);
-  cached.sort((a, b) => a.id.compareTo(b.id));
-  _cache.saveAchievements(cached);
+    final allAchievementsResponse = await _supabase
+        .from('achievements')
+        .select(_achievementColumns);
 
-  return achievement;
-}
+    final allAchievements = allAchievementsResponse
+        .map((row) => _mapAchievement(Map<String, dynamic>.from(row)))
+        .toList();
+
+    if (allAchievements.isEmpty) {
+      return null;
+    }
+
+    final unlockedIds = await _getUnlockedAchievementIds(userId);
+
+    final available = allAchievements
+        .where((a) => !unlockedIds.contains(a.id))
+        .toList();
+
+    if (available.isEmpty) {
+      return null;
+    }
+
+    final achievement = available[Random().nextInt(available.length)];
+
+    try {
+      await _supabase.from('user_achievement').insert({
+        'user_id': userId,
+        'achievement_id': achievement.id,
+      });
+    } catch (e) {
+      final relationAfterFailure = await _supabase
+          .from('user_achievement')
+          .select('achievement_id')
+          .eq('user_id', userId)
+          .eq('achievement_id', achievement.id)
+          .maybeSingle();
+      if (relationAfterFailure == null) {
+        rethrow;
+      }
+      // Запись уже есть — достижение выдано ранее, показываем его.
+    }
+
+    final prefs = await _prefs;
+    await prefs.setInt(_pendingAchievementKey, achievement.id);
+
+    final cached = List<AchievementEntity>.from(
+      _cache.achievements ?? const [],
+    );
+    cached.removeWhere((item) => item.id == achievement.id);
+    cached.add(achievement);
+    cached.sort((a, b) => a.id.compareTo(b.id));
+    _cache.saveAchievements(cached);
+
+    return achievement;
+  }
 
   @override
   Future<AchievementEntity?> getPendingAchievement() async {

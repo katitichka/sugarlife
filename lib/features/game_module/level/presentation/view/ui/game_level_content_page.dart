@@ -9,6 +9,8 @@ import 'package:sugarlife/features/game_module/level/presentation/bloc/game_modu
 import 'package:sugarlife/features/game_module/level/presentation/view/ui/game_level_result_page.dart';
 import 'package:sugarlife/features/game_module/level/presentation/view/ui/game_level_start_level_page.dart';
 import 'package:sugarlife/features/game_module/level/presentation/view/ui/game_question_page.dart';
+import 'package:sugarlife/shared/ui/achievement_image.dart';
+import 'package:sugarlife/shared/ui/app_error_view.dart';
 
 class GameLevelContentPage extends StatelessWidget {
   final int levelId;
@@ -22,7 +24,12 @@ class GameLevelContentPage extends StatelessWidget {
           case ReceiveInProgress():
             return const _LoadingPage();
           case ReceiveFailed(:final message):
-            return _ErrorPage(message: message);
+            return AppErrorView(
+              message: message,
+              onRetry: () => context.read<GameModuleLevelBloc>().add(
+                GameModuleLevelEvent.receive(levelId: levelId),
+              ),
+            );
           case ReceiveSuccess():
             final successState = state;
             if (successState.currentIndex == -1
@@ -34,6 +41,16 @@ class GameLevelContentPage extends StatelessWidget {
             }
           case AnswerInProgress():
             return const GameQuestionPage();
+          case CompletingLevel():
+            return const _LoadingPage();
+          case LevelCompletionFailed(:final message):
+            return AppErrorView(
+              message: message,
+              wrapInScaffold: false,
+              onRetry: () => context.read<GameModuleLevelBloc>().add(
+                const GameModuleLevelEvent.retryCompleteLevel(),
+              ),
+            );
           case LevelCompleted(
             :final correctAnswers,
             :final totalQuestions,
@@ -72,16 +89,6 @@ class _LoadingPage extends StatelessWidget {
   }
 }
 
-class _ErrorPage extends StatelessWidget {
-  final String message;
-  const _ErrorPage({required this.message});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(body: Center(child: Text('Ошибка: $message')));
-  }
-}
-
 /// Карточку показываем до `pop`: [AchievementBloc] + prefs могут не успеть
 /// синхронизироваться; при закрытии модуля передаём [unlockedOnThisRun] из блока.
 Future<void> _finishLevelWithAchievementCard(
@@ -94,6 +101,10 @@ Future<void> _finishLevelWithAchievementCard(
     final rootCtx = rootNavigatorKey.currentContext;
     final dialogContext =
         (rootCtx != null && rootCtx.mounted) ? rootCtx : context;
+    if (!dialogContext.mounted) return;
+    try {
+      await AchievementImage.precache(achievement.imageUrl, dialogContext);
+    } catch (_) {}
     if (!dialogContext.mounted) return;
     await showDialog<void>(
       context: dialogContext,

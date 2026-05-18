@@ -1,5 +1,10 @@
-﻿import 'package:bloc/bloc.dart';
+﻿import 'dart:async';
+
+import 'package:bloc/bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:sugarlife/core/errors/error_mapper.dart';
+import 'package:sugarlife/core/errors/error_messages.dart';
+import 'package:sugarlife/core/errors/load_with_retry.dart';
 import 'package:sugarlife/features/game_module/level/domain/entities/game_module_level_entity.dart';
 import 'package:sugarlife/features/game_module/level/domain/repositories/game_module_level_list_repository.dart';
 import 'package:sugarlife/features/profile/domain/entities/level_progress_entity.dart';
@@ -37,8 +42,8 @@ class GameModuleListBloc
             stars: stars,
             correctAnswers: correctAnswers,
           );
-          // 2. Тихая синхронизация с сервером в фоне.
-          await _onSilentRefresh(emit: emit);
+          // Синхронизация в фоне — не блокируем завершение уровня.
+          unawaited(_onSilentRefresh(emit: emit));
       }
     });
   }
@@ -52,10 +57,14 @@ class GameModuleListBloc
       ),
     );
     try {
-      final levels = await _gameModuleLevelListRepository.getAllLevels();
-      final allLevelsProgress = await _gameProgressRepository
-          .getAllLevelsProgress()
-          .timeout(const Duration(seconds: 15));
+      final levels = await loadWithRetry(
+        _gameModuleLevelListRepository.getAllLevels,
+      );
+      final allLevelsProgress = await loadWithRetry(
+        () => _gameProgressRepository
+            .getAllLevelsProgress()
+            .timeout(const Duration(seconds: 15)),
+      );
       emit(
         GameModuleListState.receiveSuccess(
           levels: levels,
@@ -63,7 +72,14 @@ class GameModuleListBloc
         ),
       );
     } catch (e) {
-      emit(GameModuleListState.receiveFailed(message: 'Ошибка: $e'));
+      emit(
+        GameModuleListState.receiveFailed(
+          message: ErrorMapper.toUserMessage(
+            e,
+            loadContext: ErrorMessages.loadFailed,
+          ),
+        ),
+      );
     }
   }
 

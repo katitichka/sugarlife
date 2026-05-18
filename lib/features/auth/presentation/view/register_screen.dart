@@ -19,6 +19,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   bool _isLoading = false;
   String? _emailError;
   String? _passwordError;
+  String? _serverError;
 
   @override
   void dispose() {
@@ -55,7 +56,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           }),
           failure: (message) {
             setState(() {
-              _emailError = message;
+              _serverError = message;
               _isLoading = false;
             });
           },
@@ -130,6 +131,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   errorText: _passwordError,
                 ),
               ),
+              if (_serverError != null) ...[
+                const SizedBox(height: 12),
+                Text(
+                  _serverError!,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Colors.red.shade700, fontSize: 14),
+                ),
+              ],
               SizedBox(height: 30),
               Center(
                 child: ElevatedButton(

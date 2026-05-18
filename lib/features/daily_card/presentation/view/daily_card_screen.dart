@@ -6,6 +6,7 @@ import 'package:sugarlife/features/daily_card/domain/entities/daily_card_entity.
 import 'package:sugarlife/features/daily_card/domain/repositories/daily_card_repository.dart';
 import 'package:sugarlife/features/daily_card/presentation/bloc/daily_card_bloc.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:sugarlife/shared/ui/app_error_view.dart';
 
 class DailyCardScreen extends StatelessWidget {
   const DailyCardScreen({super.key});
@@ -76,7 +77,13 @@ class _DialogContent extends StatelessWidget {
                   'Карточки закончились, но скоро появятся новые факты!',
                   textAlign: TextAlign.center,
                 ),
-                Error(:final message) => Text('Ошибка: $message'),
+                Error(:final message) => AppErrorView(
+                  message: message,
+                  compact: true,
+                  onRetry: () => context.read<DailyCardBloc>().add(
+                    const DailyCardEvent.loadTodayCard(),
+                  ),
+                ),
                 _ => const SizedBox.shrink(),
               },
 

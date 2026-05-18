@@ -25,7 +25,9 @@ class AchievementBloc extends Bloc<AchievementEvent, AchievementState> {
 
   Future<void> _loadAchievements(Emitter<AchievementState> emit) async {
     try {
-      final achievements = await _achievementRepository.getUserAchievements();
+      final achievements = await _achievementRepository.getUserAchievements(
+        forceRefresh: true,
+      );
       emit(state.copyWith(achievements: achievements));
     } catch (e) {
       print('Ошибка загрузки достижений: $e');

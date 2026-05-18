@@ -1,9 +1,9 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:sugarlife/core/theme/app_color.dart';
 import 'package:sugarlife/features/achievement/domain/entities/achievement_entity.dart';
+import 'package:sugarlife/shared/ui/achievement_image.dart';
 
 class AchievementRewardDialog extends StatefulWidget {
   const AchievementRewardDialog({required this.achievement, super.key});
@@ -69,13 +69,13 @@ class _AchievementRewardDialogState extends State<AchievementRewardDialog> {
                                 alignment: Alignment.center,
                                 transform: Matrix4.identity()..rotateY(math.pi),
                                 child: _CardFace(
-                                  imagePath: 'assets/achievements/open_cup.png',
+                                  imageUrl: widget.achievement.imageUrl,
                                   title: widget.achievement.name,
                                   subtitle: widget.achievement.description,
                                 ),
                               )
                             : const _CardFace(
-                                imagePath: 'assets/achievements/closed_card.png',
+                                imageUrl: 'assets/achievements/closed_card.png',
                                 title: 'Нажми, чтобы открыть',
                                 subtitle: 'Твоя новая награда уже здесь',
                               ),
@@ -102,17 +102,14 @@ class _AchievementRewardDialogState extends State<AchievementRewardDialog> {
 
 class _CardFace extends StatelessWidget {
   const _CardFace({
-    required this.imagePath,
+    required this.imageUrl,
     required this.title,
     required this.subtitle,
   });
 
-  final String imagePath;
+  final String imageUrl;
   final String title;
   final String subtitle;
-
-  bool get isNetworkImage => imagePath.startsWith('http');
-  bool get isSvg => imagePath.endsWith('.svg');
 
   @override
   Widget build(BuildContext context) {
@@ -127,7 +124,11 @@ class _CardFace extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          _buildImage(),
+          AchievementImage(
+            imageUrl: imageUrl,
+            width: 140,
+            height: 140,
+          ),
           const SizedBox(height: 16),
           Text(
             title,
@@ -149,31 +150,4 @@ class _CardFace extends StatelessWidget {
     );
   }
 
-  Widget _buildImage() {
-    if (!isNetworkImage) {
-      // Локальный PNG
-      return Image.asset(imagePath, width: 140, height: 140, fit: BoxFit.contain);
-    }
-    
-    // Сетевой URL
-    if (isSvg) {
-      return SvgPicture.network(
-        imagePath,
-        width: 140,
-        height: 140,
-        placeholderBuilder: (context) => const SizedBox(
-          width: 140,
-          height: 140,
-          child: CircularProgressIndicator(),
-        ),
-      );
-    } else {
-      return Image.network(
-        imagePath,
-        width: 140,
-        height: 140,
-        fit: BoxFit.contain,
-      );
-    }
-  }
 }

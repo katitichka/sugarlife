@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -10,6 +9,8 @@ import 'package:sugarlife/features/avatars/domain/entities/avatar_entity.dart';
 import 'package:sugarlife/features/avatars/presentation/view/choose_avatar_page.dart';
 import 'package:sugarlife/features/profile/domain/entities/profile_entity.dart';
 import 'package:sugarlife/features/profile/domain/repositories/profile_repository.dart';
+import 'package:sugarlife/shared/ui/achievement_image.dart';
+import 'package:sugarlife/shared/ui/app_snackbar.dart';
 import 'package:sugarlife/shared/ui/main_app_bar.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -71,9 +72,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   Navigator.pop(context);
                 } catch (e) {
                   if (!context.mounted) return;
-                  ScaffoldMessenger.of(
-                    context,
-                  ).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+                  showAppErrorSnackBar(context, e);
                 }
               }
             },
@@ -114,15 +113,11 @@ class _ProfilePageState extends State<ProfilePage> {
           AuthEvent.profileUpdate(newProfile: updatedProfile),
         );
         if (mounted) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(const SnackBar(content: Text('Аватар обновлён!')));
+          showAppSuccessSnackBar(context, 'Аватар обновлён!');
         }
       } catch (e) {
         if (mounted) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+          showAppErrorSnackBar(context, e);
         }
       }
     }
@@ -371,31 +366,13 @@ class _AchievementIcon extends StatelessWidget {
 
   final String url;
 
-  static Widget _placeholder() => Image.asset(
-    'assets/achievements/placeholder.png',
-    width: 58,
-    height: 58,
-    fit: BoxFit.cover,
-  );
-
   @override
   Widget build(BuildContext context) {
-    if (url.toLowerCase().endsWith('.svg')) {
-      return SvgPicture.network(
-        url,
-        width: 58,
-        height: 58,
-        fit: BoxFit.cover,
-        placeholderBuilder: (_) => _placeholder(),
-      );
-    }
-    return CachedNetworkImage(
+    return AchievementImage(
       imageUrl: url,
       width: 58,
       height: 58,
       fit: BoxFit.cover,
-      placeholder: (_, __) => _placeholder(),
-      errorWidget: (_, __, ___) => _placeholder(),
     );
   }
 }

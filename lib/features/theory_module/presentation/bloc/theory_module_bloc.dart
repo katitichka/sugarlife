@@ -1,5 +1,8 @@
 import 'package:bloc/bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:sugarlife/core/errors/error_mapper.dart';
+import 'package:sugarlife/core/errors/error_messages.dart';
+import 'package:sugarlife/core/errors/load_with_retry.dart';
 import 'package:sugarlife/features/theory_module/domain/entities/theory_module_entity.dart';
 import 'package:sugarlife/features/theory_module/domain/repositories/theory_module_repository.dart';
 
@@ -25,13 +28,20 @@ class TheoryModuleBloc
       ),
     );
     try {
-      final theoryModuleList = await _theoryModuleRepository.getAllModules();
+      final theoryModuleList = await loadWithRetry(
+        _theoryModuleRepository.getAllModules,
+      );
       emit(
         TheoryModuleState.receiveSuccess(theoryModules: theoryModuleList),
       );
     } catch (e) {
       emit(
-        TheoryModuleState.receiveFailed(message: 'Ошибка загрузки модулей'),
+        TheoryModuleState.receiveFailed(
+          message: ErrorMapper.toUserMessage(
+            e,
+            loadContext: ErrorMessages.loadFailed,
+          ),
+        ),
       );
     }
   }

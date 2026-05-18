@@ -1,3 +1,4 @@
+import 'package:sugarlife/core/errors/load_with_retry.dart';
 import 'package:sugarlife/features/profile/domain/entities/level_progress_entity.dart';
 import 'package:sugarlife/features/profile/domain/repositories/level_progress_repository.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -32,6 +33,21 @@ class LevelProgressRepositoryImpl implements LevelProgressRepository {
   // Сохраняет или обновляет прогресс уровня после прохождения
   @override
   Future<void> saveLevelProgress({
+    required int levelId,
+    required int stars,
+    required int correctAnswers,
+  }) {
+    return loadWithRetry(
+      () => _saveLevelProgress(
+        levelId: levelId,
+        stars: stars,
+        correctAnswers: correctAnswers,
+      ),
+      maxAttempts: 3,
+    );
+  }
+
+  Future<void> _saveLevelProgress({
     required int levelId,
     required int stars,
     required int correctAnswers,

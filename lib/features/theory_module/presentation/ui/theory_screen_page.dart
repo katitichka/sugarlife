@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sugarlife/core/theme/app_color.dart';
 import 'package:sugarlife/features/theory_module/domain/entities/theory_module_entity.dart';
 import 'package:sugarlife/features/theory_module/presentation/bloc/theory_module_bloc.dart';
+import 'package:sugarlife/shared/ui/app_error_view.dart';
 import 'package:sugarlife/shared/ui/main_app_bar.dart';
 
 class TheoryScreenPage extends StatelessWidget {
@@ -20,7 +21,13 @@ class TheoryScreenPage extends StatelessWidget {
             case ReceiveInProgress():
               return const Center(child: CircularProgressIndicator());
             case ReceiveFailed(:final message):
-              return Center(child: Text('Ошибка: $message'));
+              return AppErrorView(
+                message: message,
+                wrapInScaffold: false,
+                onRetry: () => context.read<TheoryModuleBloc>().add(
+                  TheoryModuleEvent.receive(),
+                ),
+              );
             case ReceiveSuccess():
               final module = _findModuleById(state.theoryModules, moduleId);
               if (module == null) {
