@@ -28,10 +28,16 @@ class _GameQuestionPageState extends State<GameQuestionPage> {
     final state = context.watch<GameModuleLevelBloc>().state;
 
     int? currentQuestionId;
+    int? currentCharacterId;
+    GameModuleQuestionEntity? currentQuestion;
     if (state is ReceiveSuccess) {
-      currentQuestionId = state.questions[state.currentIndex].id;
+      currentQuestion = state.questions[state.currentIndex];
+      currentQuestionId = currentQuestion.id;
+      currentCharacterId = currentQuestion.characterId;
     } else if (state is AnswerInProgress) {
-      currentQuestionId = state.question.id;
+      currentQuestion = state.question;
+      currentQuestionId = currentQuestion.id;
+      currentCharacterId = currentQuestion.characterId;
     }
 
     if (_lastQuestionId != currentQuestionId) {
@@ -39,12 +45,19 @@ class _GameQuestionPageState extends State<GameQuestionPage> {
       _selectedStringAnswer = null;
       _selectedBoolAnswer = null;
       _selectedMultipleSelectAnswer = null;
+
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
     final state = context.watch<GameModuleLevelBloc>().state;
+    final Map<int, String> characterImages = switch (state) {
+    ReceiveSuccess s => s.characterImages,
+    AnswerInProgress a => a.characterImages,
+    _ => const {},
+  };
     if (state is! ReceiveSuccess && state is! AnswerInProgress) {
       return const SizedBox.shrink();
     }
@@ -79,7 +92,7 @@ class _GameQuestionPageState extends State<GameQuestionPage> {
             Column(
               children: [
                 SizedBox(height: 100),
-                _buildQuestionHeader(currentQuestion, context),
+                _buildQuestionHeader(currentQuestion,characterImages),
                 _buildAnswer(
                   currentQuestion,
                   selectionLocked: selectionLocked,
@@ -121,192 +134,156 @@ class _GameQuestionPageState extends State<GameQuestionPage> {
       ),
     );
   }
-}
 
-Widget _buildQuestionHeader(GameModuleQuestionEntity question,  BuildContext context,) {
-  final repository = context.read<GameModuleLevelRepository>();
-  return Padding(
-    padding: const EdgeInsets.symmetric(horizontal: 16),
-    child: Row(
-      children: [
-        FutureBuilder<String?>(
-          future: _getCharacterImage(repository, question.characterId),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const SizedBox(
-                width: 80,
-                height: 80,
-                child: Center(child: CircularProgressIndicator()),
-              );
-            }
-            
-            if (snapshot.hasData && snapshot.data != null) {
-              return SvgPicture.network(
-                snapshot.data!,
-                width: 80,
-                height: 80,
-                fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => const SizedBox(
-                  width: 80,
-                  height: 80,
-                  child: Center(
-                    child: Icon(Icons.error, color: Colors.red),
-                  ),
-                ),
-              );
-            }
-            
-             // Если персонаж не найден, показываем заглушку
-            return const SizedBox(
+  Widget _buildQuestionHeader(GameModuleQuestionEntity question,Map<int, String> characterImages) {
+    final imageUrl = characterImages[question.characterId];
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 80,
+            height: 80,
+            child: imageUrl != null ?
+            SvgPicture.network(
+              imageUrl,
               width: 80,
               height: 80,
-              child: Center(
-                child: Icon(Icons.person, color: Colors.grey),
+              fit: BoxFit.contain,
+              errorBuilder: (_, __, ___) => const SizedBox(
+                width: 80,
+                height: 80,
+                child: Center(child: Icon(Icons.error, color: Colors.red)),
               ),
-            );
-          },
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Text(
-            question.question,
-            style: const TextStyle(
-              fontSize: 17,
-              color: AppColors.blue,
-              height: 1.4,
-            ),
-          ),
-        ),
-      ],
-    ),
-  );
-}
-
-Future<String?> _getCharacterImage(
-  GameModuleLevelRepository repository,
-  int? characterId,
-) async {
-  if (characterId == null) {
-    print('❌ characterId = null');
-    return null;
-  }
-  
-  print('🔍 Загружаю персонажа с ID: $characterId');
-  
-  try {
-    final url = await repository.getCharacterImageUrl(characterId);
-    print('✅ Загружен URL: $url');
-    return url;
-  } catch (e) {
-    print('❌ Ошибка загрузки персонажа: $e');
-    return null;
-  }
-}
-Widget _buildExplantationOverlay(BuildContext context, AnswerInProgress state) {
-  return Container(
-    padding: EdgeInsets.all(24),
-    decoration: BoxDecoration(
-      color: Colors.white,
-      borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      boxShadow: [
-        BoxShadow(color: Colors.black, blurRadius: 10, offset: Offset(0, -5)),
-      ],
-    ),
-    child: Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(
-          state.isCorrect ? Icons.check_circle : Icons.cancel,
-          color: state.isCorrect ? Colors.green : Colors.red,
-          size: 48,
-        ),
-        SizedBox(height: 16),
-        Text(
-          state.isCorrect ? 'Правильно!' : 'Неправильно',
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: state.isCorrect ? Colors.green : Colors.red,
-          ),
-        ),
-        SizedBox(height: 16),
-        Text(state.explanation, textAlign: TextAlign.center),
-        SizedBox(height: 16),
-        Text(
-          'Правильный ответ: ${state.correctAnswer}',
-          style: TextStyle(fontWeight: FontWeight.w500),
-        ),
-        SizedBox(height: 24),
-        SizedBox(
-          width: double.infinity,
-          child: ElevatedButton(
-            onPressed: () {
-              context.read<GameModuleLevelBloc>().add(
-                GameModuleLevelEvent.nextQuestion(),
-              );
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.blue,
-              padding: EdgeInsets.symmetric(vertical: 14),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
+            ) : const Center(child: CircularProgressIndicator(),),),
+         
+          const SizedBox(width: 12),
+          Expanded(
             child: Text(
-              'Далее',
-              style: TextStyle(fontSize: 16, color: Colors.white),
+              question.question,
+              style: const TextStyle(
+                fontSize: 17,
+                color: AppColors.blue,
+                height: 1.4,
+              ),
             ),
           ),
-        ),
-      ],
-    ),
-  );
-}
-
-void _handleAnswer(BuildContext context, QuestionType type, dynamic answer) {
-  switch (type) {
-    case QuestionType.multipleChoice:
-      context.read<GameModuleLevelBloc>().add(
-        GameModuleLevelEvent.answerMultipleChoice(answer: answer),
-      );
-    case QuestionType.trueFalse:
-      context.read<GameModuleLevelBloc>().add(
-        GameModuleLevelEvent.answerTrueFalse(answer: answer),
-      );
-    case QuestionType.fillBlank:
-      context.read<GameModuleLevelBloc>().add(
-        GameModuleLevelEvent.answerFillBlank(answer: answer),
-      );
-    case QuestionType.multipleSelect:
-      context.read<GameModuleLevelBloc>().add(
-        GameModuleLevelEvent.answerMultipleSelect(
-          selectedIndices: answer as List<int>,
-        ),
-      );
-  }
-}
-
-Widget _buildButton(
-  BuildContext context,
-  bool isAnswerInProgress,
-  bool hasSelectedAnswer,
-  QuestionType currentQuestionType,
-  selectedAnswer,
-  isAnswered,
-) {
-  if (isAnswerInProgress) {
-    return const SizedBox.shrink();
+        ],
+      ),
+    );
   }
 
-  return ElevatedButton(
-    onPressed: () {
-      // В состоянии вопроса - можно нажать только если есть выбранный ответ и еще не отвечали
-      if (hasSelectedAnswer && !isAnswered) {
-        _handleAnswer(context, currentQuestionType, selectedAnswer);
-      }
-    },
-    child: Text(isAnswerInProgress ? 'Далее' : 'Готово'),
-  );
+  Widget _buildExplantationOverlay(
+    BuildContext context,
+    AnswerInProgress state,
+  ) {
+    return Container(
+      padding: EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        boxShadow: [
+          BoxShadow(color: Colors.black, blurRadius: 10, offset: Offset(0, -5)),
+        ],
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            state.isCorrect ? Icons.check_circle : Icons.cancel,
+            color: state.isCorrect ? Colors.green : Colors.red,
+            size: 48,
+          ),
+          SizedBox(height: 16),
+          Text(
+            state.isCorrect ? 'Правильно!' : 'Неправильно',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: state.isCorrect ? Colors.green : Colors.red,
+            ),
+          ),
+          SizedBox(height: 16),
+          Text(state.explanation, textAlign: TextAlign.center),
+          SizedBox(height: 16),
+          Text(
+            'Правильный ответ: ${state.correctAnswer}',
+            style: TextStyle(fontWeight: FontWeight.w500),
+          ),
+          SizedBox(height: 24),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: () {
+                context.read<GameModuleLevelBloc>().add(
+                  GameModuleLevelEvent.nextQuestion(),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.blue,
+                padding: EdgeInsets.symmetric(vertical: 14),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              child: Text(
+                'Далее',
+                style: TextStyle(fontSize: 16, color: Colors.white),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _handleAnswer(BuildContext context, QuestionType type, dynamic answer) {
+    switch (type) {
+      case QuestionType.multipleChoice:
+        context.read<GameModuleLevelBloc>().add(
+          GameModuleLevelEvent.answerMultipleChoice(answer: answer),
+        );
+      case QuestionType.trueFalse:
+        context.read<GameModuleLevelBloc>().add(
+          GameModuleLevelEvent.answerTrueFalse(answer: answer),
+        );
+      case QuestionType.fillBlank:
+        context.read<GameModuleLevelBloc>().add(
+          GameModuleLevelEvent.answerFillBlank(answer: answer),
+        );
+      case QuestionType.multipleSelect:
+        context.read<GameModuleLevelBloc>().add(
+          GameModuleLevelEvent.answerMultipleSelect(
+            selectedIndices: answer as List<int>,
+          ),
+        );
+    }
+  }
+
+  Widget _buildButton(
+    BuildContext context,
+    bool isAnswerInProgress,
+    bool hasSelectedAnswer,
+    QuestionType currentQuestionType,
+    selectedAnswer,
+    isAnswered,
+  ) {
+    if (isAnswerInProgress) {
+      return const SizedBox.shrink();
+    }
+
+    return ElevatedButton(
+      onPressed: () {
+        // В состоянии вопроса - можно нажать только если есть выбранный ответ и еще не отвечали
+        if (hasSelectedAnswer && !isAnswered) {
+          _handleAnswer(context, currentQuestionType, selectedAnswer);
+        }
+      },
+      child: Text(isAnswerInProgress ? 'Далее' : 'Готово'),
+    );
+  }
 }
 
 Widget _buildAnswer(

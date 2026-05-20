@@ -5,4 +5,7 @@ abstract interface class GameModuleLevelRepository {
     required int levelId,
   });
   Future<String?> getCharacterImageUrl(int characterId);
+  Future<Map<int, String>> getCharacterImagesForLevel({
+    required int levelId,
+  });
 }

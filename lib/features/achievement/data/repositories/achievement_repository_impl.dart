@@ -68,7 +68,7 @@ class AchievementRepositoryImpl implements AchievementRepository {
 
     final response = await _supabase
         .from('achievements')
-        .select('id, module_id, name, description, image_url')
+        .select('id, name, description, image_url')
         .eq('id', id)
         .maybeSingle();
     if (response == null) {
@@ -107,7 +107,7 @@ class AchievementRepositoryImpl implements AchievementRepository {
 
     final achievementsResponse = await _supabase
         .from('achievements')
-        .select('id, module_id, name, description, image_url')
+        .select('id, name, description, image_url')
         .inFilter('id', achievementIds)
         .order('id');
 
@@ -127,7 +127,7 @@ Future<AchievementEntity?> unlockRandomAchievement() async {
 
   final allAchievementsResponse = await _supabase
       .from('achievements')
-      .select('id, module_id, name, description, image_url');
+      .select('id,  name, description, image_url');
 
   final allAchievements = allAchievementsResponse
       .map((row) => _mapAchievement(Map<String, dynamic>.from(row)))

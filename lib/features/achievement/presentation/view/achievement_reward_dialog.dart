@@ -69,7 +69,7 @@ class _AchievementRewardDialogState extends State<AchievementRewardDialog> {
                                 alignment: Alignment.center,
                                 transform: Matrix4.identity()..rotateY(math.pi),
                                 child: _CardFace(
-                                  imagePath: 'assets/achievements/open_cup.png',
+                                  imagePath: widget.achievement.imageUrl,
                                   title: widget.achievement.name,
                                   subtitle: widget.achievement.description,
                                 ),

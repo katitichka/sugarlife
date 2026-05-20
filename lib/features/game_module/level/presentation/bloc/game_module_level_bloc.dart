@@ -66,15 +66,17 @@ class GameModuleLevelBloc
   }) async {
     emit(const ReceiveInProgress(message: 'Получение вопросов'));
     try {
-      final progress = _levelProgressRepository.getLevelProgress(
-        levelId: levelId,
-      );
-      final questions = _gameModuleLevelRepository.getQuestionsForLevel(
-        levelId: levelId,
-      );
-      final results = await Future.wait([questions, progress]);
-      final questionsResult = results[0] as List<GameModuleQuestionEntity>;
-      final progressResult = results[1] as LevelProgressEntity?;
+      // Загружаем всё параллельно
+      final results = await Future.wait([
+        _levelProgressRepository.getLevelProgress(levelId: levelId),
+        _gameModuleLevelRepository.getQuestionsForLevel(levelId: levelId),
+        _gameModuleLevelRepository.getCharacterImagesForLevel(levelId: levelId),
+      ]);
+
+      final progressResult = results[0] as LevelProgressEntity?;
+      final questionsResult = results[1] as List<GameModuleQuestionEntity>;
+      final characterImages = results[2] as Map<int, String>;
+
       emit(
         ReceiveSuccess(
           questions: questionsResult,
@@ -82,6 +84,7 @@ class GameModuleLevelBloc
           progress: progressResult,
           isAnswered: false,
           answers: {},
+          characterImages: characterImages,
         ),
       );
     } catch (e) {
@@ -111,6 +114,7 @@ class GameModuleLevelBloc
         questions: successState.questions,
         progress: successState.progress,
         answers: newAnswers,
+        characterImages: successState.characterImages,
       ),
     );
   }
@@ -138,6 +142,7 @@ class GameModuleLevelBloc
         questions: successState.questions,
         progress: successState.progress,
         answers: newAnswers,
+        characterImages: successState.characterImages,
       ),
     );
   }
@@ -164,6 +169,7 @@ class GameModuleLevelBloc
         questions: successState.questions,
         progress: successState.progress,
         answers: newAnswers,
+        characterImages: successState.characterImages,
       ),
     );
   }
@@ -204,15 +210,16 @@ class GameModuleLevelBloc
         isCorrect: isCorrect,
         explanation: currentQuestion.explanation,
         selectedAnswer: selectedIndices
-          .map((i) => currentQuestion.answers[i])
-          .toList()
-          .join(', '),
+            .map((i) => currentQuestion.answers[i])
+            .toList()
+            .join(', '),
         correctAnswer: correctAnswerText,
         question: currentQuestion,
         currentIndex: successState.currentIndex,
         questions: successState.questions,
         progress: successState.progress,
         answers: newAnswers,
+        characterImages: successState.characterImages,
       ),
     );
   }
@@ -224,17 +231,22 @@ class GameModuleLevelBloc
     List<GameModuleQuestionEntity> questions;
     LevelProgressEntity? progress;
     Map<int, bool> answers;
+    Map<int, String> characterImages;
 
     if (state is ReceiveSuccess) {
-      currentIndex = (state as ReceiveSuccess).currentIndex;
-      questions = (state as ReceiveSuccess).questions;
-      progress = (state as ReceiveSuccess).progress;
-      answers = (state as ReceiveSuccess).answers;
+      final successState = state as ReceiveSuccess;
+      currentIndex = successState.currentIndex;
+      questions = successState.questions;
+      progress = successState.progress;
+      answers = successState.answers;
+      characterImages = successState.characterImages;
     } else if (state is AnswerInProgress) {
-      currentIndex = (state as AnswerInProgress).currentIndex;
-      questions = (state as AnswerInProgress).questions;
-      progress = (state as AnswerInProgress).progress;
-      answers = (state as AnswerInProgress).answers;
+      final answerState = state as AnswerInProgress;
+      currentIndex = answerState.currentIndex;
+      questions = answerState.questions;
+      progress = answerState.progress;
+      answers = answerState.answers;
+      characterImages = answerState.characterImages;
     } else {
       return;
     }
@@ -248,13 +260,14 @@ class GameModuleLevelBloc
           progress: progress,
           isAnswered: false,
           answers: answers,
+          characterImages: characterImages,
         ),
       );
     } else {
       final correctCount = answers.values.where((correct) => correct).length;
       print('=== РАСЧЁТ ЗВЁЗД ===');
-print('correctCount: $correctCount');
-print('answers: $answers');
+      print('correctCount: $correctCount');
+      print('answers: $answers');
       int stars;
       if (correctCount >= 3) {
         stars = 3;
@@ -329,7 +342,8 @@ print('answers: $answers');
         return null;
       }
 
-      final achievement = await _achievementRepository.unlockRandomAchievement();
+      final achievement = await _achievementRepository
+          .unlockRandomAchievement();
       if (achievement != null) {
         print('Выдано достижение ${achievement.id}: ${achievement.name}');
       }
@@ -361,6 +375,7 @@ print('answers: $answers');
         progress: currentState.progress,
         isAnswered: false,
         answers: {},
+        characterImages: currentState.characterImages,
       ),
     );
   }

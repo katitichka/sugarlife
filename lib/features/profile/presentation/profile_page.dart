@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:sugarlife/core/theme/app_color.dart';
 import 'package:sugarlife/features/achievement/presentation/bloc/achievement_bloc.dart';
 import 'package:sugarlife/features/auth/presentation/bloc/auth_bloc.dart';
@@ -22,18 +23,33 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   late final TextEditingController _usernameController;
   late final ProfileRepository _profileRepository;
+  final ScrollController _achievementsScrollController = ScrollController();
+  bool _showLeftArrow = false;
+  bool _showRightArrow = false;
+
   @override
   void initState() {
+    super.initState();
     _usernameController = TextEditingController();
     _profileRepository = context.read<ProfileRepository>();
-    super.initState();
+    _achievementsScrollController.addListener(_updateArrowsVisibility);
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) {
-        return;
+      if (mounted) {
+        context.read<AchievementBloc>().add(
+          const AchievementEvent.loadAchievements(),
+        );
       }
-      context.read<AchievementBloc>().add(
-        const AchievementEvent.loadAchievements(),
-      );
+    });
+  }
+
+  void _updateArrowsVisibility() {
+    if (!_achievementsScrollController.hasClients) return;
+    setState(() {
+      _showLeftArrow = _achievementsScrollController.position.pixels > 0;
+      _showRightArrow =
+          _achievementsScrollController.position.pixels <
+          _achievementsScrollController.position.maxScrollExtent;
     });
   }
 
@@ -41,10 +57,10 @@ class _ProfilePageState extends State<ProfilePage> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Изменить имя'),
+        title: const Text('Изменить имя'),
         content: TextField(
           controller: _usernameController,
-          decoration: InputDecoration(
+          decoration: const InputDecoration(
             hintText: 'Введите новое имя',
             border: OutlineInputBorder(),
           ),
@@ -52,7 +68,7 @@ class _ProfilePageState extends State<ProfilePage> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('Отмена'),
+            child: const Text('Отмена'),
           ),
           TextButton(
             onPressed: () async {
@@ -60,7 +76,7 @@ class _ProfilePageState extends State<ProfilePage> {
               if (newUsername.isNotEmpty) {
                 try {
                   await _profileRepository.updateUsername(newUsername);
-                  if (!context.mounted) return;
+                  if (!mounted) return;
                   final updatedProfile = currentProfile.copyWith(
                     username: newUsername,
                   );
@@ -70,14 +86,14 @@ class _ProfilePageState extends State<ProfilePage> {
                   _usernameController.clear();
                   Navigator.pop(context);
                 } catch (e) {
-                  if (!context.mounted) return;
+                  if (!mounted) return;
                   ScaffoldMessenger.of(
                     context,
                   ).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
                 }
               }
             },
-            child: Text('Изменить'),
+            child: const Text('Изменить'),
           ),
         ],
       ),
@@ -131,6 +147,7 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   void dispose() {
     _usernameController.dispose();
+    _achievementsScrollController.dispose();
     super.dispose();
   }
 
@@ -226,15 +243,16 @@ class _ProfilePageState extends State<ProfilePage> {
                     children: [
                       Text(
                         profile.username,
-                        style: const TextStyle(
+                        style: GoogleFonts.rubik(
                           color: AppColors.white,
-                          fontSize: 50,
+                          fontSize: 30,
+                          fontWeight: FontWeight.w700,
                         ),
                       ),
                       const SizedBox(height: 20),
                       SizedBox(
-                        width: 150,
-                        height: 150,
+                        width: 190,
+                        height: 190,
                         child: FutureBuilder<String>(
                           future: _profileRepository.getAvatarUrl(
                             profile.currentAvatarId,
@@ -265,12 +283,12 @@ class _ProfilePageState extends State<ProfilePage> {
                                   color: AppColors.blue,
                                   width: 3,
                                 ),
-                              ),// TODO
+                              ),
                               child: ClipOval(
                                 child: SvgPicture.network(
                                   url,
-                                  width: 150,
-                                  height: 150,
+                                  width: 190,
+                                  height: 190,
                                   fit: BoxFit.cover,
                                   placeholderBuilder: (context) => const Center(
                                     child: CircularProgressIndicator(
@@ -291,49 +309,107 @@ class _ProfilePageState extends State<ProfilePage> {
                           },
                         ),
                       ),
-                      const SizedBox(height: 32),
-                      Align(
-                        alignment: Alignment.centerLeft,
+                      const SizedBox(height: 14),
+                      const Center(
                         child: Text(
                           'Достижения',
-                          style: Theme.of(context).textTheme.titleLarge
-                              ?.copyWith(
-                                color: AppColors.white,
-                                fontWeight: FontWeight.w700,
-                              ),
+                          style: TextStyle(
+                            color: AppColors.white,
+                            fontSize: 30,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
                       ),
-                      const SizedBox(height: 12),
-                      BlocBuilder<AchievementBloc, AchievementState>(
-                        builder: (context, achievementState) {
-                          final achievements = achievementState.achievements;
-                          final itemCount = achievements.isEmpty
-                              ? 3
-                              : achievements.length;
-                          return SizedBox(
-                            height: 66,
-                            child: ListView.builder(
-                              scrollDirection: Axis.horizontal,
-                              itemCount: itemCount,
-                              itemBuilder: (context, index) {
-                                if (achievements.isEmpty) {
-                                  return _AchievementPlaceholderCard();
-                                }
-
-                                final achievement = achievements[index];
-                                return Padding(
-                                  padding: const EdgeInsets.only(right: 8),
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(14),
-                                    child: _AchievementIcon(
-                                      url: achievement.imageUrl,
-                                    ),
-                                  ),
-                                );
-                              },
+                      const SizedBox(height: 10),
+                      SizedBox(
+                        height: 100,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            if (_showLeftArrow)
+                              IconButton(
+                                icon: const Icon(
+                                  Icons.chevron_left,
+                                  color: AppColors.white,
+                                  size: 25,
+                                ),
+                                onPressed: () {
+                                  _achievementsScrollController.animateTo(
+                                    _achievementsScrollController
+                                            .position
+                                            .pixels -
+                                        200,
+                                    duration: const Duration(milliseconds: 300),
+                                    curve: Curves.easeOut,
+                                  );
+                                },
+                              )
+                            else
+                              const SizedBox(width: 25),
+                            SizedBox(
+                              width: 240,
+                              height: 90,
+                              child: BlocBuilder<AchievementBloc, AchievementState>(
+                                builder: (context, achievementState) {
+                                  final achievements =
+                                      achievementState.achievements;
+                                  final displayItems = List.generate(6, (
+                                    index,
+                                  ) {
+                                    if (index < achievements.length) {
+                                      return achievements[index];
+                                    }
+                                    return null;
+                                  });
+                                  return ListView.builder(
+                                    controller: _achievementsScrollController,
+                                    scrollDirection: Axis.horizontal,
+                                    itemCount: displayItems.length,
+                                    itemBuilder: (context, index) {
+                                      final achievement = displayItems[index];
+                                      return Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 0,
+                                        ),
+                                        child: SizedBox(
+                                          width: 88,
+                                          height: 88,
+                                          child: Center(
+                                            child: achievement != null
+                                                ? _AchievementIcon(
+                                                    url: achievement.imageUrl,
+                                                  )
+                                                : _AchievementPlaceholderCard(),
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  );
+                                },
+                              ),
                             ),
-                          );
-                        },
+                            if (_showRightArrow)
+                              IconButton(
+                                icon: const Icon(
+                                  Icons.chevron_right,
+                                  color: AppColors.white,
+                                  size: 25,
+                                ),
+                                onPressed: () {
+                                  _achievementsScrollController.animateTo(
+                                    _achievementsScrollController
+                                            .position
+                                            .pixels +
+                                        200,
+                                    duration: const Duration(milliseconds: 300),
+                                    curve: Curves.easeOut,
+                                  );
+                                },
+                              )
+                            else
+                              const SizedBox(width: 25),
+                          ],
+                        ),
                       ),
                     ],
                   ),
@@ -351,16 +427,13 @@ class _ProfilePageState extends State<ProfilePage> {
 class _AchievementPlaceholderCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(right: 8),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(14),
-        child: Image.asset(
-          'assets/achievements/placeholder.png',
-          width: 58,
-          height: 58,
-          fit: BoxFit.cover,
-        ),
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(14),
+      child: SvgPicture.asset(
+        'assets/achievements/plug.svg',
+        width: 80,
+        height: 80,
+        fit: BoxFit.contain,
       ),
     );
   }
@@ -371,11 +444,11 @@ class _AchievementIcon extends StatelessWidget {
 
   final String url;
 
-  static Widget _placeholder() => Image.asset(
-    'assets/achievements/placeholder.png',
+  static Widget _placeholder() => SvgPicture.asset(
+    'assets/achievements/plug.svg',
     width: 58,
     height: 58,
-    fit: BoxFit.cover,
+    fit: BoxFit.contain,
   );
 
   @override
@@ -383,17 +456,17 @@ class _AchievementIcon extends StatelessWidget {
     if (url.toLowerCase().endsWith('.svg')) {
       return SvgPicture.network(
         url,
-        width: 58,
-        height: 58,
-        fit: BoxFit.cover,
+        width: 80,
+        height: 80,
+        fit: BoxFit.contain,
         placeholderBuilder: (_) => _placeholder(),
       );
     }
     return CachedNetworkImage(
       imageUrl: url,
-      width: 58,
-      height: 58,
-      fit: BoxFit.cover,
+      width: 80,
+      height: 80,
+      fit: BoxFit.contain,
       placeholder: (_, __) => _placeholder(),
       errorWidget: (_, __, ___) => _placeholder(),
     );

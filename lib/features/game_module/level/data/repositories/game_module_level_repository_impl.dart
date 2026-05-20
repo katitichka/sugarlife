@@ -9,7 +9,21 @@ class GameModuleLevelRepositoryImpl implements GameModuleLevelRepository {
 
   final SupabaseClient _supabase;
   final AppCacheService _cache;
+  static const String _charactersBucket = 'characters';
 
+   String _publicSvgUrl(String raw) {
+    final t = raw.trim();
+    if (t.isEmpty) return t;
+    if (t.startsWith('http://') || t.startsWith('https://')) {
+      return t;
+    }
+    var path = t.startsWith('/') ? t.substring(1) : t;
+    final bucketPrefix = '$_charactersBucket/';
+    if (path.toLowerCase().startsWith(bucketPrefix)) {
+      path = path.substring(bucketPrefix.length);
+    }
+    return _supabase.storage.from(_charactersBucket).getPublicUrl(path);
+  }
   @override
   Future<List<GameModuleQuestionEntity>> getQuestionsForLevel({
     required int levelId,
@@ -42,15 +56,42 @@ class GameModuleLevelRepositoryImpl implements GameModuleLevelRepository {
 
   @override
   Future<String?> getCharacterImageUrl(int characterId) async {
-  final response = await _supabase
-      .from('characters')
-      .select('image_url')
-      .eq('id', characterId)
-      .maybeSingle();
-  final imageUrl = response?['image_url'] as String?;
-  if (imageUrl == null) return null;
-  
-  // Формируем полный URL из имени файла
-  return _supabase.storage.from('characters').getPublicUrl(imageUrl);
-}
+    final response = await _supabase
+        .from('characters')
+        .select('image_url')
+        .eq('id', characterId)
+        .maybeSingle();
+    final imageUrl = response?['image_url'] as String?;
+    if (imageUrl == null) return null;
+
+    // Формируем полный URL из имени файла
+    return _supabase.storage.from('characters').getPublicUrl(imageUrl);
+  }
+
+  @override
+  Future<Map<int, String>> getCharacterImagesForLevel({required int levelId}) async {
+    // 1. Получаем все вопросы уровня
+    final questions = await getQuestionsForLevel(levelId: levelId);
+
+    // 2. Собираем уникальные ID персонажей
+    final characterIds = questions
+        .map((q) => q.characterId)
+        .whereType<int>()
+        .toSet()
+        .toList();
+
+    if (characterIds.isEmpty) return {};
+
+    // 3. Загружаем всех персонажей одним запросом
+    final response = await _supabase
+        .from('characters')
+        .select('id, image_url')
+        .inFilter('id', characterIds);
+
+    // 4. Возвращаем Map<characterId, imageUrl>
+    return {
+      for (final row in response)
+        row['id'] as int: _publicSvgUrl(row['image_url'] as String),
+    };
+  }
 }

@@ -12,6 +12,7 @@ sealed class GameModuleLevelState with _$GameModuleLevelState {
     required LevelProgressEntity? progress,
     required bool isAnswered,
     required Map<int,bool> answers,
+    required Map<int, String> characterImages,
   }) = ReceiveSuccess;
   const factory GameModuleLevelState.receiveFailed({required String message}) =
       ReceiveFailed;
@@ -25,6 +26,7 @@ sealed class GameModuleLevelState with _$GameModuleLevelState {
     required List<GameModuleQuestionEntity> questions,
     required LevelProgressEntity? progress,
     required Map<int,bool> answers,
+    required Map<int, String> characterImages, 
   }) = AnswerInProgress;
   const factory GameModuleLevelState.levelCompleted({
     required int levelId,
