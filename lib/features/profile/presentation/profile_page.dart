@@ -23,33 +23,22 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   late final TextEditingController _usernameController;
   late final ProfileRepository _profileRepository;
-  final ScrollController _achievementsScrollController = ScrollController();
-  bool _showLeftArrow = false;
-  bool _showRightArrow = false;
+  final PageController _achievementsPageController = PageController();
+  int _currentPage = 0;
+  int _totalPages = 0;
 
   @override
   void initState() {
     super.initState();
     _usernameController = TextEditingController();
     _profileRepository = context.read<ProfileRepository>();
-    _achievementsScrollController.addListener(_updateArrowsVisibility);
-
+    
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
         context.read<AchievementBloc>().add(
           const AchievementEvent.loadAchievements(),
         );
       }
-    });
-  }
-
-  void _updateArrowsVisibility() {
-    if (!_achievementsScrollController.hasClients) return;
-    setState(() {
-      _showLeftArrow = _achievementsScrollController.position.pixels > 0;
-      _showRightArrow =
-          _achievementsScrollController.position.pixels <
-          _achievementsScrollController.position.maxScrollExtent;
     });
   }
 
@@ -147,7 +136,7 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   void dispose() {
     _usernameController.dispose();
-    _achievementsScrollController.dispose();
+    _achievementsPageController.dispose();
     super.dispose();
   }
 
@@ -283,6 +272,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                   color: AppColors.blue,
                                   width: 3,
                                 ),
+                              color: const Color(0xFFF5F5DC),
                               ),
                               child: ClipOval(
                                 child: SvgPicture.network(
@@ -290,6 +280,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                   width: 190,
                                   height: 190,
                                   fit: BoxFit.cover,
+                                  
                                   placeholderBuilder: (context) => const Center(
                                     child: CircularProgressIndicator(
                                       color: Colors.white,
@@ -321,95 +312,130 @@ class _ProfilePageState extends State<ProfilePage> {
                         ),
                       ),
                       const SizedBox(height: 10),
-                      SizedBox(
-                        height: 100,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            if (_showLeftArrow)
-                              IconButton(
-                                icon: const Icon(
-                                  Icons.chevron_left,
-                                  color: AppColors.white,
-                                  size: 25,
-                                ),
-                                onPressed: () {
-                                  _achievementsScrollController.animateTo(
-                                    _achievementsScrollController
-                                            .position
-                                            .pixels -
-                                        200,
-                                    duration: const Duration(milliseconds: 300),
-                                    curve: Curves.easeOut,
-                                  );
-                                },
-                              )
-                            else
-                              const SizedBox(width: 25),
-                            SizedBox(
-                              width: 240,
-                              height: 90,
-                              child: BlocBuilder<AchievementBloc, AchievementState>(
-                                builder: (context, achievementState) {
-                                  final achievements =
-                                      achievementState.achievements;
-                                  final displayItems = List.generate(6, (
-                                    index,
-                                  ) {
-                                    if (index < achievements.length) {
-                                      return achievements[index];
-                                    }
-                                    return null;
-                                  });
-                                  return ListView.builder(
-                                    controller: _achievementsScrollController,
-                                    scrollDirection: Axis.horizontal,
-                                    itemCount: displayItems.length,
-                                    itemBuilder: (context, index) {
-                                      final achievement = displayItems[index];
-                                      return Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 0,
-                                        ),
-                                        child: SizedBox(
-                                          width: 88,
-                                          height: 88,
-                                          child: Center(
-                                            child: achievement != null
-                                                ? _AchievementIcon(
-                                                    url: achievement.imageUrl,
-                                                  )
-                                                : _AchievementPlaceholderCard(),
-                                          ),
-                                        ),
+                      BlocBuilder<AchievementBloc, AchievementState>(
+                        builder: (context, achievementState) {
+                          final achievements = achievementState.achievements;
+                          final totalAchievements = achievements.length;
+                          _totalPages = (totalAchievements / 3).ceil();
+                          if (_totalPages == 0) _totalPages = 1;
+                          
+                          // Сбрасываем страницу, если текущая стала невалидной
+                          if (_currentPage >= _totalPages) {
+                            _currentPage = _totalPages - 1;
+                            if (_currentPage < 0) _currentPage = 0;
+                          }
+                          
+                          return SizedBox(
+                            height: 100,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                // Левая стрелка (показываем только если страниц > 1 и не первая страница)
+                                if (_totalPages > 1 && _currentPage > 0)
+                                  IconButton(
+                                    icon: const Icon(
+                                      Icons.arrow_circle_left,
+                                      color: AppColors.white,
+                                      size: 25,
+                                    ),
+                                    onPressed: () {
+                                      if (_currentPage > 0) {
+                                        setState(() {
+                                          _currentPage--;
+                                        });
+                                        _achievementsPageController.animateToPage(
+                                          _currentPage,
+                                          duration: const Duration(milliseconds: 300),
+                                          curve: Curves.easeOut,
+                                        );
+                                      }
+                                    },
+                                  )
+                                else
+                                  const SizedBox(width: 25),
+                                
+                                // Страницы с достижениями
+                                SizedBox(
+                                  width: 240,
+                                  height: 90,
+                                  child: PageView.builder(
+                                    controller: _achievementsPageController,
+                                    onPageChanged: (page) {
+                                      setState(() {
+                                        _currentPage = page;
+                                      });
+                                    },
+                                    itemCount: _totalPages,
+                                    itemBuilder: (context, pageIndex) {
+                                      final startIndex = pageIndex * 3;
+                                      final endIndex = startIndex + 3;
+                                      final pageAchievements = 
+                                          achievements.length > startIndex
+                                              ? achievements.sublist(
+                                                  startIndex,
+                                                  endIndex > achievements.length
+                                                      ? achievements.length
+                                                      : endIndex,
+                                                )
+                                              : [];
+                                      
+                                      // Формируем список из 3 элементов (достижения + заглушки)
+                                      final displayItems = List.generate(3, (index) {
+                                        if (index < pageAchievements.length) {
+                                          return pageAchievements[index];
+                                        }
+                                        return null;
+                                      });
+                                      
+                                      return Row(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: List.generate(displayItems.length, (index) {
+                                          final achievement = displayItems[index];
+                                          return Padding(
+                                            padding: const EdgeInsets.symmetric(horizontal: 2),
+                                            child: SizedBox(
+                                              width: 90,
+                                              height: 80,
+                                              child: Center(
+                                                child: achievement != null
+                                                    ? _AchievementIcon(url: achievement.imageUrl)
+                                                    : const _AchievementPlaceholderCard(),
+                                              ),
+                                            ),
+                                          );
+                                        }),
                                       );
                                     },
-                                  );
-                                },
-                              ),
-                            ),
-                            if (_showRightArrow)
-                              IconButton(
-                                icon: const Icon(
-                                  Icons.chevron_right,
-                                  color: AppColors.white,
-                                  size: 25,
+                                  ),
                                 ),
-                                onPressed: () {
-                                  _achievementsScrollController.animateTo(
-                                    _achievementsScrollController
-                                            .position
-                                            .pixels +
-                                        200,
-                                    duration: const Duration(milliseconds: 300),
-                                    curve: Curves.easeOut,
-                                  );
-                                },
-                              )
-                            else
-                              const SizedBox(width: 25),
-                          ],
-                        ),
+                                
+                                // Правая стрелка (показываем только если страниц > 1 и не последняя страница)
+                                if (_totalPages > 1 && _currentPage < _totalPages - 1)
+                                  IconButton(
+                                    icon: const Icon(
+                                      Icons.arrow_circle_right,
+                                      color: AppColors.white,
+                                      size: 25,
+                                    ),
+                                    onPressed: () {
+                                      if (_currentPage < _totalPages - 1) {
+                                        setState(() {
+                                          _currentPage++;
+                                        });
+                                        _achievementsPageController.animateToPage(
+                                          _currentPage,
+                                          duration: const Duration(milliseconds: 300),
+                                          curve: Curves.easeOut,
+                                        );
+                                      }
+                                    },
+                                  )
+                                else
+                                  const SizedBox(width: 25),
+                              ],
+                            ),
+                          );
+                        },
                       ),
                     ],
                   ),
@@ -425,6 +451,8 @@ class _ProfilePageState extends State<ProfilePage> {
 }
 
 class _AchievementPlaceholderCard extends StatelessWidget {
+  const _AchievementPlaceholderCard();
+
   @override
   Widget build(BuildContext context) {
     return ClipRRect(
@@ -458,7 +486,7 @@ class _AchievementIcon extends StatelessWidget {
         url,
         width: 80,
         height: 80,
-        fit: BoxFit.contain,
+        fit: BoxFit.cover,
         placeholderBuilder: (_) => _placeholder(),
       );
     }
@@ -466,7 +494,7 @@ class _AchievementIcon extends StatelessWidget {
       imageUrl: url,
       width: 80,
       height: 80,
-      fit: BoxFit.contain,
+      fit: BoxFit.cover,
       placeholder: (_, __) => _placeholder(),
       errorWidget: (_, __, ___) => _placeholder(),
     );

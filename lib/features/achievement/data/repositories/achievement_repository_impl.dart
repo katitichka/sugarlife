@@ -154,24 +154,25 @@ Future<AchievementEntity?> unlockRandomAchievement() async {
   final achievement = available[randomIndex];
 
   // Сохраняем в БД с обработкой ошибок
-  try {
-    await _supabase.from('user_achievement').insert({
-      'user_id': userId,
-      'achievement_id': achievement.id,
-    });
-  } catch (e) {
-    // Проверяем, возможно запись уже есть (дубль)
-    final relationAfterFailure = await _supabase
-        .from('user_achievement')
-        .select('achievement_id')
-        .eq('user_id', userId)
-        .eq('achievement_id', achievement.id)
-        .maybeSingle();
-    if (relationAfterFailure == null) {
-      rethrow;
-    }
-    print('INSERT вернул ошибку ($e), но запись уже есть в БД');
+ try {
+  await _supabase.from('user_achievement').insert({
+    'user_id': userId,
+    'achievement_id': achievement.id,
+  });
+} catch (e) {
+  // Проверяем, может запись уже есть
+  final relationAfterFailure = await _supabase
+      .from('user_achievement')
+      .select('achievement_id')
+      .eq('user_id', userId)
+      .eq('achievement_id', achievement.id)
+      .maybeSingle();
+  if (relationAfterFailure == null) {
+    print('❌ Ошибка вставки: $e');
+    return null;  // ← не rethrow, а просто вернуть null
   }
+  print('⚠️ Достижение ${achievement.id} уже есть в БД');
+}
   
   print('Выдано достижение ${achievement.id}: ${achievement.name}');
 
