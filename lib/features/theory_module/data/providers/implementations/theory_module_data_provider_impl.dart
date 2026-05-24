@@ -11,25 +11,19 @@ class TheoryModuleDataProviderImpl implements TheoryModuleDataProvider {
     try {
       final response = await _supabase
           .from('theory_module')
-          .select('id, title, subtitle, character_id, color_hex, order_index, characters(image_url)')
+          .select('id, title, subtitle, color_hex, order_index')
           .order('order_index', ascending: true);
-          
+      
       return response
           .map<TheoryModuleDto>((rawData) => _convertToDto(rawData))
           .toList();
     } catch (e) {
-      throw Exception('Failed to fetch modules: $e');
+      print('❌ Ошибка в getModules(): $e');
+      rethrow;
     }
   }
 
   TheoryModuleDto _convertToDto(Map<String, dynamic> rawData) {
-    final characters = rawData['characters'] as Map<String, dynamic>;
-    final characterImageUrl = characters['image_url'] as String;
-
-    final jsonForDto = Map<String, dynamic>.from(rawData);
-    jsonForDto['character_image_url'] = characterImageUrl;
-    jsonForDto.remove('characters');
-
-    return TheoryModuleDto.fromJson(jsonForDto);
+    return TheoryModuleDto.fromJson(rawData);
   }
 }

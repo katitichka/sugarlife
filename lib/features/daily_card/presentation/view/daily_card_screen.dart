@@ -5,6 +5,7 @@ import 'package:sugarlife/features/daily_card/data/repositories/daily_card_repos
 import 'package:sugarlife/features/daily_card/domain/entities/daily_card_entity.dart';
 import 'package:sugarlife/features/daily_card/domain/repositories/daily_card_repository.dart';
 import 'package:sugarlife/features/daily_card/presentation/bloc/daily_card_bloc.dart';
+import 'package:sugarlife/shared/ui/lottie_progress_indicator.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class DailyCardScreen extends StatelessWidget {
@@ -62,7 +63,7 @@ class _DialogContent extends StatelessWidget {
               const SizedBox(height: 16),
 
               switch (state) {
-                Loading() => const CircularProgressIndicator(),
+                Loading() => const LottieProgressIndicator(),
                 Loaded(:final card, :final hasAnsweredToday) => _LoadedContent(
                   card: card,
                   hasAnsweredToday: hasAnsweredToday,

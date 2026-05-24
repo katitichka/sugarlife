@@ -8,4 +8,5 @@ class AppColors {
   static const Color grey = Colors.grey;
   static const Color menuSeparator = Color.fromRGBO(230, 225, 219, 1);
   static const Color green = Colors.green;
+  static const Color red = Color.fromRGBO(239, 76, 94, 1);
 }

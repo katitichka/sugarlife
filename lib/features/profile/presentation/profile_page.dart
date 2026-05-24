@@ -11,6 +11,10 @@ import 'package:sugarlife/features/avatars/domain/entities/avatar_entity.dart';
 import 'package:sugarlife/features/avatars/presentation/view/choose_avatar_page.dart';
 import 'package:sugarlife/features/profile/domain/entities/profile_entity.dart';
 import 'package:sugarlife/features/profile/domain/repositories/profile_repository.dart';
+import 'package:sugarlife/features/profile/presentation/achievements_sections.dart';
+import 'package:sugarlife/features/profile/presentation/settings_dialog.dart';
+import 'package:sugarlife/shared/ui/animated_settings_button.dart';
+import 'package:sugarlife/shared/ui/lottie_progress_indicator.dart';
 import 'package:sugarlife/shared/ui/main_app_bar.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -23,16 +27,13 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   late final TextEditingController _usernameController;
   late final ProfileRepository _profileRepository;
-  final PageController _achievementsPageController = PageController();
-  int _currentPage = 0;
-  int _totalPages = 0;
 
   @override
   void initState() {
     super.initState();
     _usernameController = TextEditingController();
     _profileRepository = context.read<ProfileRepository>();
-    
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
         context.read<AchievementBloc>().add(
@@ -98,9 +99,11 @@ class _ProfilePageState extends State<ProfilePage> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(44)),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(44),
-          child: SizedBox(
-            height: MediaQuery.of(context).size.height * 0.80,
-            width: MediaQuery.of(context).size.width * 0.9,
+          child: ConstrainedBox(
+             constraints: BoxConstraints(
+            maxWidth: MediaQuery.of(context).size.width * 0.9,
+            maxHeight: MediaQuery.of(context).size.height * 0.75,
+          ),
             child: ChooseAvatarPage(
               currentAvatarId: currentProfile.currentAvatarId,
             ),
@@ -136,7 +139,6 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   void dispose() {
     _usernameController.dispose();
-    _achievementsPageController.dispose();
     super.dispose();
   }
 
@@ -157,68 +159,16 @@ class _ProfilePageState extends State<ProfilePage> {
             authenticated: (profile) => Scaffold(
               backgroundColor: AppColors.blue,
               appBar: MainAppBar(
-                title: 'Профиль',
-                leading: IconButton(
-                  icon: const Icon(Icons.settings),
-                  color: AppColors.white,
-                  onPressed: () {
-                    showDialog(
-                      context: context,
-                      builder: (context) => AlertDialog(
-                        title: const Text('Настройки'),
-                        content: const Text('Что вы хотите изменить?'),
-                        actions: [
-                          TextButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                              _showEditNameDialog(profile);
-                            },
-                            child: const Text('Имя'),
-                          ),
-                          TextButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                              _showAvatarSelectionSheet(profile);
-                            },
-                            child: const Text('Аватар'),
-                          ),
-                          TextButton(
-                            onPressed: () => Navigator.pop(context),
-                            child: const Text('Отмена'),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                ),
                 actions: [
-                  IconButton(
-                    icon: const Icon(Icons.logout),
-                    color: AppColors.white,
-                    onPressed: () {
-                      showDialog(
-                        context: context,
-                        builder: (context) => AlertDialog(
-                          title: const Text('Выход'),
-                          content: const Text('Вы уверены, что хотите выйти?'),
-                          actions: [
-                            TextButton(
-                              onPressed: () => Navigator.pop(context),
-                              child: const Text('Отмена'),
-                            ),
-                            TextButton(
-                              onPressed: () {
-                                Navigator.pop(context);
-                                context.read<AuthBloc>().add(
-                                  const AuthEvent.logoutPressed(),
-                                );
-                              },
-                              child: const Text('Выйти'),
-                            ),
-                          ],
-                        ),
-                      );
-                    },
+                  AnimatedSettingsButton(
+                    onPressed: () => showDialog(
+                      context: context,
+                      builder: (_) => SettingsDialog(
+                        profile: profile,
+                        onEditName: () => _showEditNameDialog(profile),
+                        onEditAvatar: () => _showAvatarSelectionSheet(profile),
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -238,7 +188,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           fontWeight: FontWeight.w700,
                         ),
                       ),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 40),
                       SizedBox(
                         width: 190,
                         height: 190,
@@ -250,7 +200,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             if (snapshot.connectionState ==
                                 ConnectionState.waiting) {
                               return const Center(
-                                child: CircularProgressIndicator(),
+                                child: LottieProgressIndicator(),
                               );
                             }
                             if (snapshot.hasError ||
@@ -272,19 +222,16 @@ class _ProfilePageState extends State<ProfilePage> {
                                   color: AppColors.blue,
                                   width: 3,
                                 ),
-                              color: const Color(0xFFF5F5DC),
+                                color: const Color(0xFFF5F5DC),
                               ),
                               child: ClipOval(
                                 child: SvgPicture.network(
                                   url,
                                   width: 190,
                                   height: 190,
-                                  fit: BoxFit.cover,
-                                  
+                                  fit: BoxFit.contain,
                                   placeholderBuilder: (context) => const Center(
-                                    child: CircularProgressIndicator(
-                                      color: Colors.white,
-                                    ),
+                                    child: LottieProgressIndicator(),
                                   ),
                                   errorBuilder: (context, error, stackTrace) =>
                                       const Center(
@@ -300,7 +247,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           },
                         ),
                       ),
-                      const SizedBox(height: 14),
+                      const SizedBox(height: 20),
                       const Center(
                         child: Text(
                           'Достижения',
@@ -312,131 +259,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         ),
                       ),
                       const SizedBox(height: 10),
-                      BlocBuilder<AchievementBloc, AchievementState>(
-                        builder: (context, achievementState) {
-                          final achievements = achievementState.achievements;
-                          final totalAchievements = achievements.length;
-                          _totalPages = (totalAchievements / 3).ceil();
-                          if (_totalPages == 0) _totalPages = 1;
-                          
-                          // Сбрасываем страницу, если текущая стала невалидной
-                          if (_currentPage >= _totalPages) {
-                            _currentPage = _totalPages - 1;
-                            if (_currentPage < 0) _currentPage = 0;
-                          }
-                          
-                          return SizedBox(
-                            height: 100,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                // Левая стрелка (показываем только если страниц > 1 и не первая страница)
-                                if (_totalPages > 1 && _currentPage > 0)
-                                  IconButton(
-                                    icon: const Icon(
-                                      Icons.arrow_circle_left,
-                                      color: AppColors.white,
-                                      size: 25,
-                                    ),
-                                    onPressed: () {
-                                      if (_currentPage > 0) {
-                                        setState(() {
-                                          _currentPage--;
-                                        });
-                                        _achievementsPageController.animateToPage(
-                                          _currentPage,
-                                          duration: const Duration(milliseconds: 300),
-                                          curve: Curves.easeOut,
-                                        );
-                                      }
-                                    },
-                                  )
-                                else
-                                  const SizedBox(width: 25),
-                                
-                                // Страницы с достижениями
-                                SizedBox(
-                                  width: 240,
-                                  height: 90,
-                                  child: PageView.builder(
-                                    controller: _achievementsPageController,
-                                    onPageChanged: (page) {
-                                      setState(() {
-                                        _currentPage = page;
-                                      });
-                                    },
-                                    itemCount: _totalPages,
-                                    itemBuilder: (context, pageIndex) {
-                                      final startIndex = pageIndex * 3;
-                                      final endIndex = startIndex + 3;
-                                      final pageAchievements = 
-                                          achievements.length > startIndex
-                                              ? achievements.sublist(
-                                                  startIndex,
-                                                  endIndex > achievements.length
-                                                      ? achievements.length
-                                                      : endIndex,
-                                                )
-                                              : [];
-                                      
-                                      // Формируем список из 3 элементов (достижения + заглушки)
-                                      final displayItems = List.generate(3, (index) {
-                                        if (index < pageAchievements.length) {
-                                          return pageAchievements[index];
-                                        }
-                                        return null;
-                                      });
-                                      
-                                      return Row(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        children: List.generate(displayItems.length, (index) {
-                                          final achievement = displayItems[index];
-                                          return Padding(
-                                            padding: const EdgeInsets.symmetric(horizontal: 2),
-                                            child: SizedBox(
-                                              width: 90,
-                                              height: 80,
-                                              child: Center(
-                                                child: achievement != null
-                                                    ? _AchievementIcon(url: achievement.imageUrl)
-                                                    : const _AchievementPlaceholderCard(),
-                                              ),
-                                            ),
-                                          );
-                                        }),
-                                      );
-                                    },
-                                  ),
-                                ),
-                                
-                                // Правая стрелка (показываем только если страниц > 1 и не последняя страница)
-                                if (_totalPages > 1 && _currentPage < _totalPages - 1)
-                                  IconButton(
-                                    icon: const Icon(
-                                      Icons.arrow_circle_right,
-                                      color: AppColors.white,
-                                      size: 25,
-                                    ),
-                                    onPressed: () {
-                                      if (_currentPage < _totalPages - 1) {
-                                        setState(() {
-                                          _currentPage++;
-                                        });
-                                        _achievementsPageController.animateToPage(
-                                          _currentPage,
-                                          duration: const Duration(milliseconds: 300),
-                                          curve: Curves.easeOut,
-                                        );
-                                      }
-                                    },
-                                  )
-                                else
-                                  const SizedBox(width: 25),
-                              ],
-                            ),
-                          );
-                        },
-                      ),
+                      const AchievementsSection(),
                     ],
                   ),
                 ),
@@ -446,57 +269,6 @@ class _ProfilePageState extends State<ProfilePage> {
           );
         },
       ),
-    );
-  }
-}
-
-class _AchievementPlaceholderCard extends StatelessWidget {
-  const _AchievementPlaceholderCard();
-
-  @override
-  Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(14),
-      child: SvgPicture.asset(
-        'assets/achievements/plug.svg',
-        width: 80,
-        height: 80,
-        fit: BoxFit.contain,
-      ),
-    );
-  }
-}
-
-class _AchievementIcon extends StatelessWidget {
-  const _AchievementIcon({required this.url});
-
-  final String url;
-
-  static Widget _placeholder() => SvgPicture.asset(
-    'assets/achievements/plug.svg',
-    width: 58,
-    height: 58,
-    fit: BoxFit.contain,
-  );
-
-  @override
-  Widget build(BuildContext context) {
-    if (url.toLowerCase().endsWith('.svg')) {
-      return SvgPicture.network(
-        url,
-        width: 80,
-        height: 80,
-        fit: BoxFit.cover,
-        placeholderBuilder: (_) => _placeholder(),
-      );
-    }
-    return CachedNetworkImage(
-      imageUrl: url,
-      width: 80,
-      height: 80,
-      fit: BoxFit.cover,
-      placeholder: (_, __) => _placeholder(),
-      errorWidget: (_, __, ___) => _placeholder(),
     );
   }
 }

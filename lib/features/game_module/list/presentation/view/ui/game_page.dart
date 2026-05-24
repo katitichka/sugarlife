@@ -10,6 +10,7 @@ import 'package:sugarlife/features/daily_card/presentation/view/daily_card_scree
 import 'package:sugarlife/features/game_module/level/domain/entities/game_module_level_entity.dart';
 import 'package:sugarlife/features/game_module/list/presentation/bloc/game_module_list_bloc.dart';
 import 'package:sugarlife/features/profile/domain/entities/level_progress_entity.dart';
+import 'package:sugarlife/shared/ui/lottie_progress_indicator.dart';
 
 class LevelPositionCalculator {
   static const int stepX = 80;
@@ -165,7 +166,7 @@ class _GamePageState extends State<GamePage> {
           if (state is ReceiveFailed) {
             return Center(child: Text('Ошибка: ${state.message}'));
           }
-          return const Center(child: CircularProgressIndicator());
+          return const Center(child: LottieProgressIndicator());
         },
       ),
     );

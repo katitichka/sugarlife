@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sugarlife/core/theme/app_color.dart';
 import 'package:sugarlife/features/theory_module/domain/entities/theory_module_entity.dart';
 import 'package:sugarlife/features/theory_module/presentation/bloc/theory_module_bloc.dart';
+import 'package:sugarlife/shared/ui/lottie_progress_indicator.dart';
 import 'package:sugarlife/shared/ui/main_app_bar.dart';
 
 class TheoryScreenPage extends StatelessWidget {
@@ -18,7 +19,7 @@ class TheoryScreenPage extends StatelessWidget {
         builder: (context, state) {
           switch (state) {
             case ReceiveInProgress():
-              return const Center(child: CircularProgressIndicator());
+              return const Center(child: LottieProgressIndicator());
             case ReceiveFailed(:final message):
               return Center(child: Text('Ошибка: $message'));
             case ReceiveSuccess():
@@ -43,7 +44,7 @@ class TheoryScreenPage extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.only(bottom: 20),
                       child: Image.asset(
-                        'assets/modules/module$moduleId.png',
+                        'assets/modules/theory/module$moduleId.png',
                         width: double.infinity,
                         fit: BoxFit.contain,
                         errorBuilder: (context, error, stackTrace) => Container(
@@ -59,7 +60,7 @@ class TheoryScreenPage extends StatelessWidget {
                 ),
               );
             default:
-              return const Center(child: CircularProgressIndicator());
+              return const Center(child: LottieProgressIndicator());
           }
         },
       ),

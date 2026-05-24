@@ -6,6 +6,7 @@ import 'package:sugarlife/core/theme/app_color.dart';
 import 'package:sugarlife/features/game_module/level/domain/entities/game_module_question_entity.dart';
 import 'package:sugarlife/features/game_module/level/domain/repositories/game_module_level_repository.dart';
 import 'package:sugarlife/features/game_module/level/presentation/bloc/game_module_level_bloc.dart';
+import 'package:sugarlife/shared/ui/lottie_progress_indicator.dart';
 import 'package:sugarlife/shared/ui/main_app_bar.dart';
 
 class GameQuestionPage extends StatefulWidget {
@@ -157,7 +158,7 @@ class _GameQuestionPageState extends State<GameQuestionPage> {
                 height: 80,
                 child: Center(child: Icon(Icons.error, color: Colors.red)),
               ),
-            ) : const Center(child: CircularProgressIndicator(),),),
+            ) : const Center(child: LottieProgressIndicator(),),),
          
           const SizedBox(width: 12),
           Expanded(

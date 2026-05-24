@@ -9,6 +9,7 @@ import 'package:sugarlife/features/game_module/level/presentation/bloc/game_modu
 import 'package:sugarlife/features/game_module/level/presentation/view/ui/game_level_result_page.dart';
 import 'package:sugarlife/features/game_module/level/presentation/view/ui/game_level_start_level_page.dart';
 import 'package:sugarlife/features/game_module/level/presentation/view/ui/game_question_page.dart';
+import 'package:sugarlife/shared/ui/lottie_progress_indicator.dart';
 
 class GameLevelContentPage extends StatelessWidget {
   final int levelId;
@@ -68,7 +69,7 @@ class _LoadingPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    return const Scaffold(body: Center(child: LottieProgressIndicator()));
   }
 }
 

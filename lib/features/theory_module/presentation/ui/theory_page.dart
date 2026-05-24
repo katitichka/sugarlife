@@ -1,45 +1,96 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
 import 'package:sugarlife/core/theme/app_color.dart';
 import 'package:sugarlife/features/theory_module/presentation/bloc/theory_module_bloc.dart';
+import 'package:sugarlife/features/theory_module/presentation/ui/theory_list_card.dart';
+import 'package:sugarlife/shared/ui/lottie_progress_indicator.dart';
 import 'package:sugarlife/shared/ui/main_app_bar.dart';
 
-class TheoryPage extends StatelessWidget {
+class TheoryPage extends StatefulWidget {
   const TheoryPage({super.key});
+
+  @override
+  State<TheoryPage> createState() => _TheoryPageState();
+}
+
+class _TheoryPageState extends State<TheoryPage> {
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    context.read<TheoryModuleBloc>().add(const TheoryModuleEvent.receive());
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.blue,
-      appBar: MainAppBar(title: 'Теоретический модуль'),
+      appBar: MainAppBar(
+        title: 'Теоретический модуль',
+        titleFontSize: 24,
+        titleFontWeight: FontWeight.w700,
+      ),
       body: BlocBuilder<TheoryModuleBloc, TheoryModuleState>(
         builder: (BuildContext context, state) {
           switch (state) {
             case ReceiveInProgress():
               return const _LoadingPage();
             case ReceiveFailed(:final message):
-              return _ErrorPage(message: message);
+              return _ErrorPage(
+                message: message,
+                onRetry: () {
+                  context.read<TheoryModuleBloc>().add(const TheoryModuleEvent.receive());
+                },
+              );
             case ReceiveSuccess():
               final modules = state.theoryModules;
-              return ListView.builder(
-                itemCount: modules.length,
-                itemBuilder: (context, index) {
-                  final module = modules[index];
-                  final Color moduleColor = module.color;
-                  return SizedBox(
-                    height: 140,
-                    child: Card(
-                      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                      color: moduleColor,
-                      child: ListTile(
-                        contentPadding: const EdgeInsets.all(15),
-                        title: Text(module.title),
-                        subtitle: Text(module.subtitle),
-                        trailing: Icon(Icons.arrow_forward_ios, color: AppColors.blue, size: 30,),
-                        onTap: () => context.push('/theory/module/${module.id}'),
+              if (modules.isEmpty) {
+                return const Center(child: Text('Нет доступных модулей'));
+              }
+              
+              return LayoutBuilder(
+                builder: (context, constraints) {
+                  // Высота: экран - AppBar - BottomNavBar (100)
+                  final availableHeight = constraints.maxHeight - 100;
+                  // Высота одной карточки ~130
+                  final totalHeight = modules.length * 130.0;
+                  final needScroll = totalHeight > availableHeight;
+                  
+                  return Column(
+                    children: [
+                      SizedBox(
+                        height: availableHeight,
+                        child: RawScrollbar(
+                          controller: _scrollController,
+                          thumbVisibility: needScroll,
+                          trackVisibility: needScroll,
+                          thickness: 4,
+                          radius: const Radius.circular(2),
+                          thumbColor: AppColors.white.withValues(alpha: 0.8),
+                          child: ListView.builder(
+                            controller: _scrollController,
+                            physics: needScroll 
+                                ? const AlwaysScrollableScrollPhysics()
+                                : const NeverScrollableScrollPhysics(),
+                            itemCount: modules.length,
+                            itemBuilder: (context, index) {
+                              final module = modules[index];
+                              return TheoryListCard(
+                                module: module,
+                                moduleId: module.id,
+                              );
+                            },
+                          ),
+                        ),
                       ),
-                    ),
+                    ],
                   );
                 },
               );
@@ -57,16 +108,52 @@ class _LoadingPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    return const Scaffold(body: Center(child: LottieProgressIndicator()));
   }
 }
 
 class _ErrorPage extends StatelessWidget {
   final String message;
-  const _ErrorPage({required this.message});
+  final VoidCallback? onRetry;
+
+  const _ErrorPage({
+    required this.message,
+    this.onRetry,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(body: Center(child: Text('Ошибка: $message')));
+    print('❌ Ошибка загрузки модулей: $message');
+    
+    return Scaffold(
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Text(
+              'Не удалось загрузить теоретические модули',
+              textAlign: TextAlign.center,
+              style: TextStyle(color: Colors.white, fontSize: 16),
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              'Проверьте подключение к интернету',
+              textAlign: TextAlign.center,
+              style: TextStyle(color: Colors.white70, fontSize: 14),
+            ),
+            const SizedBox(height: 20),
+            if (onRetry != null)
+              ElevatedButton(
+                onPressed: onRetry,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.blue,
+                  foregroundColor: Colors.white,
+                ),
+                child: const Text('Повторить'),
+              ),
+          ],
+        ),
+      ),
+    );
   }
 }

@@ -14,7 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$TheoryModuleEntity {
 
- int get id; String get title; String get subtitle; int get characterId; Color get color; int get orderIndex; String get characterImageUrl;
+ int get id; String get title; String get subtitle; Color get color; int get orderIndex;
 /// Create a copy of TheoryModuleEntity
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +25,16 @@ $TheoryModuleEntityCopyWith<TheoryModuleEntity> get copyWith => _$TheoryModuleEn
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is TheoryModuleEntity&&(identical(other.id, id) || other.id == id)&&(identical(other.title, title) || other.title == title)&&(identical(other.subtitle, subtitle) || other.subtitle == subtitle)&&(identical(other.characterId, characterId) || other.characterId == characterId)&&(identical(other.color, color) || other.color == color)&&(identical(other.orderIndex, orderIndex) || other.orderIndex == orderIndex)&&(identical(other.characterImageUrl, characterImageUrl) || other.characterImageUrl == characterImageUrl));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is TheoryModuleEntity&&(identical(other.id, id) || other.id == id)&&(identical(other.title, title) || other.title == title)&&(identical(other.subtitle, subtitle) || other.subtitle == subtitle)&&(identical(other.color, color) || other.color == color)&&(identical(other.orderIndex, orderIndex) || other.orderIndex == orderIndex));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,id,title,subtitle,characterId,color,orderIndex,characterImageUrl);
+int get hashCode => Object.hash(runtimeType,id,title,subtitle,color,orderIndex);
 
 @override
 String toString() {
-  return 'TheoryModuleEntity(id: $id, title: $title, subtitle: $subtitle, characterId: $characterId, color: $color, orderIndex: $orderIndex, characterImageUrl: $characterImageUrl)';
+  return 'TheoryModuleEntity(id: $id, title: $title, subtitle: $subtitle, color: $color, orderIndex: $orderIndex)';
 }
 
 
@@ -45,7 +45,7 @@ abstract mixin class $TheoryModuleEntityCopyWith<$Res>  {
   factory $TheoryModuleEntityCopyWith(TheoryModuleEntity value, $Res Function(TheoryModuleEntity) _then) = _$TheoryModuleEntityCopyWithImpl;
 @useResult
 $Res call({
- int id, String title, String subtitle, int characterId, Color color, int orderIndex, String characterImageUrl
+ int id, String title, String subtitle, Color color, int orderIndex
 });
 
 
@@ -62,16 +62,14 @@ class _$TheoryModuleEntityCopyWithImpl<$Res>
 
 /// Create a copy of TheoryModuleEntity
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? title = null,Object? subtitle = null,Object? characterId = null,Object? color = null,Object? orderIndex = null,Object? characterImageUrl = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? title = null,Object? subtitle = null,Object? color = null,Object? orderIndex = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
 as String,subtitle: null == subtitle ? _self.subtitle : subtitle // ignore: cast_nullable_to_non_nullable
-as String,characterId: null == characterId ? _self.characterId : characterId // ignore: cast_nullable_to_non_nullable
-as int,color: null == color ? _self.color : color // ignore: cast_nullable_to_non_nullable
+as String,color: null == color ? _self.color : color // ignore: cast_nullable_to_non_nullable
 as Color,orderIndex: null == orderIndex ? _self.orderIndex : orderIndex // ignore: cast_nullable_to_non_nullable
-as int,characterImageUrl: null == characterImageUrl ? _self.characterImageUrl : characterImageUrl // ignore: cast_nullable_to_non_nullable
-as String,
+as int,
   ));
 }
 
@@ -153,10 +151,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int id,  String title,  String subtitle,  int characterId,  Color color,  int orderIndex,  String characterImageUrl)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int id,  String title,  String subtitle,  Color color,  int orderIndex)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _TheoryModuleEntity() when $default != null:
-return $default(_that.id,_that.title,_that.subtitle,_that.characterId,_that.color,_that.orderIndex,_that.characterImageUrl);case _:
+return $default(_that.id,_that.title,_that.subtitle,_that.color,_that.orderIndex);case _:
   return orElse();
 
 }
@@ -174,10 +172,10 @@ return $default(_that.id,_that.title,_that.subtitle,_that.characterId,_that.colo
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int id,  String title,  String subtitle,  int characterId,  Color color,  int orderIndex,  String characterImageUrl)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int id,  String title,  String subtitle,  Color color,  int orderIndex)  $default,) {final _that = this;
 switch (_that) {
 case _TheoryModuleEntity():
-return $default(_that.id,_that.title,_that.subtitle,_that.characterId,_that.color,_that.orderIndex,_that.characterImageUrl);}
+return $default(_that.id,_that.title,_that.subtitle,_that.color,_that.orderIndex);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -191,10 +189,10 @@ return $default(_that.id,_that.title,_that.subtitle,_that.characterId,_that.colo
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int id,  String title,  String subtitle,  int characterId,  Color color,  int orderIndex,  String characterImageUrl)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int id,  String title,  String subtitle,  Color color,  int orderIndex)?  $default,) {final _that = this;
 switch (_that) {
 case _TheoryModuleEntity() when $default != null:
-return $default(_that.id,_that.title,_that.subtitle,_that.characterId,_that.color,_that.orderIndex,_that.characterImageUrl);case _:
+return $default(_that.id,_that.title,_that.subtitle,_that.color,_that.orderIndex);case _:
   return null;
 
 }
@@ -206,16 +204,14 @@ return $default(_that.id,_that.title,_that.subtitle,_that.characterId,_that.colo
 
 
 class _TheoryModuleEntity implements TheoryModuleEntity {
-  const _TheoryModuleEntity({required this.id, required this.title, required this.subtitle, required this.characterId, required this.color, required this.orderIndex, required this.characterImageUrl});
+  const _TheoryModuleEntity({required this.id, required this.title, required this.subtitle, required this.color, required this.orderIndex});
   
 
 @override final  int id;
 @override final  String title;
 @override final  String subtitle;
-@override final  int characterId;
 @override final  Color color;
 @override final  int orderIndex;
-@override final  String characterImageUrl;
 
 /// Create a copy of TheoryModuleEntity
 /// with the given fields replaced by the non-null parameter values.
@@ -227,16 +223,16 @@ _$TheoryModuleEntityCopyWith<_TheoryModuleEntity> get copyWith => __$TheoryModul
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _TheoryModuleEntity&&(identical(other.id, id) || other.id == id)&&(identical(other.title, title) || other.title == title)&&(identical(other.subtitle, subtitle) || other.subtitle == subtitle)&&(identical(other.characterId, characterId) || other.characterId == characterId)&&(identical(other.color, color) || other.color == color)&&(identical(other.orderIndex, orderIndex) || other.orderIndex == orderIndex)&&(identical(other.characterImageUrl, characterImageUrl) || other.characterImageUrl == characterImageUrl));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _TheoryModuleEntity&&(identical(other.id, id) || other.id == id)&&(identical(other.title, title) || other.title == title)&&(identical(other.subtitle, subtitle) || other.subtitle == subtitle)&&(identical(other.color, color) || other.color == color)&&(identical(other.orderIndex, orderIndex) || other.orderIndex == orderIndex));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,id,title,subtitle,characterId,color,orderIndex,characterImageUrl);
+int get hashCode => Object.hash(runtimeType,id,title,subtitle,color,orderIndex);
 
 @override
 String toString() {
-  return 'TheoryModuleEntity(id: $id, title: $title, subtitle: $subtitle, characterId: $characterId, color: $color, orderIndex: $orderIndex, characterImageUrl: $characterImageUrl)';
+  return 'TheoryModuleEntity(id: $id, title: $title, subtitle: $subtitle, color: $color, orderIndex: $orderIndex)';
 }
 
 
@@ -247,7 +243,7 @@ abstract mixin class _$TheoryModuleEntityCopyWith<$Res> implements $TheoryModule
   factory _$TheoryModuleEntityCopyWith(_TheoryModuleEntity value, $Res Function(_TheoryModuleEntity) _then) = __$TheoryModuleEntityCopyWithImpl;
 @override @useResult
 $Res call({
- int id, String title, String subtitle, int characterId, Color color, int orderIndex, String characterImageUrl
+ int id, String title, String subtitle, Color color, int orderIndex
 });
 
 
@@ -264,16 +260,14 @@ class __$TheoryModuleEntityCopyWithImpl<$Res>
 
 /// Create a copy of TheoryModuleEntity
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? title = null,Object? subtitle = null,Object? characterId = null,Object? color = null,Object? orderIndex = null,Object? characterImageUrl = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? title = null,Object? subtitle = null,Object? color = null,Object? orderIndex = null,}) {
   return _then(_TheoryModuleEntity(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
 as String,subtitle: null == subtitle ? _self.subtitle : subtitle // ignore: cast_nullable_to_non_nullable
-as String,characterId: null == characterId ? _self.characterId : characterId // ignore: cast_nullable_to_non_nullable
-as int,color: null == color ? _self.color : color // ignore: cast_nullable_to_non_nullable
+as String,color: null == color ? _self.color : color // ignore: cast_nullable_to_non_nullable
 as Color,orderIndex: null == orderIndex ? _self.orderIndex : orderIndex // ignore: cast_nullable_to_non_nullable
-as int,characterImageUrl: null == characterImageUrl ? _self.characterImageUrl : characterImageUrl // ignore: cast_nullable_to_non_nullable
-as String,
+as int,
   ));
 }
 

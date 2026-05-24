@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:sugarlife/core/theme/app_color.dart';
 import 'package:sugarlife/features/achievement/domain/entities/achievement_entity.dart';
+import 'package:sugarlife/shared/ui/lottie_progress_indicator.dart';
 
 class AchievementRewardDialog extends StatefulWidget {
   const AchievementRewardDialog({required this.achievement, super.key});
@@ -164,7 +165,7 @@ class _CardFace extends StatelessWidget {
         placeholderBuilder: (context) => const SizedBox(
           width: 140,
           height: 140,
-          child: CircularProgressIndicator(),
+          child: LottieProgressIndicator(),
         ),
       );
     } else {

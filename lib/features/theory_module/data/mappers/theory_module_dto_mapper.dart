@@ -10,10 +10,8 @@ abstract class TheoryModuleDtoMapper {
       id: dto.id,
       title: dto.title,
       subtitle: dto.subtitle,
-      characterImageUrl: dto.characterImageUrl,
       color: _convertColor(dto.colorHex),
       orderIndex: dto.orderIndex,
-      characterId: dto.characterId,
     );
   }
 
