@@ -8,28 +8,31 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
   final List<Widget>? actions;
   final double? titleFontSize;
   final FontWeight? titleFontWeight;
-  
+  final Color? backgroundColor;
+
   const MainAppBar({
-    this.title, 
-    super.key, 
-    this.actions, 
+    this.title,
+    super.key,
+    this.actions,
     this.leading,
     this.titleFontSize,
     this.titleFontWeight,
+    this.backgroundColor,
   });
-  
+
   @override
   Widget build(BuildContext context) {
     return AppBar(
       scrolledUnderElevation: 0,
       elevation: 0,
-      backgroundColor: AppColors.blue,
+      backgroundColor: backgroundColor ?? AppColors.blue,
+      iconTheme: const IconThemeData(color: AppColors.white),
       title: title != null
           ? Text(
               title!,
               style: GoogleFonts.rubik(
-                fontSize: titleFontSize ?? 20,
-                fontWeight: titleFontWeight ?? FontWeight.w500,
+                fontSize: titleFontSize ?? 24,
+                fontWeight: titleFontWeight ?? FontWeight.w700,
                 color: AppColors.white,
               ),
             )

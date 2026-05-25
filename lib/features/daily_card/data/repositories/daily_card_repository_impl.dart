@@ -10,44 +10,53 @@ class DailyCardRepositoryImpl implements DailyCardRepository {
 
   DailyCardRepositoryImpl(this._supabase, this._userId);
 
-@override
-Future<DailyCardEntity?> getTodayCard() async {
-  try {
-    final userResponse = await _supabase
-      .from('user_profile')
-      .select('created_at')
-      .eq('id', _userId)
-      .maybeSingle();
+Future<DailyCardEntity?> getTodayCard({int retries = 3}) async {
+  for (int attempt = 0; attempt < retries; attempt++) {
+    try {
+      final userId = _supabase.auth.currentUser?.id;
+      if (userId == null) {
+        print('Пользователь не авторизован');
+        return null;
+      }
 
-    if (userResponse == null) {
-      print('[DailyCardRepository] User profile not found: $_userId');
-      return null;
-    }
+      final userResponse = await _supabase
+          .from('user_profile')
+          .select('created_at')
+          .eq('id', _userId)
+          .maybeSingle();
 
-    final createdAt = DateTime.parse(userResponse['created_at']);
-    final today = DateTime.now();
-    final dayNumber = today.difference(createdAt).inDays + 1;
-    
-    print('[DailyCardRepository] Day number: $dayNumber');
+      if (userResponse == null) {
+        print('[DailyCardRepository] User profile not found: $_userId');
+        return null;
+      }
 
-    final response = await _supabase
-        .from('daily_cards')
-        .select()
-        .eq('day_number', dayNumber)
-        .maybeSingle();
+      final createdAt = DateTime.parse(userResponse['created_at']);
+      final today = DateTime.now();
+      final dayNumber = today.difference(createdAt).inDays + 1;
+      
+      print('[DailyCardRepository] Day number: $dayNumber, attempt: ${attempt + 1}');
 
-    if (response == null) {
+      final response = await _supabase
+          .from('daily_cards')
+          .select()
+          .eq('day_number', dayNumber)
+          .maybeSingle();
+
+      if (response != null) {
+        final dto = DailyCardDto.fromJson(response);
+        return DailyCardDtoMapper.toEntity(dto: dto);
+      }
+      
       print('[DailyCardRepository] No card for day: $dayNumber');
       return null;
+      
+    } catch (e) {
+      print('[DailyCardRepository] Attempt ${attempt + 1} failed: $e');
+      if (attempt == retries - 1) rethrow;
+      await Future.delayed(Duration(milliseconds: 500 * (attempt + 1)));
     }
-
-    final dto = DailyCardDto.fromJson(response);
-    return DailyCardDtoMapper.toEntity(dto: dto);
-  } catch (e, stackTrace) {
-    print('[DailyCardRepository] Get card error: $e');
-    print('[DailyCardRepository] Stack: $stackTrace');
-    return null;
   }
+  return null;
 }
 
 @override

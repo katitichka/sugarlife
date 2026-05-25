@@ -43,99 +43,6 @@ class _ProfilePageState extends State<ProfilePage> {
     });
   }
 
-  void _showEditNameDialog(ProfileEntity currentProfile) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Изменить имя'),
-        content: TextField(
-          controller: _usernameController,
-          decoration: const InputDecoration(
-            hintText: 'Введите новое имя',
-            border: OutlineInputBorder(),
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Отмена'),
-          ),
-          TextButton(
-            onPressed: () async {
-              final newUsername = _usernameController.text.trim();
-              if (newUsername.isNotEmpty) {
-                try {
-                  await _profileRepository.updateUsername(newUsername);
-                  if (!mounted) return;
-                  final updatedProfile = currentProfile.copyWith(
-                    username: newUsername,
-                  );
-                  context.read<AuthBloc>().add(
-                    AuthEvent.profileUpdate(newProfile: updatedProfile),
-                  );
-                  _usernameController.clear();
-                  Navigator.pop(context);
-                } catch (e) {
-                  if (!mounted) return;
-                  ScaffoldMessenger.of(
-                    context,
-                  ).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
-                }
-              }
-            },
-            child: const Text('Изменить'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showAvatarSelectionSheet(ProfileEntity currentProfile) async {
-    final result = await showDialog<AvatarEntity>(
-      context: context,
-      barrierDismissible: true,
-      builder: (context) => Dialog(
-        insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(44)),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(44),
-          child: ConstrainedBox(
-             constraints: BoxConstraints(
-            maxWidth: MediaQuery.of(context).size.width * 0.9,
-            maxHeight: MediaQuery.of(context).size.height * 0.75,
-          ),
-            child: ChooseAvatarPage(
-              currentAvatarId: currentProfile.currentAvatarId,
-            ),
-          ),
-        ),
-      ),
-    );
-    if (result != null) {
-      try {
-        await _profileRepository.updateAvatar(result.id);
-        if (!mounted) return;
-        final updatedProfile = currentProfile.copyWith(
-          currentAvatarId: result.id,
-        );
-        context.read<AuthBloc>().add(
-          AuthEvent.profileUpdate(newProfile: updatedProfile),
-        );
-        if (mounted) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(const SnackBar(content: Text('Аватар обновлён!')));
-        }
-      } catch (e) {
-        if (mounted) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
-        }
-      }
-    }
-  }
-
   @override
   void dispose() {
     _usernameController.dispose();
@@ -163,11 +70,9 @@ class _ProfilePageState extends State<ProfilePage> {
                   AnimatedSettingsButton(
                     onPressed: () => showDialog(
                       context: context,
-                      builder: (_) => SettingsDialog(
-                        profile: profile,
-                        onEditName: () => _showEditNameDialog(profile),
-                        onEditAvatar: () => _showAvatarSelectionSheet(profile),
-                      ),
+                      barrierColor: Colors.black.withValues(alpha: 0.6),
+                      barrierDismissible: true,
+                      builder: (_) => SettingsDialog(profile: profile),
                     ),
                   ),
                 ],

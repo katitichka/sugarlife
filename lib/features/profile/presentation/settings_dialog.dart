@@ -5,18 +5,215 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:sugarlife/core/theme/app_color.dart';
 import 'package:sugarlife/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:sugarlife/features/profile/domain/entities/profile_entity.dart';
+import 'package:sugarlife/features/profile/domain/repositories/profile_repository.dart';
 
 class SettingsDialog extends StatelessWidget {
   final ProfileEntity profile;
-  final VoidCallback onEditName;
-  final VoidCallback onEditAvatar;
 
   const SettingsDialog({
     super.key,
     required this.profile,
-    required this.onEditName,
-    required this.onEditAvatar,
   });
+
+  // Диалог изменения имени
+  void _showEditNameDialog(BuildContext context, ProfileEntity currentProfile) {
+    final controller = TextEditingController(text: currentProfile.username);
+    final repository = context.read<ProfileRepository>();
+
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        insetPadding: const EdgeInsets.symmetric(horizontal: 44),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Изменить имя',
+                style: GoogleFonts.rubik(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.blue,
+                ),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: controller,
+                decoration: InputDecoration(
+                  hintText: 'Введите новое имя',
+                  hintStyle: GoogleFonts.rubik(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w400,
+                    color: AppColors.blue,
+                  ),
+                  contentPadding: const EdgeInsets.all(10),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: AppColors.blue, width: 2),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: AppColors.blue, width: 2),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: AppColors.blue, width: 2),
+                  ),
+                ),
+                style: GoogleFonts.rubik(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: AppColors.blue,
+                ),
+              ),
+              const SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    style: TextButton.styleFrom(
+                      padding: EdgeInsets.zero,
+                      minimumSize: Size.zero,
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    ),
+                    child: Text(
+                      'Отмена',
+                      style: GoogleFonts.rubik(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () async {
+                      final newUsername = controller.text.trim();
+                      if (newUsername.isNotEmpty && newUsername != currentProfile.username) {
+                        try {
+                          await repository.updateUsername(newUsername);
+                          if (!context.mounted) return;
+                          final updatedProfile = currentProfile.copyWith(
+                            username: newUsername,
+                          );
+                          context.read<AuthBloc>().add(
+                            AuthEvent.profileUpdate(newProfile: updatedProfile),
+                          );
+                          if (context.mounted) Navigator.pop(context);
+                        } catch (e) {
+                          if (!context.mounted) return;
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('Ошибка: $e')),
+                          );
+                        }
+                      } else {
+                        Navigator.pop(context);
+                      }
+                    },
+                    style: TextButton.styleFrom(
+                      padding: EdgeInsets.zero,
+                      minimumSize: Size.zero,
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    ),
+                    child: Text(
+                      'Изменить',
+                      style: GoogleFonts.rubik(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.blue,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // Диалог выхода
+  void _showLogoutDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        insetPadding: const EdgeInsets.symmetric(horizontal: 44),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Выход',
+                style: GoogleFonts.rubik(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.blue,
+                ),
+              ),
+              const SizedBox(height: 9),
+              Text(
+                'Вы уверены, что хотите выйти?',
+                style: GoogleFonts.rubik(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w400,
+                  color: AppColors.blue,
+                ),
+              ),
+              const SizedBox(height: 24),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    style: TextButton.styleFrom(
+                      padding: EdgeInsets.zero,
+                      minimumSize: Size.zero,
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    ),
+                    child: Text(
+                      'Отмена',
+                      style: GoogleFonts.rubik(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pop(context); // закрыть диалог выхода
+                      Navigator.pop(context); // закрыть SettingsDialog
+                      context.read<AuthBloc>().add(const AuthEvent.logoutPressed());
+                    },
+                    style: TextButton.styleFrom(
+                      padding: EdgeInsets.zero,
+                      minimumSize: Size.zero,
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    ),
+                    child: Text(
+                      'Выйти',
+                      style: GoogleFonts.rubik(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.red,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,52 +224,56 @@ class SettingsDialog extends StatelessWidget {
         child: Align(
           alignment: Alignment.topCenter,
           child: GestureDetector(
-            onTap: () {}, // предотвращает закрытие при нажатии на сам диалог
-            child: Container(
-              margin: const EdgeInsets.only(top: 70),
-              width: MediaQuery.of(context).size.width - 32,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    _buildDialogItem(
-                      onTap: () {
-                        Navigator.pop(context);
-                        onEditName();
-                      },
-                      iconPath: 'assets/profile/edit_name.svg',
-                      text: 'Изменить имя',
-                      textColor: AppColors.blue,
+            onTap: () {},
+            child: Column(
+              children: [
+                const SizedBox(height: 70),
+                Container(
+                  width: MediaQuery.of(context).size.width - 32,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        _buildDialogItem(
+                          onTap: () {
+                            Navigator.pop(context);
+                            _showEditNameDialog(context, profile);
+                          },
+                          iconPath: 'assets/profile/edit_name.svg',
+                          text: 'Изменить имя',
+                          textColor: AppColors.blue,
+                        ),
+                        const Divider(height: 1.5, color: AppColors.blue),
+                        _buildDialogItem(
+                          onTap: () {
+                            Navigator.pop(context);
+                            // TODO: открыть выбор аватара
+                          },
+                          iconPath: 'assets/profile/edit_avatar.svg',
+                          text: 'Изменить аватар',
+                          textColor: AppColors.blue,
+                        ),
+                        const Divider(height: 1.5, color: AppColors.blue),
+                        _buildDialogItem(
+                          onTap: () {
+                            Navigator.pop(context);
+                            _showLogoutDialog(context);
+                          },
+                          iconPath: 'assets/profile/logout.svg',
+                          text: 'Выйти из профиля',
+                          textColor: AppColors.red,
+                        ),
+                      ],
                     ),
-                    const Divider(height: 1.5, color: AppColors.blue),
-                    _buildDialogItem(
-                      onTap: () {
-                        Navigator.pop(context);
-                        onEditAvatar();
-                      },
-                      iconPath: 'assets/profile/edit_avatar.svg',
-                      text: 'Изменить аватар',
-                      textColor: AppColors.blue,
-                    ),
-                    const Divider(height: 1.5, color: AppColors.blue),
-                    _buildDialogItem(
-                      onTap: () {
-                        Navigator.pop(context);
-                        _showLogoutDialog(context);
-                      },
-                      iconPath: 'assets/profile/logout.svg',
-                      text: 'Выйти из профиля',
-                      textColor: AppColors.red,
-                    ),
-                  ],
+                  ),
                 ),
-              ),
+              ],
             ),
           ),
         ),
@@ -114,29 +315,6 @@ class SettingsDialog extends StatelessWidget {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  void _showLogoutDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Выход'),
-        content: const Text('Вы уверены, что хотите выйти?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Отмена'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              context.read<AuthBloc>().add(const AuthEvent.logoutPressed());
-            },
-            child: const Text('Выйти', style: TextStyle(color: Colors.red)),
-          ),
-        ],
       ),
     );
   }

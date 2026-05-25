@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:sugarlife/core/theme/app_color.dart';
 import 'package:sugarlife/features/theory_module/domain/entities/theory_module_entity.dart';
 import 'package:sugarlife/features/theory_module/presentation/bloc/theory_module_bloc.dart';
@@ -10,10 +12,24 @@ class TheoryScreenPage extends StatelessWidget {
   final int moduleId;
   const TheoryScreenPage({required this.moduleId, super.key});
 
+  Color mixWithBlack(Color color, [double amount = 0.1]) {
+    return Color.lerp(color, Colors.black, amount)!;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: MainAppBar(title: 'Теоретический модуль'),
+      appBar: MainAppBar(
+        backgroundColor: AppColors.white,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.cancel_outlined),
+            color: AppColors.blue,
+            iconSize: 45,
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+        ],
+      ),
       backgroundColor: AppColors.white,
       body: BlocBuilder<TheoryModuleBloc, TheoryModuleState>(
         builder: (context, state) {
@@ -28,19 +44,73 @@ class TheoryScreenPage extends StatelessWidget {
                 return const Center(child: Text('Модуль не найден'));
               }
               return SingleChildScrollView(
+                padding: const EdgeInsets.only(bottom: 16, left: 16, right: 16),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Text(
-                      module.title,
-                      style: Theme.of(context).textTheme.headlineMedium,
+                    Container(
+                      decoration: BoxDecoration(
+                        boxShadow: [
+                          BoxShadow(
+                            color: mixWithBlack(module.color, 0.1),
+                            offset: const Offset(3, 3),
+                            blurRadius: 0,
+                            spreadRadius: 0,
+                          ),
+                        ],
+                        borderRadius: BorderRadius.circular(24),
+                      ),
+                      child: Card(
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(24),
+                          side: BorderSide.none,
+                        ),
+                        color: module.color,
+                        child: SizedBox(
+                          height: 50,
+                          width: 200,
+                          child: Stack(
+                            children: [
+                              Positioned(
+                                left: 16,
+                                right: 80,
+                                top: 0,
+                                bottom: 0,
+                                child: Center(
+                                  child: Text(
+                                    module.title,
+                                    style: GoogleFonts.rubik(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.w700,
+                                      color: AppColors.blue,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              Positioned(
+                                right: 0,
+                                bottom: 0,
+                                child: ClipRRect(
+                                  borderRadius: const BorderRadius.only(
+                                    bottomRight: Radius.circular(24),
+                                  ),
+                                  child: SizedBox(
+                                    width: 80,
+                                    height: 50,
+                                    child: SvgPicture.asset(
+                                      'assets/modules/theory_characters/character_module$moduleId.svg',
+                                      fit: BoxFit.contain,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
                     ),
-                    const SizedBox(height: 10),
-                    Text(
-                      module.subtitle,
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 4),
                     Padding(
                       padding: const EdgeInsets.only(bottom: 20),
                       child: Image.asset(
@@ -66,7 +136,6 @@ class TheoryScreenPage extends StatelessWidget {
       ),
     );
   }
-
 
   TheoryModuleEntity? _findModuleById(
     List<TheoryModuleEntity> modules,
