@@ -4,6 +4,8 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sugarlife/core/theme/app_color.dart';
 import 'package:sugarlife/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:sugarlife/features/avatars/domain/entities/avatar_entity.dart';
+import 'package:sugarlife/features/avatars/presentation/view/choose_avatar_page.dart';
 import 'package:sugarlife/features/profile/domain/entities/profile_entity.dart';
 import 'package:sugarlife/features/profile/domain/repositories/profile_repository.dart';
 
@@ -215,6 +217,64 @@ class SettingsDialog extends StatelessWidget {
     );
   }
 
+  Future<bool> _showAvatarSelectionSheet(BuildContext context, ProfileEntity currentProfile) async {
+    // Сначала закрываем SettingsDialog
+    if (context.mounted) {
+      Navigator.pop(context);
+    }
+    
+    // Открываем диалог выбора аватара
+    final result = await showDialog<AvatarEntity>(
+      context: context,
+      barrierDismissible: true,
+      builder: (context) => Dialog(
+        insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(44)),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(44),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxWidth: MediaQuery.of(context).size.width * 0.9,
+              maxHeight: MediaQuery.of(context).size.height * 0.75,
+            ),
+            child: ChooseAvatarPage(
+              currentAvatarId: currentProfile.currentAvatarId,
+            ),
+          ),
+        ),
+      ),
+    );
+    
+    if (result != null) {
+      try {
+        final repository = context.read<ProfileRepository>();
+        await repository.updateAvatar(result.id);
+        if (!context.mounted) return false;
+        
+        final updatedProfile = currentProfile.copyWith(
+          currentAvatarId: result.id,
+        );
+        context.read<AuthBloc>().add(
+          AuthEvent.profileUpdate(newProfile: updatedProfile),
+        );
+        
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Аватар обновлён!')),
+          );
+        }
+        return true;
+      } catch (e) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Ошибка: $e')),
+          );
+        }
+      }
+    }
+    return false;
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -251,9 +311,9 @@ class SettingsDialog extends StatelessWidget {
                         ),
                         const Divider(height: 1.5, color: AppColors.blue),
                         _buildDialogItem(
-                          onTap: () {
-                            Navigator.pop(context);
-                            // TODO: открыть выбор аватара
+                          onTap: () async {
+                            // Просто вызываем выбор аватара (SettingsDialog закроется внутри)
+                            await _showAvatarSelectionSheet(context, profile);
                           },
                           iconPath: 'assets/profile/edit_avatar.svg',
                           text: 'Изменить аватар',
