@@ -1,4 +1,6 @@
 ﻿import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:sugarlife/core/theme/app_color.dart';
 import 'package:lottie/lottie.dart';
 
@@ -8,12 +10,14 @@ class GameLevelResultPage extends StatelessWidget {
   final int totalQuestions;
   final int stars;
   final VoidCallback onFinish;
+  final int levelId;
 
   const GameLevelResultPage({
     required this.correctAnswers,
     required this.totalQuestions,
     required this.stars,
     required this.onFinish,
+    required this.levelId,
     super.key,
   });
 
@@ -35,47 +39,98 @@ class GameLevelResultPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print('=== GameLevelResultPage ===');
-  print('correctAnswers: $correctAnswers');
-  print('stars: $stars');
-  
-  String animationPath = _getAnimationPath();
-  print('animationPath: $animationPath');
-  
     return Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              correctAnswers == 0 ? 'Уровень не пройден!' : 'Уровень пройден!',
+      backgroundColor: AppColors.background,
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Text(
+            'Уровень $levelId', // тут orderIndex надо а не levelId
+            style: GoogleFonts.rubik(
+              fontSize: 32,
+              fontWeight: FontWeight.w700,
+              color: AppColors.blue,
             ),
-            const SizedBox(height: 16),
-            Lottie.asset(
-              _getAnimationPath(),
-              width: 200,
-              height: 200,
-              repeat: true,
-              fit: BoxFit.contain,
+            textAlign: TextAlign.center,
+          ),
+          Text(
+            'модуль $levelId', // moduleId
+            style: GoogleFonts.rubik(
+              fontSize: 24,
+              fontWeight: FontWeight.w700,
+              color: AppColors.blue,
             ),
-            const SizedBox(height: 16),
-            Text('$correctAnswers/$totalQuestions'),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(3, (index) {
-                return Icon(
-                  index < stars ? Icons.star : Icons.star_border,
-                  color: AppColors.blue,
-                  size: 48,
-                );
-              }),
+            textAlign: TextAlign.center,
+          ),
+          SizedBox(height: 14),
+          Text(
+            correctAnswers == 0 ? 'УРОВЕНЬ НЕ ПРОЙДЕН' : 'УРОВЕНЬ ПРОЙДЕН',
+            style: GoogleFonts.rubik(
+              fontSize: 24,
+              fontWeight: FontWeight.w700,
+              color: AppColors.blue,
             ),
-            ElevatedButton(
+          ),
+          const SizedBox(height: 16),
+          Lottie.asset(
+            _getAnimationPath(),
+            width: 220,
+            height: 220,
+            repeat: true,
+            fit: BoxFit.contain,
+          ),
+          const SizedBox(height: 6),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: List.generate(3, (index) {
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                child: index < stars
+                    ? SvgPicture.asset(
+                        'assets/common/star_fill.svg',
+                        width: 55,
+                        height: 55,
+                        colorFilter: const ColorFilter.mode(
+                          AppColors.blue,
+                          BlendMode.srcIn,
+                        ),
+                      )
+                    : SvgPicture.asset(
+                        'assets/common/star_border.svg',
+                        width: 55,
+                        height: 55,
+                        colorFilter: const ColorFilter.mode(
+                          AppColors.blue,
+                          BlendMode.srcIn,
+                        ),
+                      ),
+              );
+            }),
+          ),
+          const SizedBox(height: 80),
+          SizedBox(
+            height: 70,
+            child: ElevatedButton(
               onPressed: onFinish,
-              child: Text(correctAnswers == 0 ? 'Пройти заново' : 'Завершить'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.blue,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(70),
+                ),
+              ),
+              child: Text(
+                correctAnswers == 0 ? 'Пройти заново' : 'Завершить',
+                style: TextStyle(
+                  fontSize: 32,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.white,
+                ),
+                textAlign: TextAlign.center,
+              ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

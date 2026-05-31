@@ -1,5 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sugarlife/features/achievement/domain/entities/achievement_entity.dart';
 import 'package:sugarlife/features/achievement/domain/repositories/achievement_repository.dart';
 import 'package:sugarlife/features/game_module/level/domain/entities/game_module_question_entity.dart';
@@ -310,50 +311,56 @@ class GameModuleLevelBloc
   }
 
   Future<AchievementEntity?> _checkAndUnlockAchievement({
-    required int levelId,
-  }) async {
-    try {
-      final currentLevel = await _gameModuleLevelListRepository.getLevelById(
-        levelId: levelId,
-      );
-      final allLevels = await _gameModuleLevelListRepository.getAllLevels();
-      final moduleLevels =
-          allLevels
-              .where(
-                (level) => level.theoryModuleId == currentLevel.theoryModuleId,
-              )
-              .toList()
-            ..sort((a, b) => a.orderIndex.compareTo(b.orderIndex));
+  required int levelId,
+}) async {
+  try {
+    final currentLevel = await _gameModuleLevelListRepository.getLevelById(
+      levelId: levelId,
+    );
+    final allLevels = await _gameModuleLevelListRepository.getAllLevels();
+    final moduleLevels = allLevels
+        .where((level) => level.theoryModuleId == currentLevel.theoryModuleId)
+        .toList()
+      ..sort((a, b) => a.orderIndex.compareTo(b.orderIndex));
 
-      if (moduleLevels.isEmpty) {
-        return null;
-      }
-
-      final progressMap = await _levelProgressRepository.getAllLevelsProgress();
-      final isModuleCompleted = moduleLevels.every((level) {
-        final progress = progressMap[level.id];
-        return progress != null && (progress.stars ?? 0) > 0;
-      });
-
-      print(
-        'Модуль ${currentLevel.theoryModuleId} полностью пройден: $isModuleCompleted',
-      );
-      if (!isModuleCompleted) {
-        return null;
-      }
-
-      final achievement = await _achievementRepository
-          .unlockRandomAchievement();
-      if (achievement != null) {
-        print('Выдано достижение ${achievement.id}: ${achievement.name}');
-      }
-      return achievement;
-    } catch (e) {
-      print('Ошибка проверки/выдачи достижения: $e');
+    if (moduleLevels.isEmpty) {
       return null;
     }
-  }
 
+    final progressMap = await _levelProgressRepository.getAllLevelsProgress();
+    final isModuleCompleted = moduleLevels.every((level) {
+      final progress = progressMap[level.id];
+      return progress != null && (progress.stars ?? 0) > 0;
+    });
+
+    print('Модуль ${currentLevel.theoryModuleId} полностью пройден: $isModuleCompleted');
+    
+    if (!isModuleCompleted) {
+      return null;
+    }
+    
+    // Проверяем, не выдавалось ли уже достижение за этот модуль
+    // Используем SharedPreferences
+    final prefs = await SharedPreferences.getInstance();
+    final key = 'achievement_given_for_module_${currentLevel.theoryModuleId}';
+    final alreadyGiven = prefs.getBool(key) ?? false;
+    
+    if (alreadyGiven) {
+      print('Достижение за модуль ${currentLevel.theoryModuleId} уже выдавалось');
+      return null;
+    }
+    
+    final achievement = await _achievementRepository.unlockRandomAchievement();
+    if (achievement != null) {
+      await prefs.setBool(key, true);
+      print('Выдано достижение ${achievement.id}: ${achievement.name}');
+    }
+    return achievement;
+  } catch (e) {
+    print('Ошибка проверки/выдачи достижения: $e');
+    return null;
+  }
+}
   Future<void> _retryLevel({
     required Emitter<GameModuleLevelState> emit,
   }) async {

@@ -165,7 +165,7 @@ class _ChooseAvatarPageState extends State<ChooseAvatarPage> {
                   : null,
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.blue,
-                foregroundColor: Colors.white,
+                foregroundColor: AppColors.background,
                 fixedSize: const Size(230, 60),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(90),

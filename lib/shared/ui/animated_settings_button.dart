@@ -62,10 +62,7 @@ class _AnimatedSettingsButtonState extends State<AnimatedSettingsButton>
           'assets/profile/settings.svg',
           width: 40,
           height: 40,
-          colorFilter: const ColorFilter.mode(
-            AppColors.white,
-            BlendMode.srcIn,
-          ),
+          
         ),
         onPressed: _handlePressed,
       ),

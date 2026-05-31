@@ -2,6 +2,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:sugarlife/core/router/root_navigator.dart';
 import 'package:sugarlife/core/theme/app_color.dart';
 import 'package:sugarlife/features/achievement/presentation/bloc/achievement_bloc.dart';
@@ -55,6 +56,8 @@ class _GamePageState extends State<GamePage> {
   final ScrollController _scrollController = ScrollController();
   bool _isAchievementDialogVisible = false;
   int? _lastHandledAchievementId;
+  
+  final Map<int, bool> _pressedStates = {};
 
   static List<GameModuleLevelEntity> _orderedLevels(
     List<GameModuleLevelEntity> levels,
@@ -172,6 +175,129 @@ class _GamePageState extends State<GamePage> {
     );
   }
 
+  Future<void> _navigateToLevel(int levelId) async {
+    final achievementBloc = context.read<AchievementBloc>();
+    final result = await context.push('/game/level/$levelId');
+    if (!mounted) return;
+    if (result == true) {
+      achievementBloc.add(
+        const AchievementEvent.checkPendingAchievement(),
+      );
+      achievementBloc.add(
+        const AchievementEvent.loadAchievements(),
+      );
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        await Future<void>.delayed(const Duration(milliseconds: 150));
+        if (!mounted) return;
+        await _showAchievementDialog(
+          context.read<AchievementBloc>().state,
+        );
+      });
+    }
+  }
+
+  Widget _getLevelIcon(String assetPath, bool isPressed) {
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 100),
+      transform: isPressed
+          ? Matrix4.translationValues(0, 4, 0)
+          : Matrix4.identity(),
+      child: SvgPicture.asset(
+        assetPath,
+        width: _GameMapMetrics.circleSize,
+        height: _GameMapMetrics.circleSize,
+        fit: BoxFit.contain,
+      ),
+    );
+  }
+
+  Widget _getLevelNumberText(int orderIndex, bool isPressed) {
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 100),
+      transform: isPressed
+          ? Matrix4.translationValues(0, 4, 0)
+          : Matrix4.identity(),
+      child: Container(
+        width: _GameMapMetrics.circleSize,
+        height: _GameMapMetrics.circleSize,
+        decoration: const BoxDecoration(
+          shape: BoxShape.circle,
+        ),
+        child: Padding(
+          padding: const EdgeInsets.only(bottom: 10),
+          child: Center(
+            child: Text(
+              '$orderIndex',
+              style: GoogleFonts.rubik(
+                fontSize: 36,
+                fontWeight: FontWeight.w500,
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLevelButton({
+    required int levelId,
+    required int orderIndex,
+    required bool isAccessible,
+    required bool isCompleted,
+    required double left,
+    required double top,
+  }) {
+    final isPressed = _pressedStates[levelId] ?? false;
+    
+    String assetPath;
+    if (isCompleted) {
+      assetPath = 'assets/levels/completed_level.svg';
+    } else if (isAccessible) {
+      assetPath = 'assets/levels/current_level.svg';
+    } else {
+      assetPath = 'assets/levels/new_level.svg';
+    }
+
+    return Positioned(
+      left: left,
+      top: top,
+      child: SizedBox(
+        width: _GameMapMetrics.circleSize,
+        height: _GameMapMetrics.circleSize,
+        child: GestureDetector(
+          onTapDown: (_) {
+            if (!isAccessible) return;
+            setState(() {
+              _pressedStates[levelId] = true;
+            });
+          },
+          onTapUp: (_) {
+            if (!isAccessible) return;
+            setState(() {
+              _pressedStates[levelId] = false;
+            });
+            _navigateToLevel(levelId);
+          },
+          onTapCancel: () {
+            setState(() {
+              _pressedStates[levelId] = false;
+            });
+          },
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              // Иконка уровня
+              _getLevelIcon(assetPath, isPressed),
+              // Номер уровня поверх иконки
+              _getLevelNumberText(orderIndex, isPressed),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildGameContent(
     List<GameModuleLevelEntity> levels,
     Map<int, LevelProgressEntity> progressMap,
@@ -182,7 +308,8 @@ class _GamePageState extends State<GamePage> {
     }
 
     final screenHeight = MediaQuery.of(context).size.height;
-    final centerX = MediaQuery.of(context).size.width / 2 - 28;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final centerX = screenWidth / 2 - 28;
     const calculator = LevelPositionCalculator();
 
     positions = List.generate(
@@ -193,9 +320,12 @@ class _GamePageState extends State<GamePage> {
     final minY = positions.map((p) => p.dy).reduce((a, b) => a < b ? a : b);
     final maxY = positions.map((p) => p.dy).reduce((a, b) => a > b ? a : b);
 
+    const bottomOffset = 100.0;
+    const topOffset = 80.0;
+
     final baseLevelTop = List.generate(
       orderedLevels.length,
-      (i) => _GameMapMetrics.topPadding + positions[i].dy - minY,
+      (i) => _GameMapMetrics.topPadding + positions[i].dy - minY + bottomOffset,
     );
 
     final children = <Widget>[];
@@ -261,68 +391,20 @@ class _GamePageState extends State<GamePage> {
         isAccessible = p != null && (p.stars ?? 0) > 0;
       }
 
-      final circleColor = progressMap[level.id]?.isCompleted == true
-          ? AppColors.green
-          : (isAccessible ? AppColors.blue : AppColors.grey);
+      final isCompleted = progressMap[level.id]?.isCompleted == true;
 
       children.add(
-        Positioned(
+        _buildLevelButton(
+          levelId: level.id,
+          orderIndex: level.orderIndex,
+          isAccessible: isAccessible,
+          isCompleted: isCompleted,
           left: pos.dx,
           top: levelTop,
-          child: SizedBox(
-            width: _GameMapMetrics.circleSize,
-            height: _GameMapMetrics.circleSize,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                padding: EdgeInsets.zero,
-                shape: const CircleBorder(),
-                backgroundColor: circleColor,
-                foregroundColor: Colors.white,
-                disabledForegroundColor: Colors.white70,
-                elevation: 2,
-              ),
-              onPressed: isAccessible
-                  ? () async {
-                      final achievementBloc = context.read<AchievementBloc>();
-                      final result = await context.push(
-                        '/game/level/${level.id}',
-                      );
-                      if (!mounted) return;
-                      if (result == true) {
-                        achievementBloc.add(
-                          const AchievementEvent.checkPendingAchievement(),
-                        );
-                        achievementBloc.add(
-                          const AchievementEvent.loadAchievements(),
-                        );
-                        WidgetsBinding.instance.addPostFrameCallback((_) async {
-                          await Future<void>.delayed(
-                            const Duration(milliseconds: 150),
-                          );
-                          if (!mounted) return;
-                          await _showAchievementDialog(
-                            context.read<AchievementBloc>().state,
-                          );
-                        });
-                      }
-                    }
-                  : null,
-              child: Center(
-                child: Text(
-                  '${level.orderIndex}',
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ),
-          ),
         ),
       );
     }
 
-    // Разделитель после последнего модуля
     if (orderedLevels.isNotEmpty) {
       final lastLevelTop = baseLevelTop[orderedLevels.length - 1];
       final lastDividerY = lastLevelTop + _GameMapMetrics.circleSize - 90;
@@ -372,17 +454,70 @@ class _GamePageState extends State<GamePage> {
         _GameMapMetrics.topPadding +
         _GameMapMetrics.bottomPadding +
         _GameMapMetrics.contentHeightExtra +
-        80;
+        80 +
+        bottomOffset +
+        topOffset;
 
     return Stack(
       children: [
         SingleChildScrollView(
           controller: _scrollController,
-          child: Padding(
-            padding: const EdgeInsets.only(top: 50, bottom: 60),
-            child: SizedBox(
-              height: contentHeight,
-              child: Stack(clipBehavior: Clip.none, children: children),
+          child: SizedBox(
+            height: contentHeight,
+            child: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Positioned(
+                  left: 0,
+                  right: 0,
+                  top: -30,
+                  bottom: 0,
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      final w = constraints.maxWidth;
+
+                      return FutureBuilder(
+                        future: _getSvgSize(
+                          'assets/images/repeat_background.svg',
+                        ),
+                        builder: (context, snapshot) {
+                          final repeatHeight = snapshot.data ?? 1280.0;
+                          final bottomHeight = 1147.0;
+
+                          final availableHeight = contentHeight - bottomHeight;
+                          final repeatCount =
+                              (availableHeight / repeatHeight).ceil() + 2;
+
+                          return Column(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              Expanded(
+                                child: ListView.builder(
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  shrinkWrap: true,
+                                  itemCount: repeatCount,
+                                  itemBuilder: (context, index) =>
+                                      SvgPicture.asset(
+                                        'assets/images/repeat_background.svg',
+                                        width: w,
+                                        fit: BoxFit.fitWidth,
+                                      ),
+                                ),
+                              ),
+                              SvgPicture.asset(
+                                'assets/images/start_background.svg',
+                                width: w,
+                                fit: BoxFit.fitWidth,
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    },
+                  ),
+                ),
+                ...children,
+              ],
             ),
           ),
         ),
@@ -402,7 +537,7 @@ class _GamePageState extends State<GamePage> {
                 ],
               ),
               child: SvgPicture.asset(
-                'assets/icons/daily_icon.svg',
+                'assets/common/daily_icon.svg',
                 width: 82,
                 height: 45,
                 fit: BoxFit.contain,
@@ -419,5 +554,9 @@ class _GamePageState extends State<GamePage> {
         ),
       ],
     );
+  }
+
+  Future<double> _getSvgSize(String assetPath) async {
+    return 1280.0;
   }
 }

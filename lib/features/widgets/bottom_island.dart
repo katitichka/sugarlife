@@ -23,7 +23,7 @@ class BottomIsland extends StatelessWidget {
           width: 211,
           height: 48,
           decoration: BoxDecoration(
-            color: AppColors.white,
+            color: AppColors.background,
             borderRadius: BorderRadius.circular(32),
           ),
           child: Row(
@@ -31,33 +31,29 @@ class BottomIsland extends StatelessWidget {
               Expanded(
                 child: Center(
                   child: _NavItem(
-                    iconPath: 'assets/icons/theory_menu.svg',
+                    iconPath: 'assets/common/theory_menu.svg',
                     index: 0,
                     currentIndex: currentIndex,
                     onTap: onTap,
                   ),
                 ),
               ),
-
               Container(width: 2, height: 32, color: AppColors.menuSeparator),
-
               Expanded(
                 child: Center(
                   child: _NavItem(
-                    iconPath: 'assets/icons/game_menu.svg',
+                    iconPath: 'assets/common/game_menu.svg',
                     index: 1,
                     currentIndex: currentIndex,
                     onTap: onTap,
                   ),
                 ),
               ),
-
               Container(width: 2, height: 32, color: AppColors.menuSeparator),
-
               Expanded(
                 child: Center(
                   child: _NavItem(
-                    iconPath: 'assets/icons/profile_menu.svg',
+                    iconPath: 'assets/common/profile_menu.svg',
                     index: 2,
                     currentIndex: currentIndex,
                     onTap: onTap,
@@ -93,7 +89,7 @@ class _NavItem extends StatelessWidget {
       onTap: () => onTap(index),
       child: AnimatedScale(
         duration: const Duration(milliseconds: 200),
-        scale: isActive ? 1.15 : 1.0, // Увеличение на 15%
+        scale: isActive ? 1.25 : 1.0,
         child: SvgPicture.asset(
           iconPath,
           width: 28,

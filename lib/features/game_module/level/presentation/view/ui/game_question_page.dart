@@ -1,10 +1,11 @@
+import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:sugarlife/core/enum/question_type.dart';
 import 'package:sugarlife/core/theme/app_color.dart';
 import 'package:sugarlife/features/game_module/level/domain/entities/game_module_question_entity.dart';
-import 'package:sugarlife/features/game_module/level/domain/repositories/game_module_level_repository.dart';
 import 'package:sugarlife/features/game_module/level/presentation/bloc/game_module_level_bloc.dart';
 import 'package:sugarlife/shared/ui/lottie_progress_indicator.dart';
 import 'package:sugarlife/shared/ui/main_app_bar.dart';
@@ -21,7 +22,6 @@ class _GameQuestionPageState extends State<GameQuestionPage> {
   bool? _selectedBoolAnswer;
   List<int>? _selectedMultipleSelectAnswer;
   int? _lastQuestionId;
-
 
   @override
   void didChangeDependencies() {
@@ -46,19 +46,17 @@ class _GameQuestionPageState extends State<GameQuestionPage> {
       _selectedStringAnswer = null;
       _selectedBoolAnswer = null;
       _selectedMultipleSelectAnswer = null;
-
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
     final state = context.watch<GameModuleLevelBloc>().state;
     final Map<int, String> characterImages = switch (state) {
-    ReceiveSuccess s => s.characterImages,
-    AnswerInProgress a => a.characterImages,
-    _ => const {},
-  };
+      ReceiveSuccess s => s.characterImages,
+      AnswerInProgress a => a.characterImages,
+      _ => const {},
+    };
     if (state is! ReceiveSuccess && state is! AnswerInProgress) {
       return const SizedBox.shrink();
     }
@@ -81,19 +79,47 @@ class _GameQuestionPageState extends State<GameQuestionPage> {
         _selectedStringAnswer ??
         _selectedBoolAnswer ??
         _selectedMultipleSelectAnswer;
+
+    // Получаем текущий номер вопроса
+    int currentQuestionNumber = 0;
+    int totalQuestions = 0;
+    if (state is ReceiveSuccess) {
+      currentQuestionNumber = state.currentIndex + 1;
+      totalQuestions = state.questions.length;
+    } else if (state is AnswerInProgress) {
+      currentQuestionNumber = state.currentIndex + 1;
+      totalQuestions = state.questions.length;
+    }
     return Scaffold(
+      backgroundColor: AppColors.background,
       appBar: MainAppBar(
+        backgroundColor: AppColors.background,
         title: currentQuestion?.levelId != null
             ? 'Уровень ${currentQuestion!.levelId}'
             : 'Объяснение',
+        titleColor: AppColors.blue,
+        titleFontSize: 18,
+        subtitle: 'Задание $currentQuestionNumber',
+        iconColor: AppColors.blue,
+        leading: IconButton(
+          icon: const Icon(
+            Icons.arrow_circle_left_outlined,
+            color: AppColors.blue,
+            size: 35,
+          ),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+        ),
       ),
       body: Stack(
         children: [
           if (currentQuestion != null)
             Column(
               children: [
-                SizedBox(height: 100),
-                _buildQuestionHeader(currentQuestion,characterImages),
+                SizedBox(height: 40),
+                _buildQuestionHeader(currentQuestion, characterImages),
+                SizedBox(height: 30),
                 _buildAnswer(
                   currentQuestion,
                   selectionLocked: selectionLocked,
@@ -122,6 +148,7 @@ class _GameQuestionPageState extends State<GameQuestionPage> {
                   selectedAnswer,
                   isAnswered,
                 ),
+                SizedBox(height: 40),
               ],
             ),
           if (isAnswerInProgress)
@@ -136,7 +163,10 @@ class _GameQuestionPageState extends State<GameQuestionPage> {
     );
   }
 
-  Widget _buildQuestionHeader(GameModuleQuestionEntity question,Map<int, String> characterImages) {
+  Widget _buildQuestionHeader(
+    GameModuleQuestionEntity question,
+    Map<int, String> characterImages,
+  ) {
     final imageUrl = characterImages[question.characterId];
 
     return Padding(
@@ -145,29 +175,33 @@ class _GameQuestionPageState extends State<GameQuestionPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(
-            width: 80,
-            height: 80,
-            child: imageUrl != null ?
-            SvgPicture.network(
-              imageUrl,
-              width: 80,
-              height: 80,
-              fit: BoxFit.contain,
-              errorBuilder: (_, __, ___) => const SizedBox(
-                width: 80,
-                height: 80,
-                child: Center(child: Icon(Icons.error, color: Colors.red)),
-              ),
-            ) : const Center(child: LottieProgressIndicator(),),),
-         
+            width: 100,
+            height: 100,
+            child: imageUrl != null
+                ? SvgPicture.network(
+                    imageUrl,
+                    width: 100,
+                    height: 100,
+                    fit: BoxFit.contain,
+                    errorBuilder: (_, __, ___) => const SizedBox(
+                      width: 100,
+                      height: 100,
+                      child: Center(
+                        child: Icon(Icons.error, color: Colors.red),
+                      ),
+                    ),
+                  )
+                : const Center(child: LottieProgressIndicator()),
+          ),
+
           const SizedBox(width: 12),
           Expanded(
             child: Text(
               question.question,
               style: const TextStyle(
                 fontSize: 17,
+                fontWeight: FontWeight.w500,
                 color: AppColors.blue,
-                height: 1.4,
               ),
             ),
           ),
@@ -176,69 +210,91 @@ class _GameQuestionPageState extends State<GameQuestionPage> {
     );
   }
 
-  Widget _buildExplantationOverlay(
-    BuildContext context,
-    AnswerInProgress state,
-  ) {
-    return Container(
-      padding: EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-        boxShadow: [
-          BoxShadow(color: Colors.black, blurRadius: 10, offset: Offset(0, -5)),
-        ],
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            state.isCorrect ? Icons.check_circle : Icons.cancel,
-            color: state.isCorrect ? Colors.green : Colors.red,
-            size: 48,
-          ),
-          SizedBox(height: 16),
-          Text(
-            state.isCorrect ? 'Правильно!' : 'Неправильно',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: state.isCorrect ? Colors.green : Colors.red,
+Widget _buildExplantationOverlay(
+  BuildContext context,
+  AnswerInProgress state,
+) {
+  return DottedBorder(
+    options: RoundedRectDottedBorderOptions(
+      dashPattern: [14, 14],
+      strokeWidth: 12,
+      radius: const Radius.circular(20),
+      color: state.isCorrect ? AppColors.green : AppColors.red,
+      padding: const EdgeInsets.all(0),
+    ),
+    child: ClipRRect(
+      borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        color: state.isCorrect ? AppColors.backgroundGreen : AppColors.backgroundRed,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              state.isCorrect ? Icons.check_circle : Icons.cancel,
+              color: state.isCorrect ? AppColors.green : AppColors.red,
+              size: 48,
             ),
-          ),
-          SizedBox(height: 16),
-          Text(state.explanation, textAlign: TextAlign.center),
-          SizedBox(height: 16),
-          Text(
-            'Правильный ответ: ${state.correctAnswer}',
-            style: TextStyle(fontWeight: FontWeight.w500),
-          ),
-          SizedBox(height: 24),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: () {
-                context.read<GameModuleLevelBloc>().add(
-                  GameModuleLevelEvent.nextQuestion(),
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.blue,
-                padding: EdgeInsets.symmetric(vertical: 14),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+            const SizedBox(height: 8),
+            Text(
+              state.isCorrect ? 'ПРАВИЛЬНО!' : 'НЕПРАВИЛЬНО',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w800,
+                color: state.isCorrect ? AppColors.green : AppColors.red,
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Объяснение: ${state.explanation}',
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                color: AppColors.blue,
+                fontSize: 17,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Правильный ответ: ${state.correctAnswer}',
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontWeight: FontWeight.w600,
+                fontSize: 17,
+                color: AppColors.blue,
+              ),
+            ),
+            const SizedBox(height: 24),
+            SizedBox(
+              height: 70,
+              child: ElevatedButton(
+                onPressed: () {
+                  context.read<GameModuleLevelBloc>().add(
+                    GameModuleLevelEvent.nextQuestion(),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.blue,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(70),
+                  ),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  child: const Text(
+                    'ДАЛЕЕ',
+                    style: TextStyle(fontSize: 32, color: AppColors.background, fontWeight: FontWeight.w600),
+                  ),
                 ),
               ),
-              child: Text(
-                'Далее',
-                style: TextStyle(fontSize: 16, color: Colors.white),
-              ),
             ),
-          ),
-        ],
+            const SizedBox(height: 20),
+          ],
+        ),
       ),
-    );
-  }
+    ),
+  );
+}
 
   void _handleAnswer(BuildContext context, QuestionType type, dynamic answer) {
     switch (type) {
@@ -275,14 +331,31 @@ class _GameQuestionPageState extends State<GameQuestionPage> {
       return const SizedBox.shrink();
     }
 
-    return ElevatedButton(
-      onPressed: () {
-        // В состоянии вопроса - можно нажать только если есть выбранный ответ и еще не отвечали
-        if (hasSelectedAnswer && !isAnswered) {
-          _handleAnswer(context, currentQuestionType, selectedAnswer);
-        }
-      },
-      child: Text(isAnswerInProgress ? 'Далее' : 'Готово'),
+    return SizedBox(
+      height: 70,
+      child: ElevatedButton(
+        onPressed: () {
+          if (hasSelectedAnswer && !isAnswered) {
+            _handleAnswer(context, currentQuestionType, selectedAnswer);
+          }
+        },
+        style: ElevatedButton.styleFrom(
+          backgroundColor: AppColors.blue, // Цвет фона кнопки
+          foregroundColor: AppColors.white, // Цвет текста и иконок
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(70),
+          ),
+          disabledBackgroundColor: AppColors.grey,
+          disabledForegroundColor: AppColors.white,
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          child: Text(
+            isAnswerInProgress ? 'ДАЛЕЕ' : 'ГОТОВО',
+            style: const TextStyle(fontSize: 32, fontWeight: FontWeight.w700),
+          ),
+        ),
+      ),
     );
   }
 }
@@ -409,20 +482,22 @@ class MultipleChoiceWidget extends StatelessWidget {
           vertical: isCompact ? 8 : 14,
         ),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.blue : AppColors.white,
+          color: isSelected ? AppColors.blue : AppColors.background,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isSelected ? AppColors.blue : AppColors.grey,
-            width: isSelected ? 2 : 1,
+            color: isSelected
+                ? AppColors.blue
+                : Color.fromRGBO(220, 213, 205, 1),
+            width: isSelected ? 3 : 2,
           ),
         ),
         child: Center(
           child: Text(
             answer,
-            style: TextStyle(
-              color: isSelected ? Colors.white : Colors.black87,
-              fontSize: 16,
-              fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+            style: GoogleFonts.comme(
+              color: isSelected ? AppColors.background : AppColors.blue,
+              fontSize: 20,
+              fontWeight: FontWeight.w500,
             ),
             textAlign: TextAlign.center,
             softWrap: true,
@@ -672,5 +747,39 @@ class _MultipleSelectWidgetState extends State<MultipleSelectWidget> {
         ),
       ),
     );
+  }
+}
+
+// Добавьте этот класс в конец файла (после всех виджетов)
+class _DashedTopBorderPainter extends CustomPainter {
+  final Color color;
+  final double strokeWidth;
+  final double dashWidth;
+  final double dashSpace;
+
+  _DashedTopBorderPainter({
+    required this.color,
+    required this.strokeWidth,
+    required this.dashWidth,
+    required this.dashSpace,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..strokeWidth = strokeWidth
+      ..style = PaintingStyle.stroke;
+
+    double x = 0;
+    while (x < size.width) {
+      canvas.drawLine(Offset(x, 0), Offset(x + dashWidth, 0), paint);
+      x += dashWidth + dashSpace;
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) {
+    return oldDelegate != this;
   }
 }

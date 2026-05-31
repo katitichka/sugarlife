@@ -4,20 +4,26 @@ import 'package:sugarlife/core/theme/app_color.dart';
 
 class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String? title;
+  final String? subtitle;
   final Widget? leading;
   final List<Widget>? actions;
   final double? titleFontSize;
   final FontWeight? titleFontWeight;
   final Color? backgroundColor;
+  final Color? titleColor;
+  final Color? iconColor;
 
   const MainAppBar({
     this.title,
-    super.key,
+    this.subtitle,
     this.actions,
     this.leading,
     this.titleFontSize,
     this.titleFontWeight,
     this.backgroundColor,
+    this.titleColor,
+    this.iconColor,
+    super.key,
   });
 
   @override
@@ -26,15 +32,31 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
       scrolledUnderElevation: 0,
       elevation: 0,
       backgroundColor: backgroundColor ?? AppColors.blue,
-      iconTheme: const IconThemeData(color: AppColors.white),
-      title: title != null
-          ? Text(
-              title!,
-              style: GoogleFonts.rubik(
-                fontSize: titleFontSize ?? 24,
-                fontWeight: titleFontWeight ?? FontWeight.w700,
-                color: AppColors.white,
-              ),
+      iconTheme: IconThemeData(color: iconColor ?? AppColors.white),
+      title: (title != null || subtitle != null)
+          ? Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                if (title != null)
+                  Text(
+                    title!,
+                    style: GoogleFonts.rubik(
+                      fontSize: titleFontSize ?? 24,
+                      fontWeight: titleFontWeight ?? FontWeight.w700,
+                      color: titleColor ?? AppColors.white,
+                    ),
+                  ),
+                if (subtitle != null)
+                  Text(
+                    subtitle!,
+                    style: GoogleFonts.rubik(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w500,
+                      color: (titleColor ?? AppColors.white),
+                    ),
+                  ),
+              ],
             )
           : null,
 

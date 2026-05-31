@@ -130,6 +130,8 @@ class _LoadedContent extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
+
+        
         Text(
           card.question,
           style: const TextStyle(fontSize: 18, height: 1.4),
@@ -218,7 +220,7 @@ class _AnsweredContent extends StatelessWidget {
         ),
         const SizedBox(height: 12),
         Text(
-          isCorrect ? 'Правильно! 🎉' : 'Неправильно 😔',
+          isCorrect ? 'Правильно!' : 'Неправильно',
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,

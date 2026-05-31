@@ -2,6 +2,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sugarlife/core/router/root_navigator.dart';
+import 'package:sugarlife/core/theme/app_color.dart';
 import 'package:sugarlife/features/achievement/domain/entities/achievement_entity.dart';
 import 'package:sugarlife/features/achievement/presentation/bloc/achievement_bloc.dart';
 import 'package:sugarlife/features/achievement/presentation/view/achievement_reward_dialog.dart';
@@ -27,7 +28,6 @@ class GameLevelContentPage extends StatelessWidget {
           case ReceiveSuccess():
             final successState = state;
             if (successState.currentIndex == -1
-            // && successState.progress?.isCompleted == true
             ) {
               return GameLevelStartLevelPage(levelId: levelId);
             } else {
@@ -55,6 +55,7 @@ class GameLevelContentPage extends StatelessWidget {
                   );
                 }
               },
+              levelId: levelId,
             );
           default:
             return const SizedBox.shrink();
@@ -69,7 +70,7 @@ class _LoadingPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(body: Center(child: LottieProgressIndicator()));
+    return const Scaffold(body: Center(child: LottieProgressIndicator()), backgroundColor: AppColors.background,);
   }
 }
 
@@ -83,8 +84,6 @@ class _ErrorPage extends StatelessWidget {
   }
 }
 
-/// Карточку показываем до `pop`: [AchievementBloc] + prefs могут не успеть
-/// синхронизироваться; при закрытии модуля передаём [unlockedOnThisRun] из блока.
 Future<void> _finishLevelWithAchievementCard(
   BuildContext context, {
   AchievementEntity? unlockedOnThisRun,

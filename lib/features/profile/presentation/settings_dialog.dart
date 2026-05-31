@@ -12,10 +12,7 @@ import 'package:sugarlife/features/profile/domain/repositories/profile_repositor
 class SettingsDialog extends StatelessWidget {
   final ProfileEntity profile;
 
-  const SettingsDialog({
-    super.key,
-    required this.profile,
-  });
+  const SettingsDialog({super.key, required this.profile});
 
   // Диалог изменения имени
   void _showEditNameDialog(BuildContext context, ProfileEntity currentProfile) {
@@ -54,15 +51,24 @@ class SettingsDialog extends StatelessWidget {
                   contentPadding: const EdgeInsets.all(10),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: AppColors.blue, width: 2),
+                    borderSide: const BorderSide(
+                      color: AppColors.blue,
+                      width: 2,
+                    ),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: AppColors.blue, width: 2),
+                    borderSide: const BorderSide(
+                      color: AppColors.blue,
+                      width: 2,
+                    ),
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: AppColors.blue, width: 2),
+                    borderSide: const BorderSide(
+                      color: AppColors.blue,
+                      width: 2,
+                    ),
                   ),
                 ),
                 style: GoogleFonts.rubik(
@@ -94,7 +100,8 @@ class SettingsDialog extends StatelessWidget {
                   TextButton(
                     onPressed: () async {
                       final newUsername = controller.text.trim();
-                      if (newUsername.isNotEmpty && newUsername != currentProfile.username) {
+                      if (newUsername.isNotEmpty &&
+                          newUsername != currentProfile.username) {
                         try {
                           await repository.updateUsername(newUsername);
                           if (!context.mounted) return;
@@ -107,9 +114,9 @@ class SettingsDialog extends StatelessWidget {
                           if (context.mounted) Navigator.pop(context);
                         } catch (e) {
                           if (!context.mounted) return;
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('Ошибка: $e')),
-                          );
+                          ScaffoldMessenger.of(
+                            context,
+                          ).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
                         }
                       } else {
                         Navigator.pop(context);
@@ -190,9 +197,10 @@ class SettingsDialog extends StatelessWidget {
                   ),
                   TextButton(
                     onPressed: () {
-                      Navigator.pop(context); // закрыть диалог выхода
-                      Navigator.pop(context); // закрыть SettingsDialog
-                      context.read<AuthBloc>().add(const AuthEvent.logoutPressed());
+                      
+                      context.read<AuthBloc>().add(
+                        const AuthEvent.logoutPressed(),
+                      );
                     },
                     style: TextButton.styleFrom(
                       padding: EdgeInsets.zero,
@@ -217,13 +225,10 @@ class SettingsDialog extends StatelessWidget {
     );
   }
 
-  Future<bool> _showAvatarSelectionSheet(BuildContext context, ProfileEntity currentProfile) async {
-    // Сначала закрываем SettingsDialog
-    if (context.mounted) {
-      Navigator.pop(context);
-    }
-    
-    // Открываем диалог выбора аватара
+  Future<bool> _showAvatarSelectionSheet(
+    BuildContext context,
+    ProfileEntity currentProfile,
+  ) async {
     final result = await showDialog<AvatarEntity>(
       context: context,
       barrierDismissible: true,
@@ -244,31 +249,37 @@ class SettingsDialog extends StatelessWidget {
         ),
       ),
     );
-    
+
     if (result != null) {
       try {
         final repository = context.read<ProfileRepository>();
         await repository.updateAvatar(result.id);
         if (!context.mounted) return false;
-        
+
         final updatedProfile = currentProfile.copyWith(
           currentAvatarId: result.id,
         );
         context.read<AuthBloc>().add(
           AuthEvent.profileUpdate(newProfile: updatedProfile),
         );
-        
+
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Аватар обновлён!')),
+            const SnackBar(
+              content: Text(
+                'Аватар обновлён!',
+                style: TextStyle(color: AppColors.blue),
+              ),
+              backgroundColor: AppColors.background,
+            ),
           );
+          return true;
         }
-        return true;
       } catch (e) {
         if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Ошибка: $e')),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
         }
       }
     }
@@ -291,11 +302,14 @@ class SettingsDialog extends StatelessWidget {
                 Container(
                   width: MediaQuery.of(context).size.width - 32,
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: AppColors.background,
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 4,
+                    ),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -312,8 +326,15 @@ class SettingsDialog extends StatelessWidget {
                         const Divider(height: 1.5, color: AppColors.blue),
                         _buildDialogItem(
                           onTap: () async {
-                            // Просто вызываем выбор аватара (SettingsDialog закроется внутри)
-                            await _showAvatarSelectionSheet(context, profile);
+                            final result = await _showAvatarSelectionSheet(
+                              context,
+                              profile,
+                            );
+                            if (result == true && context.mounted) {
+                              Navigator.pop(
+                                context,
+                              ); // закрываем SettingsDialog
+                            }
                           },
                           iconPath: 'assets/profile/edit_avatar.svg',
                           text: 'Изменить аватар',
