@@ -11,6 +11,8 @@ class GameLevelResultPage extends StatelessWidget {
   final int stars;
   final VoidCallback onFinish;
   final int levelId;
+  final int orderIndex;
+  final int theoryModuleId;
 
   const GameLevelResultPage({
     required this.correctAnswers,
@@ -18,6 +20,8 @@ class GameLevelResultPage extends StatelessWidget {
     required this.stars,
     required this.onFinish,
     required this.levelId,
+    required this.orderIndex,
+    required this.theoryModuleId,
     super.key,
   });
 
@@ -46,7 +50,7 @@ class GameLevelResultPage extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Text(
-            'Уровень $levelId', // тут orderIndex надо а не levelId
+            'Уровень $orderIndex', 
             style: GoogleFonts.rubik(
               fontSize: 32,
               fontWeight: FontWeight.w700,
@@ -55,7 +59,7 @@ class GameLevelResultPage extends StatelessWidget {
             textAlign: TextAlign.center,
           ),
           Text(
-            'модуль $levelId', // moduleId
+            'модуль $theoryModuleId', 
             style: GoogleFonts.rubik(
               fontSize: 24,
               fontWeight: FontWeight.w700,

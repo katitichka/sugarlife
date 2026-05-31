@@ -8,7 +8,14 @@ import 'package:sugarlife/shared/ui/main_app_bar.dart';
 
 class GameLevelStartLevelPage extends StatelessWidget {
   final int levelId;
-  const GameLevelStartLevelPage({required this.levelId, super.key});
+  final int orderIndex;
+  final int theoryModuleId;
+  const GameLevelStartLevelPage({
+    required this.levelId,
+    required this.orderIndex,
+    required this.theoryModuleId,
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -38,11 +45,15 @@ class GameLevelStartLevelPage extends StatelessWidget {
       body: isCompleted
           ? _CompletedLevelContent(
               levelId: levelId,
+              orderIndex: orderIndex,
+              theoryModuleId: theoryModuleId,
               stars: progress?.stars ?? 0,
               questionsCount: state.questions.length,
             )
           : _NewLevelContent(
               levelId: levelId,
+              orderIndex: orderIndex,
+              theoryModuleId: theoryModuleId,
               questionsCount: state.questions.length,
             ),
     );
@@ -52,11 +63,15 @@ class GameLevelStartLevelPage extends StatelessWidget {
 // Класс для пройденного уровня
 class _CompletedLevelContent extends StatelessWidget {
   final int levelId;
+  final int orderIndex;
+  final int theoryModuleId;
   final int stars;
   final int questionsCount;
 
   const _CompletedLevelContent({
     required this.levelId,
+    required this.orderIndex,
+    required this.theoryModuleId,
     required this.stars,
     required this.questionsCount,
   });
@@ -70,7 +85,7 @@ class _CompletedLevelContent extends StatelessWidget {
         children: [
           const SizedBox(height: 30),
           Text(
-            'Уровень $levelId', // тут orderIndex надо а не levelId
+            'Уровень $orderIndex',
             style: GoogleFonts.rubik(
               fontSize: 32,
               fontWeight: FontWeight.w700,
@@ -79,7 +94,7 @@ class _CompletedLevelContent extends StatelessWidget {
             textAlign: TextAlign.center,
           ),
           Text(
-            'модуль $levelId', // moduleId
+            'модуль $theoryModuleId',
             style: GoogleFonts.rubik(
               fontSize: 24,
               fontWeight: FontWeight.w700,
@@ -154,7 +169,7 @@ class _CompletedLevelContent extends StatelessWidget {
               ),
             ),
           ),
-          SizedBox(height: 50,),
+          SizedBox(height: 50),
         ],
       ),
     );
@@ -164,9 +179,11 @@ class _CompletedLevelContent extends StatelessWidget {
 // Класс для нового уровня
 class _NewLevelContent extends StatelessWidget {
   final int levelId;
+  final int orderIndex;
+  final int theoryModuleId;
   final int questionsCount;
 
-  const _NewLevelContent({required this.levelId, required this.questionsCount});
+  const _NewLevelContent({required this.levelId, required this.questionsCount, required this.orderIndex, required this.theoryModuleId});
 
   @override
   Widget build(BuildContext context) {
@@ -177,7 +194,7 @@ class _NewLevelContent extends StatelessWidget {
         children: [
           const SizedBox(height: 30),
           Text(
-            'Уровень $levelId', // orderIndex
+            'Уровень $orderIndex', // orderIndex
             style: const TextStyle(
               fontSize: 32,
               fontWeight: FontWeight.w700,
@@ -186,7 +203,7 @@ class _NewLevelContent extends StatelessWidget {
             textAlign: TextAlign.center,
           ),
           Text(
-            'модуль $levelId', // moduleId
+            'модуль $theoryModuleId', // moduleId
             style: const TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.w700,

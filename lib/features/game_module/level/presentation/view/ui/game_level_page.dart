@@ -10,7 +10,9 @@ import 'package:sugarlife/features/profile/domain/repositories/level_progress_re
 
 class GameLevelPage extends StatelessWidget {
   final int levelId;
-  const GameLevelPage({required this.levelId, super.key});
+  final int orderIndex;
+  final int theoryModuleId;
+  const GameLevelPage({required this.levelId, required this.orderIndex, required this.theoryModuleId, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +25,7 @@ class GameLevelPage extends StatelessWidget {
         gameModuleListBloc: context.read<GameModuleListBloc>(),
         achievementRepository: context.read<AchievementRepository>(),
       )..add(GameModuleLevelEvent.receive(levelId: levelId)),
-      child: GameLevelContentPage(levelId: levelId),
+      child: GameLevelContentPage(levelId: levelId, orderIndex: orderIndex, theoryModuleId: theoryModuleId,),
     );
   }
 }

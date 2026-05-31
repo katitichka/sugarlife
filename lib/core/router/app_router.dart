@@ -91,9 +91,14 @@ final appRoute = GoRouter(
                   name: 'gameLevel',
                   builder: (context, state) {
                     final levelId = int.parse(state.pathParameters['levelId']!);
+                    final extra = state.extra as Map<String, int>?;
+                    final orderIndex = extra?['orderIndex'] ?? 0;
+                    final theoryModuleId = extra?['theoryModuleId'] ?? 0;
                     return GameModuleLevelProvider(
                       child: GameLevelPage(
                         levelId: levelId,
+                        orderIndex: orderIndex,
+                        theoryModuleId: theoryModuleId,
                       ),
                     );
                   },

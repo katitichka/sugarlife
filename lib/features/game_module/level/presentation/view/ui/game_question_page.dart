@@ -11,7 +11,8 @@ import 'package:sugarlife/shared/ui/lottie_progress_indicator.dart';
 import 'package:sugarlife/shared/ui/main_app_bar.dart';
 
 class GameQuestionPage extends StatefulWidget {
-  const GameQuestionPage({super.key});
+  final int levelOrderIndex;
+  const GameQuestionPage({required this.levelOrderIndex, super.key});
 
   @override
   State<GameQuestionPage> createState() => _GameQuestionPageState();
@@ -94,9 +95,7 @@ class _GameQuestionPageState extends State<GameQuestionPage> {
       backgroundColor: AppColors.background,
       appBar: MainAppBar(
         backgroundColor: AppColors.background,
-        title: currentQuestion?.levelId != null
-            ? 'Уровень ${currentQuestion!.levelId}'
-            : 'Объяснение',
+        title: 'Уровень ${widget.levelOrderIndex}',
         titleColor: AppColors.blue,
         titleFontSize: 18,
         subtitle: 'Задание $currentQuestionNumber',
@@ -210,91 +209,97 @@ class _GameQuestionPageState extends State<GameQuestionPage> {
     );
   }
 
-Widget _buildExplantationOverlay(
-  BuildContext context,
-  AnswerInProgress state,
-) {
-  return DottedBorder(
-    options: RoundedRectDottedBorderOptions(
-      dashPattern: [14, 14],
-      strokeWidth: 12,
-      radius: const Radius.circular(20),
-      color: state.isCorrect ? AppColors.green : AppColors.red,
-      padding: const EdgeInsets.all(0),
-    ),
-    child: ClipRRect(
-      borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-      child: Container(
-        padding: const EdgeInsets.all(20),
-        color: state.isCorrect ? AppColors.backgroundGreen : AppColors.backgroundRed,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              state.isCorrect ? Icons.check_circle : Icons.cancel,
-              color: state.isCorrect ? AppColors.green : AppColors.red,
-              size: 48,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              state.isCorrect ? 'ПРАВИЛЬНО!' : 'НЕПРАВИЛЬНО',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w800,
+  Widget _buildExplantationOverlay(
+    BuildContext context,
+    AnswerInProgress state,
+  ) {
+    return DottedBorder(
+      options: RoundedRectDottedBorderOptions(
+        dashPattern: [14, 14],
+        strokeWidth: 12,
+        radius: const Radius.circular(20),
+        color: state.isCorrect ? AppColors.green : AppColors.red,
+        padding: const EdgeInsets.all(0),
+      ),
+      child: ClipRRect(
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          color: state.isCorrect
+              ? AppColors.backgroundGreen
+              : AppColors.backgroundRed,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                state.isCorrect ? Icons.check_circle : Icons.cancel,
                 color: state.isCorrect ? AppColors.green : AppColors.red,
+                size: 48,
               ),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Объяснение: ${state.explanation}',
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                color: AppColors.blue,
-                fontSize: 17,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Правильный ответ: ${state.correctAnswer}',
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontWeight: FontWeight.w600,
-                fontSize: 17,
-                color: AppColors.blue,
-              ),
-            ),
-            const SizedBox(height: 24),
-            SizedBox(
-              height: 70,
-              child: ElevatedButton(
-                onPressed: () {
-                  context.read<GameModuleLevelBloc>().add(
-                    GameModuleLevelEvent.nextQuestion(),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.blue,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(70),
-                  ),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
-                  child: const Text(
-                    'ДАЛЕЕ',
-                    style: TextStyle(fontSize: 32, color: AppColors.background, fontWeight: FontWeight.w600),
-                  ),
+              const SizedBox(height: 8),
+              Text(
+                state.isCorrect ? 'ПРАВИЛЬНО!' : 'НЕПРАВИЛЬНО',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w800,
+                  color: state.isCorrect ? AppColors.green : AppColors.red,
                 ),
               ),
-            ),
-            const SizedBox(height: 20),
-          ],
+              const SizedBox(height: 16),
+              Text(
+                'Объяснение: ${state.explanation}',
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  color: AppColors.blue,
+                  fontSize: 17,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Правильный ответ: ${state.correctAnswer}',
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 17,
+                  color: AppColors.blue,
+                ),
+              ),
+              const SizedBox(height: 24),
+              SizedBox(
+                height: 70,
+                child: ElevatedButton(
+                  onPressed: () {
+                    context.read<GameModuleLevelBloc>().add(
+                      GameModuleLevelEvent.nextQuestion(),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.blue,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(70),
+                    ),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    child: const Text(
+                      'ДАЛЕЕ',
+                      style: TextStyle(
+                        fontSize: 32,
+                        color: AppColors.background,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+            ],
+          ),
         ),
       ),
-    ),
-  );
-}
+    );
+  }
 
   void _handleAnswer(BuildContext context, QuestionType type, dynamic answer) {
     switch (type) {

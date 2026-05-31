@@ -338,7 +338,6 @@ class GameModuleLevelBloc
     if (!isModuleCompleted) {
       return null;
     }
-    
     // Проверяем, не выдавалось ли уже достижение за этот модуль
     // Используем SharedPreferences
     final prefs = await SharedPreferences.getInstance();

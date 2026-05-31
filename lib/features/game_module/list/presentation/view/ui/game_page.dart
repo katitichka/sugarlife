@@ -175,9 +175,15 @@ class _GamePageState extends State<GamePage> {
     );
   }
 
-  Future<void> _navigateToLevel(int levelId) async {
+  Future<void> _navigateToLevel(int levelId, int orderIndex, int theoryModuleId) async {
     final achievementBloc = context.read<AchievementBloc>();
-    final result = await context.push('/game/level/$levelId');
+    final result = await context.push(
+  '/game/level/${levelId}',
+  extra: {
+    'orderIndex': orderIndex,
+    'theoryModuleId': theoryModuleId,
+  },
+);;
     if (!mounted) return;
     if (result == true) {
       achievementBloc.add(
@@ -243,6 +249,7 @@ class _GamePageState extends State<GamePage> {
   Widget _buildLevelButton({
     required int levelId,
     required int orderIndex,
+    required int theoryModuleId,
     required bool isAccessible,
     required bool isCompleted,
     required double left,
@@ -277,7 +284,7 @@ class _GamePageState extends State<GamePage> {
             setState(() {
               _pressedStates[levelId] = false;
             });
-            _navigateToLevel(levelId);
+            _navigateToLevel(levelId, orderIndex, theoryModuleId);
           },
           onTapCancel: () {
             setState(() {
@@ -397,6 +404,7 @@ class _GamePageState extends State<GamePage> {
         _buildLevelButton(
           levelId: level.id,
           orderIndex: level.orderIndex,
+          theoryModuleId: level.theoryModuleId,
           isAccessible: isAccessible,
           isCompleted: isCompleted,
           left: pos.dx,

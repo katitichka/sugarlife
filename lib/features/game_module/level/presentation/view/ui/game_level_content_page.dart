@@ -14,7 +14,14 @@ import 'package:sugarlife/shared/ui/lottie_progress_indicator.dart';
 
 class GameLevelContentPage extends StatelessWidget {
   final int levelId;
-  const GameLevelContentPage({required this.levelId});
+  final int orderIndex;
+  final int theoryModuleId;
+  const GameLevelContentPage({
+    super.key,
+    required this.levelId,
+    required this.theoryModuleId,
+    required this.orderIndex,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -27,14 +34,17 @@ class GameLevelContentPage extends StatelessWidget {
             return _ErrorPage(message: message);
           case ReceiveSuccess():
             final successState = state;
-            if (successState.currentIndex == -1
-            ) {
-              return GameLevelStartLevelPage(levelId: levelId);
+            if (successState.currentIndex == -1) {
+              return GameLevelStartLevelPage(
+                levelId: levelId,
+                orderIndex: orderIndex,
+                theoryModuleId: theoryModuleId,
+              );
             } else {
-              return const GameQuestionPage();
+              return GameQuestionPage(levelOrderIndex: orderIndex,);
             }
           case AnswerInProgress():
-            return const GameQuestionPage();
+            return GameQuestionPage(levelOrderIndex: orderIndex,);
           case LevelCompleted(
             :final correctAnswers,
             :final totalQuestions,
@@ -56,6 +66,8 @@ class GameLevelContentPage extends StatelessWidget {
                 }
               },
               levelId: levelId,
+              orderIndex: orderIndex,
+              theoryModuleId: theoryModuleId,
             );
           default:
             return const SizedBox.shrink();
@@ -70,7 +82,10 @@ class _LoadingPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(body: Center(child: LottieProgressIndicator()), backgroundColor: AppColors.background,);
+    return const Scaffold(
+      body: Center(child: LottieProgressIndicator()),
+      backgroundColor: AppColors.background,
+    );
   }
 }
 
@@ -92,8 +107,9 @@ Future<void> _finishLevelWithAchievementCard(
 
   Future<void> showReward(AchievementEntity achievement) async {
     final rootCtx = rootNavigatorKey.currentContext;
-    final dialogContext =
-        (rootCtx != null && rootCtx.mounted) ? rootCtx : context;
+    final dialogContext = (rootCtx != null && rootCtx.mounted)
+        ? rootCtx
+        : context;
     if (!dialogContext.mounted) return;
     await showDialog<void>(
       context: dialogContext,
