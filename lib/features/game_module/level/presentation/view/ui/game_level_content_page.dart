@@ -41,10 +41,10 @@ class GameLevelContentPage extends StatelessWidget {
                 theoryModuleId: theoryModuleId,
               );
             } else {
-              return GameQuestionPage(levelOrderIndex: orderIndex,);
+              return GameQuestionPage(levelOrderIndex: orderIndex);
             }
           case AnswerInProgress():
-            return GameQuestionPage(levelOrderIndex: orderIndex,);
+            return GameQuestionPage(levelOrderIndex: orderIndex);
           case LevelCompleted(
             :final correctAnswers,
             :final totalQuestions,
@@ -114,6 +114,7 @@ Future<void> _finishLevelWithAchievementCard(
     await showDialog<void>(
       context: dialogContext,
       barrierDismissible: false,
+      barrierColor: AppColors.blue.withValues(alpha: 0.4),
       builder: (_) => AchievementRewardDialog(achievement: achievement),
     );
   }

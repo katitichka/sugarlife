@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:lottie/lottie.dart';
 import 'package:sugarlife/core/theme/app_color.dart';
 import 'package:sugarlife/features/daily_card/data/repositories/daily_card_repository_impl.dart';
 import 'package:sugarlife/features/daily_card/domain/entities/daily_card_entity.dart';
@@ -31,7 +34,7 @@ class DailyCardScreen extends StatelessWidget {
                   children: [
                     const Dialog(
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(20)),
+                        borderRadius: BorderRadius.all(Radius.circular(32)),
                       ),
                       child: _DialogContent(),
                     ),
@@ -59,8 +62,8 @@ class DailyCardScreen extends StatelessWidget {
                             padding: EdgeInsets.zero,
                             child: Icon(
                               Icons.cancel,
-                              color: AppColors.white,
-                              size: 40,
+                              color: AppColors.background,
+                              size: 45,
                             ),
                           ),
                         ),
@@ -87,8 +90,9 @@ class _DialogContent extends StatelessWidget {
         return Container(
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(20),
+            color: AppColors.background,
+            border: Border.all(color: AppColors.blue, width: 4),
+            borderRadius: BorderRadius.circular(32),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -130,11 +134,22 @@ class _LoadedContent extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-
-        
+        SizedBox(
+          width: 190,
+          height: 95,
+          child: SvgPicture.asset(
+            'assets/common/daily_icon.svg',
+            fit: BoxFit.contain,
+          ),
+        ),
+        const SizedBox(height: 24),
         Text(
           card.question,
-          style: const TextStyle(fontSize: 18, height: 1.4),
+          style: GoogleFonts.rubik(
+            fontSize: 18,
+            fontWeight: FontWeight.w500,
+            color: AppColors.blue,
+          ),
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 24),
@@ -144,9 +159,9 @@ class _LoadedContent extends StatelessWidget {
             children: [
               Expanded(
                 child: _AnswerButton(
-                  text: 'Правда',
+                  text: 'правда',
                   isCorrect: !card.isMyth,
-                  color: Colors.green,
+                  color: AppColors.green,
                   onPressed: () {
                     context.read<DailyCardBloc>().add(
                       DailyCardEvent.answerCard(
@@ -161,9 +176,9 @@ class _LoadedContent extends StatelessWidget {
               const SizedBox(width: 12),
               Expanded(
                 child: _AnswerButton(
-                  text: 'Ложь',
+                  text: 'миф',
                   isCorrect: card.isMyth,
-                  color: Colors.red,
+                  color: AppColors.red,
                   onPressed: () {
                     context.read<DailyCardBloc>().add(
                       DailyCardEvent.answerCard(
@@ -178,11 +193,6 @@ class _LoadedContent extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 12),
-          Text(
-            'Выберите "Правда" если утверждение верно, или "Ложь" если неверно',
-            style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-            textAlign: TextAlign.center,
-          ),
         ],
         if (hasAnsweredToday)
           Container(
@@ -275,11 +285,11 @@ class _AnswerButton extends StatelessWidget {
         backgroundColor: color,
         foregroundColor: Colors.white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        padding: const EdgeInsets.symmetric(vertical: 12),
+        padding: const EdgeInsets.symmetric(vertical: 10),
       ),
       child: Text(
         text,
-        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        style: GoogleFonts.rubik(fontSize: 22, fontWeight: FontWeight.w500),
       ),
     );
   }

@@ -70,7 +70,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   AnimatedSettingsButton(
                     onPressed: () => showDialog(
                       context: context,
-                      barrierColor: Colors.black.withValues(alpha: 0.6),
+                      barrierColor: AppColors.blue.withValues(alpha: 0.4),
                       barrierDismissible: true,
                       builder: (_) => SettingsDialog(profile: profile),
                     ),

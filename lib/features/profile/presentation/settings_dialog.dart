@@ -15,135 +15,169 @@ class SettingsDialog extends StatelessWidget {
   const SettingsDialog({super.key, required this.profile});
 
   // Диалог изменения имени
-  void _showEditNameDialog(BuildContext context, ProfileEntity currentProfile) {
-    final controller = TextEditingController(text: currentProfile.username);
-    final repository = context.read<ProfileRepository>();
+  // Диалог изменения имени - обновите метод _showEditNameDialog
+void _showEditNameDialog(BuildContext context, ProfileEntity currentProfile) {
+  final controller = TextEditingController(text: currentProfile.username);
+  final repository = context.read<ProfileRepository>();
 
-    showDialog(
-      context: context,
-      builder: (context) => Dialog(
-        insetPadding: const EdgeInsets.symmetric(horizontal: 44),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Изменить имя',
-                style: GoogleFonts.rubik(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.blue,
-                ),
+  showDialog(
+    context: context,
+    builder: (context) => Dialog(
+      insetPadding: const EdgeInsets.symmetric(horizontal: 44),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Изменить имя',
+              style: GoogleFonts.rubik(
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
+                color: AppColors.blue,
               ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: controller,
-                decoration: InputDecoration(
-                  hintText: 'Введите новое имя',
-                  hintStyle: GoogleFonts.rubik(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w400,
-                    color: AppColors.blue,
-                  ),
-                  contentPadding: const EdgeInsets.all(10),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(
-                      color: AppColors.blue,
-                      width: 2,
-                    ),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(
-                      color: AppColors.blue,
-                      width: 2,
-                    ),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(
-                      color: AppColors.blue,
-                      width: 2,
-                    ),
-                  ),
-                ),
-                style: GoogleFonts.rubik(
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: controller,
+              decoration: InputDecoration(
+                hintText: 'Введите новое имя',
+                hintStyle: GoogleFonts.rubik(
                   fontSize: 14,
-                  fontWeight: FontWeight.w500,
+                  fontWeight: FontWeight.w400,
                   color: AppColors.blue,
                 ),
+                contentPadding: const EdgeInsets.all(10),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(
+                    color: AppColors.blue,
+                    width: 2,
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(
+                    color: AppColors.blue,
+                    width: 2,
+                  ),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(
+                    color: AppColors.blue,
+                    width: 2,
+                  ),
+                ),
               ),
-              const SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  TextButton(
-                    onPressed: () => Navigator.pop(context),
-                    style: TextButton.styleFrom(
-                      padding: EdgeInsets.zero,
-                      minimumSize: Size.zero,
-                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    ),
-                    child: Text(
-                      'Отмена',
-                      style: GoogleFonts.rubik(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.grey,
-                      ),
+              style: GoogleFonts.rubik(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: AppColors.blue,
+              ),
+            ),
+            const SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  style: TextButton.styleFrom(
+                    padding: EdgeInsets.zero,
+                    minimumSize: Size.zero,
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  ),
+                  child: Text(
+                    'Отмена',
+                    style: GoogleFonts.rubik(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.grey,
                     ),
                   ),
-                  TextButton(
-                    onPressed: () async {
-                      final newUsername = controller.text.trim();
-                      if (newUsername.isNotEmpty &&
-                          newUsername != currentProfile.username) {
-                        try {
-                          await repository.updateUsername(newUsername);
-                          if (!context.mounted) return;
-                          final updatedProfile = currentProfile.copyWith(
-                            username: newUsername,
+                ),
+                TextButton(
+                  onPressed: () async {
+                    final newUsername = controller.text.trim();
+                    if (newUsername.isNotEmpty &&
+                        newUsername != currentProfile.username) {
+                      try {
+                        await repository.updateUsername(newUsername);
+                        if (!context.mounted) return;
+                        final updatedProfile = currentProfile.copyWith(
+                          username: newUsername,
+                        );
+                        context.read<AuthBloc>().add(
+                          AuthEvent.profileUpdate(newProfile: updatedProfile),
+                        );
+                        if (context.mounted) {
+                          Navigator.pop(context); // закрываем диалог
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                'Имя изменено!',
+                                style: GoogleFonts.rubik(
+                                  color: AppColors.blue,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                              backgroundColor: AppColors.background,
+                              behavior: SnackBarBehavior.floating,
+                              margin: const EdgeInsets.all(16),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
                           );
-                          context.read<AuthBloc>().add(
-                            AuthEvent.profileUpdate(newProfile: updatedProfile),
-                          );
-                          if (context.mounted) Navigator.pop(context);
-                        } catch (e) {
-                          if (!context.mounted) return;
-                          ScaffoldMessenger.of(
-                            context,
-                          ).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
                         }
-                      } else {
-                        Navigator.pop(context);
+                      } catch (e) {
+                        if (!context.mounted) return;
+                        ScaffoldMessenger.of(
+                          context,
+                        ).showSnackBar(
+                          SnackBar(
+                            content: Text('Ошибка: $e'),
+                            backgroundColor: AppColors.red,
+                          ),
+                        );
                       }
-                    },
-                    style: TextButton.styleFrom(
-                      padding: EdgeInsets.zero,
-                      minimumSize: Size.zero,
-                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    ),
-                    child: Text(
-                      'Изменить',
-                      style: GoogleFonts.rubik(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                        color: AppColors.blue,
-                      ),
+                    } else if (newUsername == currentProfile.username) {
+                      Navigator.pop(context);
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Имя не может быть пустым'),
+                          backgroundColor: AppColors.red,
+                        ),
+                      );
+                    }
+                  },
+                  style: TextButton.styleFrom(
+                    padding: EdgeInsets.zero,
+                    minimumSize: Size.zero,
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  ),
+                  child: Text(
+                    'Изменить',
+                    style: GoogleFonts.rubik(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      color: AppColors.blue,
                     ),
                   ),
-                ],
-              ),
-            ],
-          ),
+                ),
+              ],
+            ),
+          ],
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 
   // Диалог выхода
   void _showLogoutDialog(BuildContext context) {
@@ -224,68 +258,82 @@ class SettingsDialog extends StatelessWidget {
       ),
     );
   }
-
-  Future<bool> _showAvatarSelectionSheet(
-    BuildContext context,
-    ProfileEntity currentProfile,
-  ) async {
-    final result = await showDialog<AvatarEntity>(
-      context: context,
-      barrierDismissible: true,
-      builder: (context) => Dialog(
-        insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(44)),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(44),
-          child: ConstrainedBox(
-            constraints: BoxConstraints(
-              maxWidth: MediaQuery.of(context).size.width * 0.9,
-              maxHeight: MediaQuery.of(context).size.height * 0.75,
-            ),
-            child: ChooseAvatarPage(
-              currentAvatarId: currentProfile.currentAvatarId,
-            ),
+Future<bool> _showAvatarSelectionSheet(
+  BuildContext context,
+  ProfileEntity currentProfile,
+) async {
+  final result = await showDialog<AvatarEntity>(
+    context: context,
+    barrierDismissible: true,
+    barrierColor: AppColors.blue.withValues(alpha: 0.4),
+    builder: (context) => Dialog(
+      insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(44)),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(44),
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxWidth: MediaQuery.of(context).size.width * 0.9,
+            maxHeight: MediaQuery.of(context).size.height * 0.75,
+          ),
+          child: ChooseAvatarPage(
+            currentAvatarId: currentProfile.currentAvatarId,
           ),
         ),
       ),
-    );
+    ),
+  );
 
-    if (result != null) {
-      try {
-        final repository = context.read<ProfileRepository>();
-        await repository.updateAvatar(result.id);
-        if (!context.mounted) return false;
+  if (result != null) {
+    try {
+      final repository = context.read<ProfileRepository>();
+      await repository.updateAvatar(result.id);
+      if (!context.mounted) return false;
 
-        final updatedProfile = currentProfile.copyWith(
-          currentAvatarId: result.id,
-        );
-        context.read<AuthBloc>().add(
-          AuthEvent.profileUpdate(newProfile: updatedProfile),
-        );
+      final updatedProfile = currentProfile.copyWith(
+        currentAvatarId: result.id,
+      );
+      context.read<AuthBloc>().add(
+        AuthEvent.profileUpdate(newProfile: updatedProfile),
+      );
 
-        if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text(
-                'Аватар обновлён!',
-                style: TextStyle(color: AppColors.blue),
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Аватар обновлён!',
+              style: GoogleFonts.rubik(
+                color: AppColors.blue,
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
               ),
-              backgroundColor: AppColors.background,
+              textAlign: TextAlign.center,
             ),
-          );
-          return true;
-        }
-      } catch (e) {
-        if (context.mounted) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
-        }
+            backgroundColor: AppColors.background,
+            behavior: SnackBarBehavior.floating,
+            margin: const EdgeInsets.all(16),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+        );
+        return true;
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(
+          SnackBar(
+            content: Text('Ошибка: $e'),
+            backgroundColor: AppColors.red,
+          ),
+        );
       }
     }
-    return false;
   }
-
+  return false;
+}
   @override
   Widget build(BuildContext context) {
     return GestureDetector(

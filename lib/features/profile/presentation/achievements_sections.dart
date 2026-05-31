@@ -81,7 +81,8 @@ class _AchievementsSectionState extends State<AchievementsSection> {
                       itemBuilder: (context, pageIndex) {
                         final startIndex = pageIndex * 2;
                         final endIndex = startIndex + 2;
-                        final pageAchievements = achievements.length > startIndex
+                        final pageAchievements =
+                            achievements.length > startIndex
                             ? achievements.sublist(
                                 startIndex,
                                 endIndex > achievements.length
@@ -107,12 +108,16 @@ class _AchievementsSectionState extends State<AchievementsSection> {
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 4,
+                                  ),
                                   child: SizedBox(
                                     width: 100,
                                     height: 100,
                                     child: achievement != null
-                                        ? _AchievementIcon(url: achievement.imageUrl)
+                                        ? _AchievementIcon(
+                                            url: achievement.imageUrl,
+                                          )
                                         : const _AchievementPlaceholderCard(),
                                   ),
                                 ),
@@ -160,14 +165,25 @@ class _AchievementPlaceholderCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(14),
-      child: SvgPicture.asset(
-        'assets/achievements/plug.svg',
-        width: 68,
-        height: 68,
-        fit: BoxFit.contain,
-      ),
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.end,
+      mainAxisSize: MainAxisSize.min, 
+      children: [
+        SizedBox(
+          width: 100,
+          height: 100,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(14),
+            child: SvgPicture.asset(
+              'assets/achievements/plug.svg',
+              width: 100,
+              height: 100,
+              fit: BoxFit.contain,
+              alignment: Alignment.bottomCenter,
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
@@ -177,31 +193,63 @@ class _AchievementIcon extends StatelessWidget {
 
   final String url;
 
-  static Widget _placeholder() => SvgPicture.asset(
-    'assets/achievements/plug.svg',
-    width: 68,
-    height: 68,
-    fit: BoxFit.contain,
+  static Widget _placeholder() => Column(
+    mainAxisAlignment: MainAxisAlignment.end,
+      mainAxisSize: MainAxisSize.min,
+    children: [
+      SizedBox(
+        width: 100,
+        height: 100,
+        child: SvgPicture.asset(
+          'assets/achievements/plug.svg',
+          width: 100,
+          height: 100,
+          fit: BoxFit.contain,
+          alignment: Alignment.bottomCenter,
+        ),
+      ),
+    ],
   );
 
-  @override
+   @override
   Widget build(BuildContext context) {
-    if (url.toLowerCase().endsWith('.svg')) {
-      return SvgPicture.network(
-        url,
-        width: 68,
-        height: 68,
-        fit: BoxFit.contain,
-        placeholderBuilder: (_) => _placeholder(),
-      );
-    }
-    return CachedNetworkImage(
-      imageUrl: url,
-      width: 68,
-      height: 68,
-      fit: BoxFit.contain,
-      placeholder: (_, __) => _placeholder(),
-      errorWidget: (_, __, ___) => _placeholder(),
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.end,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (url.toLowerCase().endsWith('.svg'))
+          SizedBox(
+            width: 100,
+            height: 100,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(14),
+              child: SvgPicture.network(
+                url,
+                width: 100,
+                height: 100,
+                fit: BoxFit.contain,
+                placeholderBuilder: (_) => _placeholder(),
+              ),
+            ),
+          )
+        else
+          SizedBox(
+            width: 100,
+            height: 100,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(14),
+              child: CachedNetworkImage(
+                imageUrl: url,
+                width: 100,
+                height: 100,
+                fit: BoxFit.contain,
+                placeholder: (_, __) => _placeholder(),
+                errorWidget: (_, __, ___) => _placeholder(),
+              ),
+            ),
+          ),
+      ],
     );
   }
+
 }

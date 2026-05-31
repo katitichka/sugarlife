@@ -56,7 +56,7 @@ class _GamePageState extends State<GamePage> {
   final ScrollController _scrollController = ScrollController();
   bool _isAchievementDialogVisible = false;
   int? _lastHandledAchievementId;
-  
+
   final Map<int, bool> _pressedStates = {};
 
   static List<GameModuleLevelEntity> _orderedLevels(
@@ -98,6 +98,7 @@ class _GamePageState extends State<GamePage> {
       await showDialog<void>(
         context: dialogContext,
         barrierDismissible: false,
+        barrierColor: AppColors.blue.withValues(alpha: 0.4),
         builder: (_) => AchievementRewardDialog(achievement: achievement),
       );
       if (!mounted) return;
@@ -175,29 +176,25 @@ class _GamePageState extends State<GamePage> {
     );
   }
 
-  Future<void> _navigateToLevel(int levelId, int orderIndex, int theoryModuleId) async {
+  Future<void> _navigateToLevel(
+    int levelId,
+    int orderIndex,
+    int theoryModuleId,
+  ) async {
     final achievementBloc = context.read<AchievementBloc>();
     final result = await context.push(
-  '/game/level/${levelId}',
-  extra: {
-    'orderIndex': orderIndex,
-    'theoryModuleId': theoryModuleId,
-  },
-);;
+      '/game/level/${levelId}',
+      extra: {'orderIndex': orderIndex, 'theoryModuleId': theoryModuleId},
+    );
+    ;
     if (!mounted) return;
     if (result == true) {
-      achievementBloc.add(
-        const AchievementEvent.checkPendingAchievement(),
-      );
-      achievementBloc.add(
-        const AchievementEvent.loadAchievements(),
-      );
+      achievementBloc.add(const AchievementEvent.checkPendingAchievement());
+      achievementBloc.add(const AchievementEvent.loadAchievements());
       WidgetsBinding.instance.addPostFrameCallback((_) async {
         await Future<void>.delayed(const Duration(milliseconds: 150));
         if (!mounted) return;
-        await _showAchievementDialog(
-          context.read<AchievementBloc>().state,
-        );
+        await _showAchievementDialog(context.read<AchievementBloc>().state);
       });
     }
   }
@@ -226,9 +223,7 @@ class _GamePageState extends State<GamePage> {
       child: Container(
         width: _GameMapMetrics.circleSize,
         height: _GameMapMetrics.circleSize,
-        decoration: const BoxDecoration(
-          shape: BoxShape.circle,
-        ),
+        decoration: const BoxDecoration(shape: BoxShape.circle),
         child: Padding(
           padding: const EdgeInsets.only(bottom: 10),
           child: Center(
@@ -256,7 +251,7 @@ class _GamePageState extends State<GamePage> {
     required double top,
   }) {
     final isPressed = _pressedStates[levelId] ?? false;
-    
+
     String assetPath;
     if (isCompleted) {
       assetPath = 'assets/levels/completed_level.svg';
@@ -555,6 +550,7 @@ class _GamePageState extends State<GamePage> {
               showDialog(
                 context: context,
                 barrierDismissible: false,
+                barrierColor: AppColors.blue.withValues(alpha: 0.4),
                 builder: (_) => const DailyCardScreen(),
               );
             },

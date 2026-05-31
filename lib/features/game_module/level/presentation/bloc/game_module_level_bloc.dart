@@ -21,6 +21,7 @@ class GameModuleLevelBloc
   final LevelProgressRepository _levelProgressRepository;
   final GameModuleListBloc _gameModuleListBloc;
   final AchievementRepository _achievementRepository;
+   bool _isCompletingLevel = false;
   GameModuleLevelBloc({
     required GameModuleLevelRepository gameModuleLevelRepository,
     required GameModuleLevelListRepository gameModuleLevelListRepository,
@@ -224,93 +225,117 @@ class GameModuleLevelBloc
       ),
     );
   }
+Future<void> _nextQuestions({
+  required Emitter<GameModuleLevelState> emit,
+}) async {
+  if (_isCompletingLevel) {
+    print('=== УЖЕ В ПРОЦЕССЕ ЗАВЕРШЕНИЯ ===');
+    return;
+  }
+  
+  int currentIndex;
+  List<GameModuleQuestionEntity> questions;
+  LevelProgressEntity? progress;
+  Map<int, bool> answers;
+  Map<int, String> characterImages;
 
-  Future<void> _nextQuestions({
-    required Emitter<GameModuleLevelState> emit,
-  }) async {
-    int currentIndex;
-    List<GameModuleQuestionEntity> questions;
-    LevelProgressEntity? progress;
-    Map<int, bool> answers;
-    Map<int, String> characterImages;
+  if (state is ReceiveSuccess) {
+    final successState = state as ReceiveSuccess;
+    currentIndex = successState.currentIndex;
+    questions = successState.questions;
+    progress = successState.progress;
+    answers = successState.answers;
+    characterImages = successState.characterImages;
+  } else if (state is AnswerInProgress) {
+    final answerState = state as AnswerInProgress;
+    currentIndex = answerState.currentIndex;
+    questions = answerState.questions;
+    progress = answerState.progress;
+    answers = answerState.answers;
+    characterImages = answerState.characterImages;
+  } else {
+    print('=== НЕПОДХОДЯЩЕЕ СОСТОЯНИЕ: ${state.runtimeType} ===');
+    return;
+  }
 
-    if (state is ReceiveSuccess) {
-      final successState = state as ReceiveSuccess;
-      currentIndex = successState.currentIndex;
-      questions = successState.questions;
-      progress = successState.progress;
-      answers = successState.answers;
-      characterImages = successState.characterImages;
-    } else if (state is AnswerInProgress) {
-      final answerState = state as AnswerInProgress;
-      currentIndex = answerState.currentIndex;
-      questions = answerState.questions;
-      progress = answerState.progress;
-      answers = answerState.answers;
-      characterImages = answerState.characterImages;
+  print('=== NEXT QUESTION ===');
+  print('currentIndex: $currentIndex');
+  print('totalQuestions: ${questions.length}');
+  print('answers: $answers');
+
+  final nextIndex = currentIndex + 1;
+  
+  if (nextIndex < questions.length) {
+    print('=== ПЕРЕХОД К ВОПРОСУ ${nextIndex + 1} ===');
+    emit(
+      ReceiveSuccess(
+        questions: questions,
+        currentIndex: nextIndex,
+        progress: progress,
+        isAnswered: false,
+        answers: answers,
+        characterImages: characterImages,
+      ),
+    );
+  } else {
+    // Завершаем уровень
+    print('=== ЗАВЕРШЕНИЕ УРОВНЯ ===');
+    _isCompletingLevel = true;
+    
+    final correctCount = answers.values.where((correct) => correct).length;
+    print('correctCount: $correctCount из ${questions.length}');
+    
+    int stars;
+    if (correctCount >= 3) {
+      stars = 3;
+    } else if (correctCount == 2) {
+      stars = 2;
+    } else if (correctCount == 1) {
+      stars = 1;
     } else {
-      return;
+      stars = 0;
     }
-
-    final nextIndex = currentIndex + 1;
-    if (nextIndex < questions.length) {
-      emit(
-        ReceiveSuccess(
-          questions: questions,
-          currentIndex: nextIndex,
-          progress: progress,
-          isAnswered: false,
-          answers: answers,
-          characterImages: characterImages,
-        ),
+    print('stars: $stars');
+    
+    // Сохраняем прогресс (обновляем даже если уже был пройден)
+    await _levelProgressRepository.saveLevelProgress(
+      levelId: questions.first.levelId,
+      stars: stars,
+      correctAnswers: correctCount,
+    );
+    
+    // Проверяем достижения (только если модуль полностью пройден)
+    AchievementEntity? unlockedAchievement;
+    if (stars > 0) {
+      unlockedAchievement = await _checkAndUnlockAchievement(
+        levelId: questions.first.levelId,
       );
-    } else {
-      final correctCount = answers.values.where((correct) => correct).length;
-      print('=== РАСЧЁТ ЗВЁЗД ===');
-      print('correctCount: $correctCount');
-      print('answers: $answers');
-      int stars;
-      if (correctCount >= 3) {
-        stars = 3;
-      } else if (correctCount == 2) {
-        stars = 2;
-      } else if (correctCount == 1) {
-        stars = 1;
-      } else {
-        stars = 0;
-      }
-      await _levelProgressRepository.saveLevelProgress(
+    }
+    
+    // Обновляем список уровней в GameModuleListBloc
+    _gameModuleListBloc.add(
+      GameModuleListEvent.levelCompleted(
         levelId: questions.first.levelId,
         stars: stars,
         correctAnswers: correctCount,
-      );
-      AchievementEntity? unlockedAchievement;
-      if (stars > 0) {
-        unlockedAchievement = await _checkAndUnlockAchievement(
-          levelId: questions.first.levelId,
-        );
-      }
-      _gameModuleListBloc.add(
-        GameModuleListEvent.levelCompleted(
-          levelId: questions.first.levelId,
-          stars: stars,
-          correctAnswers: correctCount,
-          totalQuestions: questions.length,
-        ),
-      );
-      emit(
-        LevelCompleted(
-          levelId: questions.first.levelId,
-          correctAnswers: correctCount,
-          totalQuestions: questions.length,
-          stars: stars,
-          unlockedAchievement: unlockedAchievement,
-        ),
-      );
-    }
+        totalQuestions: questions.length,
+      ),
+    );
+    
+    emit(
+      LevelCompleted(
+        levelId: questions.first.levelId,
+        correctAnswers: correctCount,
+        totalQuestions: questions.length,
+        stars: stars,
+        unlockedAchievement: unlockedAchievement,
+      ),
+    );
+    
+    _isCompletingLevel = false;
   }
-
-  Future<AchievementEntity?> _checkAndUnlockAchievement({
+}
+Future<AchievementEntity?> _checkAndUnlockAchievement({
   required int levelId,
 }) async {
   try {
@@ -338,8 +363,8 @@ class GameModuleLevelBloc
     if (!isModuleCompleted) {
       return null;
     }
+    
     // Проверяем, не выдавалось ли уже достижение за этот модуль
-    // Используем SharedPreferences
     final prefs = await SharedPreferences.getInstance();
     final key = 'achievement_given_for_module_${currentLevel.theoryModuleId}';
     final alreadyGiven = prefs.getBool(key) ?? false;
