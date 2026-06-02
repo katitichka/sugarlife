@@ -8,6 +8,7 @@ sealed class DailyCardEvent with _$DailyCardEvent {
     required int cardId,
     required bool isCorrect,
     required String explanation,
+    required bool isMyth,
   }) = _AnswerCard;
   
   const factory DailyCardEvent.close() = _Close;

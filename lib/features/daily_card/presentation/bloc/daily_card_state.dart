@@ -14,6 +14,7 @@ sealed class DailyCardState with _$DailyCardState {
   const factory DailyCardState.answered({
     required bool isCorrect,
     required String explanation,
+    required bool isMyth,
   }) = Answered;
   
   const factory DailyCardState.noMoreCards() = NoMoreCards;

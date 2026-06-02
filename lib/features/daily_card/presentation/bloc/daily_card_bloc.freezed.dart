@@ -131,13 +131,13 @@ return error(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  initial,TResult Function()?  loading,TResult Function( DailyCardEntity card,  bool hasAnsweredToday)?  loaded,TResult Function( bool isCorrect,  String explanation)?  answered,TResult Function()?  noMoreCards,TResult Function( String message)?  error,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  initial,TResult Function()?  loading,TResult Function( DailyCardEntity card,  bool hasAnsweredToday)?  loaded,TResult Function( bool isCorrect,  String explanation,  bool isMyth)?  answered,TResult Function()?  noMoreCards,TResult Function( String message)?  error,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Initial() when initial != null:
 return initial();case Loading() when loading != null:
 return loading();case Loaded() when loaded != null:
 return loaded(_that.card,_that.hasAnsweredToday);case Answered() when answered != null:
-return answered(_that.isCorrect,_that.explanation);case NoMoreCards() when noMoreCards != null:
+return answered(_that.isCorrect,_that.explanation,_that.isMyth);case NoMoreCards() when noMoreCards != null:
 return noMoreCards();case Error() when error != null:
 return error(_that.message);case _:
   return orElse();
@@ -157,13 +157,13 @@ return error(_that.message);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  initial,required TResult Function()  loading,required TResult Function( DailyCardEntity card,  bool hasAnsweredToday)  loaded,required TResult Function( bool isCorrect,  String explanation)  answered,required TResult Function()  noMoreCards,required TResult Function( String message)  error,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  initial,required TResult Function()  loading,required TResult Function( DailyCardEntity card,  bool hasAnsweredToday)  loaded,required TResult Function( bool isCorrect,  String explanation,  bool isMyth)  answered,required TResult Function()  noMoreCards,required TResult Function( String message)  error,}) {final _that = this;
 switch (_that) {
 case _Initial():
 return initial();case Loading():
 return loading();case Loaded():
 return loaded(_that.card,_that.hasAnsweredToday);case Answered():
-return answered(_that.isCorrect,_that.explanation);case NoMoreCards():
+return answered(_that.isCorrect,_that.explanation,_that.isMyth);case NoMoreCards():
 return noMoreCards();case Error():
 return error(_that.message);}
 }
@@ -179,13 +179,13 @@ return error(_that.message);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  initial,TResult? Function()?  loading,TResult? Function( DailyCardEntity card,  bool hasAnsweredToday)?  loaded,TResult? Function( bool isCorrect,  String explanation)?  answered,TResult? Function()?  noMoreCards,TResult? Function( String message)?  error,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  initial,TResult? Function()?  loading,TResult? Function( DailyCardEntity card,  bool hasAnsweredToday)?  loaded,TResult? Function( bool isCorrect,  String explanation,  bool isMyth)?  answered,TResult? Function()?  noMoreCards,TResult? Function( String message)?  error,}) {final _that = this;
 switch (_that) {
 case _Initial() when initial != null:
 return initial();case Loading() when loading != null:
 return loading();case Loaded() when loaded != null:
 return loaded(_that.card,_that.hasAnsweredToday);case Answered() when answered != null:
-return answered(_that.isCorrect,_that.explanation);case NoMoreCards() when noMoreCards != null:
+return answered(_that.isCorrect,_that.explanation,_that.isMyth);case NoMoreCards() when noMoreCards != null:
 return noMoreCards();case Error() when error != null:
 return error(_that.message);case _:
   return null;
@@ -340,11 +340,12 @@ $DailyCardEntityCopyWith<$Res> get card {
 
 
 class Answered implements DailyCardState {
-  const Answered({required this.isCorrect, required this.explanation});
+  const Answered({required this.isCorrect, required this.explanation, required this.isMyth});
   
 
  final  bool isCorrect;
  final  String explanation;
+ final  bool isMyth;
 
 /// Create a copy of DailyCardState
 /// with the given fields replaced by the non-null parameter values.
@@ -356,16 +357,16 @@ $AnsweredCopyWith<Answered> get copyWith => _$AnsweredCopyWithImpl<Answered>(thi
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Answered&&(identical(other.isCorrect, isCorrect) || other.isCorrect == isCorrect)&&(identical(other.explanation, explanation) || other.explanation == explanation));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Answered&&(identical(other.isCorrect, isCorrect) || other.isCorrect == isCorrect)&&(identical(other.explanation, explanation) || other.explanation == explanation)&&(identical(other.isMyth, isMyth) || other.isMyth == isMyth));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,isCorrect,explanation);
+int get hashCode => Object.hash(runtimeType,isCorrect,explanation,isMyth);
 
 @override
 String toString() {
-  return 'DailyCardState.answered(isCorrect: $isCorrect, explanation: $explanation)';
+  return 'DailyCardState.answered(isCorrect: $isCorrect, explanation: $explanation, isMyth: $isMyth)';
 }
 
 
@@ -376,7 +377,7 @@ abstract mixin class $AnsweredCopyWith<$Res> implements $DailyCardStateCopyWith<
   factory $AnsweredCopyWith(Answered value, $Res Function(Answered) _then) = _$AnsweredCopyWithImpl;
 @useResult
 $Res call({
- bool isCorrect, String explanation
+ bool isCorrect, String explanation, bool isMyth
 });
 
 
@@ -393,11 +394,12 @@ class _$AnsweredCopyWithImpl<$Res>
 
 /// Create a copy of DailyCardState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') $Res call({Object? isCorrect = null,Object? explanation = null,}) {
+@pragma('vm:prefer-inline') $Res call({Object? isCorrect = null,Object? explanation = null,Object? isMyth = null,}) {
   return _then(Answered(
 isCorrect: null == isCorrect ? _self.isCorrect : isCorrect // ignore: cast_nullable_to_non_nullable
 as bool,explanation: null == explanation ? _self.explanation : explanation // ignore: cast_nullable_to_non_nullable
-as String,
+as String,isMyth: null == isMyth ? _self.isMyth : isMyth // ignore: cast_nullable_to_non_nullable
+as bool,
   ));
 }
 
@@ -613,11 +615,11 @@ return close(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  loadTodayCard,TResult Function( int cardId,  bool isCorrect,  String explanation)?  answerCard,TResult Function()?  close,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  loadTodayCard,TResult Function( int cardId,  bool isCorrect,  String explanation,  bool isMyth)?  answerCard,TResult Function()?  close,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _LoadTodayCard() when loadTodayCard != null:
 return loadTodayCard();case _AnswerCard() when answerCard != null:
-return answerCard(_that.cardId,_that.isCorrect,_that.explanation);case _Close() when close != null:
+return answerCard(_that.cardId,_that.isCorrect,_that.explanation,_that.isMyth);case _Close() when close != null:
 return close();case _:
   return orElse();
 
@@ -636,11 +638,11 @@ return close();case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  loadTodayCard,required TResult Function( int cardId,  bool isCorrect,  String explanation)  answerCard,required TResult Function()  close,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  loadTodayCard,required TResult Function( int cardId,  bool isCorrect,  String explanation,  bool isMyth)  answerCard,required TResult Function()  close,}) {final _that = this;
 switch (_that) {
 case _LoadTodayCard():
 return loadTodayCard();case _AnswerCard():
-return answerCard(_that.cardId,_that.isCorrect,_that.explanation);case _Close():
+return answerCard(_that.cardId,_that.isCorrect,_that.explanation,_that.isMyth);case _Close():
 return close();}
 }
 /// A variant of `when` that fallback to returning `null`
@@ -655,11 +657,11 @@ return close();}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  loadTodayCard,TResult? Function( int cardId,  bool isCorrect,  String explanation)?  answerCard,TResult? Function()?  close,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  loadTodayCard,TResult? Function( int cardId,  bool isCorrect,  String explanation,  bool isMyth)?  answerCard,TResult? Function()?  close,}) {final _that = this;
 switch (_that) {
 case _LoadTodayCard() when loadTodayCard != null:
 return loadTodayCard();case _AnswerCard() when answerCard != null:
-return answerCard(_that.cardId,_that.isCorrect,_that.explanation);case _Close() when close != null:
+return answerCard(_that.cardId,_that.isCorrect,_that.explanation,_that.isMyth);case _Close() when close != null:
 return close();case _:
   return null;
 
@@ -704,12 +706,13 @@ String toString() {
 
 
 class _AnswerCard implements DailyCardEvent {
-  const _AnswerCard({required this.cardId, required this.isCorrect, required this.explanation});
+  const _AnswerCard({required this.cardId, required this.isCorrect, required this.explanation, required this.isMyth});
   
 
  final  int cardId;
  final  bool isCorrect;
  final  String explanation;
+ final  bool isMyth;
 
 /// Create a copy of DailyCardEvent
 /// with the given fields replaced by the non-null parameter values.
@@ -721,16 +724,16 @@ _$AnswerCardCopyWith<_AnswerCard> get copyWith => __$AnswerCardCopyWithImpl<_Ans
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _AnswerCard&&(identical(other.cardId, cardId) || other.cardId == cardId)&&(identical(other.isCorrect, isCorrect) || other.isCorrect == isCorrect)&&(identical(other.explanation, explanation) || other.explanation == explanation));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _AnswerCard&&(identical(other.cardId, cardId) || other.cardId == cardId)&&(identical(other.isCorrect, isCorrect) || other.isCorrect == isCorrect)&&(identical(other.explanation, explanation) || other.explanation == explanation)&&(identical(other.isMyth, isMyth) || other.isMyth == isMyth));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,cardId,isCorrect,explanation);
+int get hashCode => Object.hash(runtimeType,cardId,isCorrect,explanation,isMyth);
 
 @override
 String toString() {
-  return 'DailyCardEvent.answerCard(cardId: $cardId, isCorrect: $isCorrect, explanation: $explanation)';
+  return 'DailyCardEvent.answerCard(cardId: $cardId, isCorrect: $isCorrect, explanation: $explanation, isMyth: $isMyth)';
 }
 
 
@@ -741,7 +744,7 @@ abstract mixin class _$AnswerCardCopyWith<$Res> implements $DailyCardEventCopyWi
   factory _$AnswerCardCopyWith(_AnswerCard value, $Res Function(_AnswerCard) _then) = __$AnswerCardCopyWithImpl;
 @useResult
 $Res call({
- int cardId, bool isCorrect, String explanation
+ int cardId, bool isCorrect, String explanation, bool isMyth
 });
 
 
@@ -758,12 +761,13 @@ class __$AnswerCardCopyWithImpl<$Res>
 
 /// Create a copy of DailyCardEvent
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') $Res call({Object? cardId = null,Object? isCorrect = null,Object? explanation = null,}) {
+@pragma('vm:prefer-inline') $Res call({Object? cardId = null,Object? isCorrect = null,Object? explanation = null,Object? isMyth = null,}) {
   return _then(_AnswerCard(
 cardId: null == cardId ? _self.cardId : cardId // ignore: cast_nullable_to_non_nullable
 as int,isCorrect: null == isCorrect ? _self.isCorrect : isCorrect // ignore: cast_nullable_to_non_nullable
 as bool,explanation: null == explanation ? _self.explanation : explanation // ignore: cast_nullable_to_non_nullable
-as String,
+as String,isMyth: null == isMyth ? _self.isMyth : isMyth // ignore: cast_nullable_to_non_nullable
+as bool,
   ));
 }
 

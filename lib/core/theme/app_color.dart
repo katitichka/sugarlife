@@ -12,5 +12,8 @@ class AppColors {
   static const Color background = Color.fromRGBO(250, 243, 235, 1);
   static const Color backgroundGreen = Color.fromRGBO(238, 255, 229, 1);
   static const Color backgroundRed = Color.fromRGBO(255, 233, 229, 1);
-
+  static const Color truth = Color.fromRGBO(50, 255, 105, 1);
+  static const Color myth = Color.fromRGBO(243, 68, 86, 1);
+  static const Color darkBlue = Color.fromRGBO(64, 153, 219, 1);
+  static const Color error = Color.fromRGBO(233, 78, 94, 1);
 }

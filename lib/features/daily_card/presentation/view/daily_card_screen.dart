@@ -103,10 +103,11 @@ class _DialogContent extends StatelessWidget {
                   card: card,
                   hasAnsweredToday: hasAnsweredToday,
                 ),
-                Answered(:final isCorrect, :final explanation) =>
+                Answered(:final isCorrect, :final explanation, :final isMyth) =>
                   _AnsweredContent(
                     isCorrect: isCorrect,
                     explanation: explanation,
+                    isMyth: isMyth,
                   ),
                 NoMoreCards() => const Text(
                   'Карточки закончились, но скоро появятся новые факты!',
@@ -168,6 +169,7 @@ class _LoadedContent extends StatelessWidget {
                         cardId: card.id,
                         isCorrect: !card.isMyth,
                         explanation: card.explanation,
+                        isMyth: card.isMyth,
                       ),
                     );
                   },
@@ -185,6 +187,7 @@ class _LoadedContent extends StatelessWidget {
                         cardId: card.id,
                         isCorrect: card.isMyth,
                         explanation: card.explanation,
+                        isMyth: card.isMyth,
                       ),
                     );
                   },
@@ -215,50 +218,66 @@ class _LoadedContent extends StatelessWidget {
 class _AnsweredContent extends StatelessWidget {
   final bool isCorrect;
   final String explanation;
+  final bool isMyth;
 
-  const _AnsweredContent({required this.isCorrect, required this.explanation});
+  const _AnsweredContent({
+    required this.isCorrect,
+    required this.explanation,
+    required this.isMyth,
+  });
 
   @override
   Widget build(BuildContext context) {
+    String resultText;
+    String animationPath;
+    if (isCorrect) {
+      resultText = isMyth ? 'ВЕРНО\n ЭТО МИФ' : 'ВЕРНО\n ЭТО ПРАВДА';
+      animationPath = 'assets/animations/correct_animation.json'; 
+    } else {
+      resultText = isMyth ? 'НЕВЕРНО\n ЭТО МИФ' : 'НЕВЕРНО\n ЭТО ПРАВДА';
+      animationPath = 'assets/animations/wrong_animation.json';
+    }
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(
-          isCorrect ? Icons.check_circle : Icons.cancel,
-          color: isCorrect ? Colors.green : Colors.red,
-          size: 48,
+        SizedBox(
+          width: 190,
+          height: 95,
+          child: Lottie.asset(
+            animationPath,
+            repeat: false,
+            fit: BoxFit.contain,
+          ),
         ),
-        const SizedBox(height: 12),
         Text(
-          isCorrect ? 'Правильно!' : 'Неправильно',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: isCorrect ? Colors.green : Colors.red,
+          resultText,
+          textAlign: TextAlign.center,
+          style: GoogleFonts.rubik(
+            fontSize: 25,
+            fontWeight: FontWeight.w700,
+            color: isCorrect ? AppColors.truth : AppColors.myth,
           ),
         ),
-        const SizedBox(height: 16),
-        Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: Colors.blue[50],
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Column(
-            children: [
-              const Text(
-                'Объяснение:',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                explanation,
-                textAlign: TextAlign.center,
-                style: const TextStyle(height: 1.4),
-              ),
-            ],
+        const SizedBox(height: 8),
+        Text(
+          'ОБЪЯСНЕНИЕ',
+          style: GoogleFonts.rubik(
+            fontWeight: FontWeight.w700,
+            color: AppColors.darkBlue,
+            fontSize: 17,
           ),
         ),
+        const SizedBox(height: 22),
+        Text(
+          explanation,
+          textAlign: TextAlign.center,
+          style: GoogleFonts.rubik(
+            fontWeight: FontWeight.w500,
+            color: AppColors.darkBlue,
+            fontSize: 17,
+          ),
+        ),
+        const SizedBox(height: 22),
       ],
     );
   }
