@@ -88,7 +88,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       Text(
                         profile.username,
                         style: GoogleFonts.rubik(
-                          color: AppColors.white,
+                          color: AppColors.background,
                           fontSize: 30,
                           fontWeight: FontWeight.w700,
                         ),
@@ -114,7 +114,7 @@ class _ProfilePageState extends State<ProfilePage> {
                               return const Center(
                                 child: Icon(
                                   Icons.error_outline,
-                                  color: Colors.white,
+                                  color: AppColors.background,
                                   size: 48,
                                 ),
                               );
@@ -142,7 +142,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                       const Center(
                                         child: Icon(
                                           Icons.error_outline,
-                                          color: Colors.white,
+                                          color: AppColors.background,
                                           size: 48,
                                         ),
                                       ),
@@ -157,7 +157,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         child: Text(
                           'Достижения',
                           style: TextStyle(
-                            color: AppColors.white,
+                            color: AppColors.background,
                             fontSize: 30,
                             fontWeight: FontWeight.w500,
                           ),

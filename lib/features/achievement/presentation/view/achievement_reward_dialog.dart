@@ -30,7 +30,7 @@ class _AchievementRewardDialogState extends State<AchievementRewardDialog> {
             width: double.infinity,
             padding: const EdgeInsets.fromLTRB(24, 32, 24, 24),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AppColors.background,
               borderRadius: BorderRadius.circular(28),
             ),
             child: Column(

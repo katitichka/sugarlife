@@ -128,7 +128,7 @@ class GameLevelResultPage extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 32,
                   fontWeight: FontWeight.w700,
-                  color: AppColors.white,
+                  color: AppColors.background,
                 ),
                 textAlign: TextAlign.center,
               ),

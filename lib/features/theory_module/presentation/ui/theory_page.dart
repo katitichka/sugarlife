@@ -133,13 +133,13 @@ class _ErrorPage extends StatelessWidget {
           const Text(
             'Не удалось загрузить теоретические модули',
             textAlign: TextAlign.center,
-            style: TextStyle(color: Colors.white, fontSize: 16),
+            style: TextStyle(color: AppColors.background, fontSize: 16),
           ),
           const SizedBox(height: 8),
           const Text(
             'Проверьте подключение к интернету',
             textAlign: TextAlign.center,
-            style: TextStyle(color: Colors.white70, fontSize: 14),
+            style: TextStyle(color: AppColors.background, fontSize: 14),
           ),
           const SizedBox(height: 20),
           if (onRetry != null)
@@ -147,7 +147,7 @@ class _ErrorPage extends StatelessWidget {
               onPressed: onRetry,
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.blue,
-                foregroundColor: Colors.white,
+                foregroundColor: AppColors.background,
               ),
               child: const Text('Повторить'),
             ),

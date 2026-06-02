@@ -35,7 +35,7 @@ class GameLevelStartLevelPage extends StatelessWidget {
           icon: const Icon(
             Icons.arrow_circle_left_outlined,
             color: AppColors.blue,
-            size: 35,
+            size: 40,
           ),
           onPressed: () {
             Navigator.of(context).pop();
@@ -162,7 +162,7 @@ class _CompletedLevelContent extends StatelessWidget {
                     style: GoogleFonts.rubik(
                       fontSize: 22,
                       fontWeight: FontWeight.w700,
-                      color: AppColors.white,
+                      color: AppColors.background,
                     ),
                   ),
                 ),
@@ -277,7 +277,7 @@ class _NewLevelContent extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 32,
                       fontWeight: FontWeight.w700,
-                      color: AppColors.white,
+                      color: AppColors.background,
                     ),
                     textAlign: TextAlign.center,
                   ),

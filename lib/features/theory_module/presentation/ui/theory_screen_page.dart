@@ -21,6 +21,7 @@ class TheoryScreenPage extends StatelessWidget {
     return Scaffold(
       appBar: MainAppBar(
         backgroundColor: AppColors.white,
+        leading: null,
         actions: [
           IconButton(
             icon: const Icon(Icons.cancel_outlined),
@@ -90,7 +91,7 @@ class TheoryScreenPage extends StatelessWidget {
                               ),
                               Positioned(
                                 right: 0,
-                                bottom: 0,
+                                bottom: -5,
                                 child: ClipRRect(
                                   borderRadius: const BorderRadius.only(
                                     bottomRight: Radius.circular(24),

@@ -232,7 +232,7 @@ class _GamePageState extends State<GamePage> {
               style: GoogleFonts.rubik(
                 fontSize: 36,
                 fontWeight: FontWeight.w500,
-                color: Colors.white,
+                color: AppColors.background,
               ),
             ),
           ),
@@ -354,7 +354,7 @@ class _GamePageState extends State<GamePage> {
               children: [
                 const Expanded(
                   child: Divider(
-                    color: AppColors.white,
+                    color: AppColors.background,
                     thickness: 1.5,
                     endIndent: 12,
                   ),
@@ -366,13 +366,13 @@ class _GamePageState extends State<GamePage> {
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
-                      color: AppColors.white,
+                      color: AppColors.background,
                     ),
                   ),
                 ),
                 const Expanded(
                   child: Divider(
-                    color: AppColors.white,
+                    color: AppColors.background,
                     thickness: 1.5,
                     indent: 12,
                   ),
@@ -422,7 +422,7 @@ class _GamePageState extends State<GamePage> {
             children: [
               const Expanded(
                 child: Divider(
-                  color: AppColors.white,
+                  color: AppColors.background,
                   thickness: 1.5,
                   endIndent: 12,
                 ),
@@ -434,13 +434,13 @@ class _GamePageState extends State<GamePage> {
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
-                    color: AppColors.white,
+                    color: AppColors.background,
                   ),
                 ),
               ),
               const Expanded(
                 child: Divider(
-                  color: AppColors.white,
+                  color: AppColors.background,
                   thickness: 1.5,
                   indent: 12,
                 ),

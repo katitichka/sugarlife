@@ -51,8 +51,8 @@ class _AchievementsSectionState extends State<AchievementsSection> {
                     constraints: const BoxConstraints(),
                     icon: const Icon(
                       Icons.arrow_circle_left_outlined,
-                      color: AppColors.white,
-                      size: 35,
+                      color: AppColors.background,
+                      size: 40,
                     ),
                     onPressed: _currentPage > 0
                         ? () {
@@ -137,7 +137,7 @@ class _AchievementsSectionState extends State<AchievementsSection> {
                     constraints: const BoxConstraints(),
                     icon: const Icon(
                       Icons.arrow_circle_right_outlined,
-                      color: AppColors.white,
+                      color: AppColors.background,
                       size: 35,
                     ),
                     onPressed: _currentPage < _totalPages - 1

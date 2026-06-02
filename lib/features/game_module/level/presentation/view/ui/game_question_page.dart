@@ -104,7 +104,7 @@ class _GameQuestionPageState extends State<GameQuestionPage> {
           icon: const Icon(
             Icons.arrow_circle_left_outlined,
             color: AppColors.blue,
-            size: 35,
+            size: 40,
           ),
           onPressed: () {
             Navigator.of(context).pop();
@@ -119,24 +119,26 @@ class _GameQuestionPageState extends State<GameQuestionPage> {
                 SizedBox(height: 40),
                 _buildQuestionHeader(currentQuestion, characterImages),
                 SizedBox(height: 30),
-                _buildAnswer(
-                  currentQuestion,
-                  selectionLocked: selectionLocked,
-                  onStringAnswerSelected: (answer) {
-                    if (selectionLocked) return;
-                    setState(() => _selectedStringAnswer = answer);
-                  },
-                  onBoolAnswerSelected: (answer) {
-                    if (selectionLocked) return;
-                    setState(() => _selectedBoolAnswer = answer);
-                  },
-                  onMultipleSelectSelected: (indices) {
-                    if (selectionLocked) return;
-                    setState(() => _selectedMultipleSelectAnswer = indices);
-                  },
-                  selectedStringAnswer: _selectedStringAnswer,
-                  selectedBoolAnswer: _selectedBoolAnswer,
-                  selectedMultipleSelectAnswer: _selectedMultipleSelectAnswer,
+                Expanded(
+                  child: _buildAnswer(
+                    currentQuestion,
+                    selectionLocked: selectionLocked,
+                    onStringAnswerSelected: (answer) {
+                      if (selectionLocked) return;
+                      setState(() => _selectedStringAnswer = answer);
+                    },
+                    onBoolAnswerSelected: (answer) {
+                      if (selectionLocked) return;
+                      setState(() => _selectedBoolAnswer = answer);
+                    },
+                    onMultipleSelectSelected: (indices) {
+                      if (selectionLocked) return;
+                      setState(() => _selectedMultipleSelectAnswer = indices);
+                    },
+                    selectedStringAnswer: _selectedStringAnswer,
+                    selectedBoolAnswer: _selectedBoolAnswer,
+                    selectedMultipleSelectAnswer: _selectedMultipleSelectAnswer,
+                  ),
                 ),
 
                 _buildButton(
@@ -213,89 +215,106 @@ class _GameQuestionPageState extends State<GameQuestionPage> {
     BuildContext context,
     AnswerInProgress state,
   ) {
-    return DottedBorder(
-      options: RoundedRectDottedBorderOptions(
-        dashPattern: [14, 14],
-        strokeWidth: 12,
-        radius: const Radius.circular(20),
-        color: state.isCorrect ? AppColors.green : AppColors.red,
-        padding: const EdgeInsets.all(0),
-      ),
-      child: ClipRRect(
+    return Container(
+      decoration: BoxDecoration(
+        color: state.isCorrect
+            ? AppColors.backgroundGreen
+            : AppColors.backgroundRed,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-        child: Container(
-          padding: const EdgeInsets.all(20),
-          color: state.isCorrect
-              ? AppColors.backgroundGreen
-              : AppColors.backgroundRed,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                state.isCorrect ? Icons.check_circle : Icons.cancel,
-                color: state.isCorrect ? AppColors.green : AppColors.red,
-                size: 48,
-              ),
-              const SizedBox(height: 8),
-              Text(
-                state.isCorrect ? 'ПРАВИЛЬНО!' : 'НЕПРАВИЛЬНО',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w800,
-                  color: state.isCorrect ? AppColors.green : AppColors.red,
-                ),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                'Объяснение: ${state.explanation}',
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  color: AppColors.blue,
-                  fontSize: 17,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                'Правильный ответ: ${state.correctAnswer}',
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 17,
-                  color: AppColors.blue,
-                ),
-              ),
-              const SizedBox(height: 24),
-              SizedBox(
-                height: 70,
-                child: ElevatedButton(
-                  onPressed: () {
-                    context.read<GameModuleLevelBloc>().add(
-                      GameModuleLevelEvent.nextQuestion(),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.blue,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(70),
-                    ),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
-                    child: const Text(
-                      'ДАЛЕЕ',
-                      style: TextStyle(
-                        fontSize: 32,
-                        color: AppColors.background,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 20),
-            ],
+        border: Border(
+          top: BorderSide(
+            color: state.isCorrect ? AppColors.green : AppColors.red,
+            width: 6,
           ),
+        ),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              state.isCorrect ? Icons.check_circle : Icons.cancel,
+              color: state.isCorrect ? AppColors.green : AppColors.red,
+              size: 48,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              state.isCorrect ? 'ПРАВИЛЬНО!' : 'НЕПРАВИЛЬНО',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w800,
+                color: state.isCorrect ? AppColors.green : AppColors.red,
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Объяснение:',
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                color: AppColors.blue,
+                fontSize: 17,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            Text(
+              '${state.explanation}',
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                color: AppColors.blue,
+                fontSize: 17,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Правильный ответ:',
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontWeight: FontWeight.w700,
+                fontSize: 17,
+                color: AppColors.blue,
+              ),
+            ),
+            Text(
+              '${state.correctAnswer}',
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontWeight: FontWeight.w500,
+                fontSize: 17,
+                color: AppColors.blue,
+              ),
+            ),
+            const SizedBox(height: 24),
+            SizedBox(
+              height: 70,
+              child: ElevatedButton(
+                onPressed: () {
+                  context.read<GameModuleLevelBloc>().add(
+                    GameModuleLevelEvent.nextQuestion(),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.blue,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(70),
+                  ),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  child: const Text(
+                    'ДАЛЕЕ',
+                    style: TextStyle(
+                      fontSize: 32,
+                      color: AppColors.background,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+          ],
         ),
       ),
     );
@@ -346,12 +365,12 @@ class _GameQuestionPageState extends State<GameQuestionPage> {
         },
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.blue, // Цвет фона кнопки
-          foregroundColor: AppColors.white, // Цвет текста и иконок
+          foregroundColor: AppColors.background, // Цвет текста и иконок
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(70),
           ),
           disabledBackgroundColor: AppColors.grey,
-          disabledForegroundColor: AppColors.white,
+          disabledForegroundColor: AppColors.background,
         ),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -424,22 +443,20 @@ class MultipleChoiceWidget extends StatelessWidget {
     final useSingleColumn = question.answers.any(_isLongAnswer);
 
     if (useSingleColumn) {
-      return Expanded(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            children: question.answers.map((answer) {
-              final isSelected = answer == selectedAnswer;
-              return Padding(
-                padding: const EdgeInsets.only(bottom: 12),
-                child: _buildAnswerCard(
-                  answer: answer,
-                  isSelected: isSelected,
-                  isCompact: false,
-                ),
-              );
-            }).toList(),
-          ),
+      return SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: question.answers.map((answer) {
+            final isSelected = answer == selectedAnswer;
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: _buildAnswerCard(
+                answer: answer,
+                isSelected: isSelected,
+                isCompact: false,
+              ),
+            );
+          }).toList(),
         ),
       );
     }
@@ -566,7 +583,7 @@ class TrueFalseWidget extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 16),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.blue : Colors.white,
+          color: isSelected ? AppColors.blue : AppColors.background,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: isSelected ? AppColors.blue : Colors.grey,
@@ -577,7 +594,7 @@ class TrueFalseWidget extends StatelessWidget {
           child: Text(
             answer,
             style: TextStyle(
-              color: isSelected ? Colors.white : Colors.black87,
+              color: isSelected ? AppColors.background : Colors.black87,
               fontSize: 16,
               fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
             ),
@@ -587,7 +604,6 @@ class TrueFalseWidget extends StatelessWidget {
     );
   }
 }
-
 class FillBlankWidget extends StatefulWidget {
   final GameModuleQuestionEntity question;
   final bool selectionLocked;
@@ -606,53 +622,90 @@ class FillBlankWidget extends StatefulWidget {
 class _FillBlankWidgetState extends State<FillBlankWidget> {
   final TextEditingController _controller = TextEditingController();
   String? _errorText;
+  final FocusNode _focusNode = FocusNode();
 
   @override
   void dispose() {
     _controller.dispose();
+    _focusNode.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        children: [
-          TextField(
-            controller: _controller,
-            readOnly: widget.selectionLocked,
-            decoration: InputDecoration(
-              hintText: 'Введите ответ...',
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
+    return SingleChildScrollView(
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom,
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            GestureDetector(
+              onTap: () => _focusNode.requestFocus(),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: AppColors.background,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: AppColors.blue,
+                    width: 3,
+                  ),
+                ),
+                child: TextField(
+                  controller: _controller,
+                  focusNode: _focusNode,
+                  readOnly: widget.selectionLocked,
+                  style: GoogleFonts.comme(
+                    color: AppColors.blue,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  decoration: InputDecoration(
+                    hintText: 'Введите ответ...',
+                    hintStyle: GoogleFonts.rubik(
+                      color: AppColors.blue,
+                      fontSize: 20,
+                      fontWeight: FontWeight.w400,
+                    ),
+                    border: InputBorder.none,
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 14,
+                    ),
+                    errorText: _errorText,
+                    errorStyle: GoogleFonts.rubik(
+                      color: Colors.red,
+                      fontSize: 12,
+                    ),
+                  ),
+                  onChanged: widget.selectionLocked
+                      ? null
+                      : (value) {
+                          if (value.trim().isNotEmpty) {
+                            setState(() => _errorText = null);
+                            widget.onAnswerSelected(value.trim());
+                          } else {
+                            widget.onAnswerSelected('');
+                          }
+                        },
+                ),
               ),
-              filled: true,
-              fillColor: Colors.white,
-              errorText: _errorText,
             ),
-            onChanged: widget.selectionLocked
-                ? null
-                : (value) {
-                    if (value.trim().isNotEmpty) {
-                      setState(() => _errorText = null);
-                      widget.onAnswerSelected(value.trim());
-                    } else {
-                      widget.onAnswerSelected('');
-                    }
-                  },
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Введите слово или фразу в поле выше',
-            style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
-          ),
-        ],
+            const SizedBox(height: 8),
+            Text(
+              'Введите слово или фразу в поле выше',
+              style: GoogleFonts.rubik(
+                fontSize: 12,
+                color: AppColors.blue.withOpacity(0.7),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 }
-
 class MultipleSelectWidget extends StatefulWidget {
   final GameModuleQuestionEntity question;
   final bool selectionLocked;
@@ -690,101 +743,90 @@ class _MultipleSelectWidgetState extends State<MultipleSelectWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: List.generate(widget.question.answers.length, (index) {
-            final isSelected = _selectedIndices.contains(index);
-            return GestureDetector(
-              onTap: widget.selectionLocked
-                  ? null
-                  : () {
-                      setState(() {
-                        if (isSelected) {
-                          _selectedIndices.remove(index);
-                        } else {
-                          _selectedIndices.add(index);
-                        }
-                      });
-                      widget.onAnswerSelected(_selectedIndices.toList());
-                    },
-              child: Container(
-                margin: const EdgeInsets.only(bottom: 12),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 14,
-                ),
-                decoration: BoxDecoration(
-                  color: isSelected ? AppColors.blue : Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: isSelected ? AppColors.blue : Colors.grey.shade300,
-                    width: isSelected ? 2 : 1,
-                  ),
-                ),
-                child: Row(
-                  children: [
-                    Icon(
-                      isSelected
-                          ? Icons.check_box
-                          : Icons.check_box_outline_blank,
-                      color: isSelected ? Colors.white : Colors.grey.shade600,
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        widget.question.answers[index],
-                        style: TextStyle(
-                          color: isSelected ? Colors.white : Colors.black87,
-                          fontSize: 16,
-                          fontWeight: isSelected
-                              ? FontWeight.w600
-                              : FontWeight.normal,
-                        ),
-                      ),
-                    ),
-                  ],
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        children: List.generate(widget.question.answers.length, (index) {
+          final isSelected = _selectedIndices.contains(index);
+          return GestureDetector(
+            onTap: widget.selectionLocked
+                ? null
+                : () {
+                    setState(() {
+                      if (isSelected) {
+                        _selectedIndices.remove(index);
+                      } else {
+                        _selectedIndices.add(index);
+                      }
+                    });
+                    widget.onAnswerSelected(_selectedIndices.toList());
+                  },
+            child: Container(
+              margin: const EdgeInsets.only(bottom: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              decoration: BoxDecoration(
+                color: isSelected ? AppColors.blue : AppColors.background,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: isSelected
+                      ? AppColors.blue
+                      : const Color.fromRGBO(220, 213, 205, 1),
+                  width: 3,
                 ),
               ),
-            );
-          }),
-        ),
+              child: Row(
+                children: [
+                  SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: Checkbox(
+                      value: isSelected,
+                      onChanged: widget.selectionLocked
+                          ? null
+                          : (_) {
+                              setState(() {
+                                if (isSelected) {
+                                  _selectedIndices.remove(index);
+                                } else {
+                                  _selectedIndices.add(index);
+                                }
+                              });
+                              widget.onAnswerSelected(
+                                _selectedIndices.toList(),
+                              );
+                            },
+                      fillColor: WidgetStateProperty.resolveWith((states) {
+                        if (states.contains(WidgetState.selected)) {
+                          return AppColors.blue;
+                        }
+                        return Colors.transparent;
+                      }),
+                      checkColor: AppColors.background,
+                      side: const BorderSide(color: AppColors.blue, width: 2),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      widget.question.answers[index],
+                      style: GoogleFonts.comme(
+                        color: isSelected
+                            ? AppColors.background
+                            : AppColors.blue,
+                        fontSize: 20,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }),
       ),
     );
-  }
-}
-
-// Добавьте этот класс в конец файла (после всех виджетов)
-class _DashedTopBorderPainter extends CustomPainter {
-  final Color color;
-  final double strokeWidth;
-  final double dashWidth;
-  final double dashSpace;
-
-  _DashedTopBorderPainter({
-    required this.color,
-    required this.strokeWidth,
-    required this.dashWidth,
-    required this.dashSpace,
-  });
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = color
-      ..strokeWidth = strokeWidth
-      ..style = PaintingStyle.stroke;
-
-    double x = 0;
-    while (x < size.width) {
-      canvas.drawLine(Offset(x, 0), Offset(x + dashWidth, 0), paint);
-      x += dashWidth + dashSpace;
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) {
-    return oldDelegate != this;
   }
 }

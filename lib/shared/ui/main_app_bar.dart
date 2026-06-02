@@ -32,7 +32,7 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
       scrolledUnderElevation: 0,
       elevation: 0,
       backgroundColor: backgroundColor ?? AppColors.blue,
-      iconTheme: IconThemeData(color: iconColor ?? AppColors.white),
+      iconTheme: IconThemeData(color: iconColor ?? AppColors.background),
       title: (title != null || subtitle != null)
           ? Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -44,7 +44,7 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
                     style: GoogleFonts.rubik(
                       fontSize: titleFontSize ?? 24,
                       fontWeight: titleFontWeight ?? FontWeight.w700,
-                      color: titleColor ?? AppColors.white,
+                      color: titleColor ?? AppColors.background,
                     ),
                   ),
                 if (subtitle != null)
@@ -53,7 +53,7 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
                     style: GoogleFonts.rubik(
                       fontSize: 18,
                       fontWeight: FontWeight.w500,
-                      color: (titleColor ?? AppColors.white),
+                      color: (titleColor ?? AppColors.background),
                     ),
                   ),
               ],

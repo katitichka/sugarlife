@@ -250,11 +250,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           style: GoogleFonts.rubik(
                             color: AppColors.blue,
                             fontSize: 16,
-                            fontWeight: FontWeight.w400,
-                            decoration: TextDecoration.underline,
-                            decorationStyle: TextDecorationStyle.dashed,
-                            decorationThickness: 2,
-                            decorationColor: AppColors.blue,
+                            fontWeight: FontWeight.w500,
                           ),
                         ),
                       ),
