@@ -12,6 +12,7 @@ class AchievementRepositoryImpl implements AchievementRepository {
 
   static const String _shownAchievementsKey = 'shown_achievement_ids';
   static const String _pendingAchievementKey = 'pending_achievement_id';
+  static const String _moduleAchievementsKey = 'module_achievement_granted_ids';
   static const String _achievementsBucket = 'achievements';
 
   AchievementEntity _mapAchievement(Map<String, dynamic> json) {
@@ -119,76 +120,74 @@ class AchievementRepositoryImpl implements AchievementRepository {
   }
 
   @override
-Future<AchievementEntity?> unlockRandomAchievement() async {
-  final userId = _supabase.auth.currentUser?.id;
-  if (userId == null) {
-    return null;
+  Future<AchievementEntity?> unlockRandomAchievement() async {
+    final userId = _supabase.auth.currentUser?.id;
+    if (userId == null) {
+      return null;
+    }
+
+    final allAchievementsResponse = await _supabase
+        .from('achievements')
+        .select('id,  name, description, image_url');
+
+    final allAchievements = allAchievementsResponse
+        .map((row) => _mapAchievement(Map<String, dynamic>.from(row)))
+        .toList();
+
+    if (allAchievements.isEmpty) {
+      print('Нет достижений в БД');
+      return null;
+    }
+
+    final userAchievements = await getUserAchievements();
+    final unlockedIds = userAchievements.map((a) => a.id).toSet();
+
+    final available = allAchievements
+        .where((a) => !unlockedIds.contains(a.id))
+        .toList();
+
+    if (available.isEmpty) {
+      print('Все достижения уже получены');
+      return null;
+    }
+
+    final randomIndex = DateTime.now().millisecondsSinceEpoch % available.length;
+    final achievement = available[randomIndex];
+
+    try {
+      await _supabase.from('user_achievement').insert({
+        'user_id': userId,
+        'achievement_id': achievement.id,
+      });
+    } catch (e) {
+      final relationAfterFailure = await _supabase
+          .from('user_achievement')
+          .select('achievement_id')
+          .eq('user_id', userId)
+          .eq('achievement_id', achievement.id)
+          .maybeSingle();
+      if (relationAfterFailure == null) {
+        print('❌ Ошибка вставки: $e');
+        return null;
+      }
+      print('⚠️ Достижение ${achievement.id} уже есть в БД');
+    }
+
+    print('Выдано достижение ${achievement.id}: ${achievement.name}');
+
+    final prefs = await _prefs;
+    await prefs.setInt(_pendingAchievementKey, achievement.id);
+
+    final cached = List<AchievementEntity>.from(
+      _cache.achievements ?? const [],
+    );
+    cached.removeWhere((item) => item.id == achievement.id);
+    cached.add(achievement);
+    cached.sort((a, b) => a.id.compareTo(b.id));
+    _cache.saveAchievements(cached);
+
+    return achievement;
   }
-
-  final allAchievementsResponse = await _supabase
-      .from('achievements')
-      .select('id,  name, description, image_url');
-
-  final allAchievements = allAchievementsResponse
-      .map((row) => _mapAchievement(Map<String, dynamic>.from(row)))
-      .toList();
-
-  if (allAchievements.isEmpty) {
-    print('Нет достижений в БД');
-    return null;
-  }
-  
-  final userAchievements = await getUserAchievements();
-  final unlockedIds = userAchievements.map((a) => a.id).toSet();
-  
-  final available = allAchievements
-      .where((a) => !unlockedIds.contains(a.id))
-      .toList();
-      
-  if (available.isEmpty) {
-    print('Все достижения уже получены');
-    return null;
-  }
-
-  final randomIndex = DateTime.now().millisecondsSinceEpoch % available.length;
-  final achievement = available[randomIndex];
-
-  // Сохраняем в БД с обработкой ошибок
- try {
-  await _supabase.from('user_achievement').insert({
-    'user_id': userId,
-    'achievement_id': achievement.id,
-  });
-} catch (e) {
-  // Проверяем, может запись уже есть
-  final relationAfterFailure = await _supabase
-      .from('user_achievement')
-      .select('achievement_id')
-      .eq('user_id', userId)
-      .eq('achievement_id', achievement.id)
-      .maybeSingle();
-  if (relationAfterFailure == null) {
-    print('❌ Ошибка вставки: $e');
-    return null;  // ← не rethrow, а просто вернуть null
-  }
-  print('⚠️ Достижение ${achievement.id} уже есть в БД');
-}
-  
-  print('Выдано достижение ${achievement.id}: ${achievement.name}');
-
-  final prefs = await _prefs;
-  await prefs.setInt(_pendingAchievementKey, achievement.id);
-
-  final cached = List<AchievementEntity>.from(
-    _cache.achievements ?? const [],
-  );
-  cached.removeWhere((item) => item.id == achievement.id);
-  cached.add(achievement);
-  cached.sort((a, b) => a.id.compareTo(b.id));
-  _cache.saveAchievements(cached);
-
-  return achievement;
-}
 
   @override
   Future<AchievementEntity?> getPendingAchievement() async {
@@ -217,6 +216,25 @@ Future<AchievementEntity?> unlockRandomAchievement() async {
     final pendingId = prefs.getInt(_pendingAchievementKey);
     if (pendingId == achievementId) {
       await prefs.remove(_pendingAchievementKey);
+    }
+  }
+
+  @override
+  Future<bool> isModuleAchievementGranted(int theoryModuleId) async {
+    final prefs = await _prefs;
+    final values = prefs.getStringList(_moduleAchievementsKey) ?? const [];
+    return values.contains(theoryModuleId.toString());
+  }
+
+  @override
+  Future<void> markModuleAchievementGranted(int theoryModuleId) async {
+    final prefs = await _prefs;
+    final values = List<String>.from(
+      prefs.getStringList(_moduleAchievementsKey) ?? const [],
+    );
+    if (!values.contains(theoryModuleId.toString())) {
+      values.add(theoryModuleId.toString());
+      await prefs.setStringList(_moduleAchievementsKey, values);
     }
   }
 }

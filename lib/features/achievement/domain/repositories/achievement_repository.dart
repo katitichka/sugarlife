@@ -5,4 +5,6 @@ abstract interface class AchievementRepository {
   Future<AchievementEntity?> unlockRandomAchievement();
   Future<AchievementEntity?> getPendingAchievement();
   Future<void> markAchievementCardShown({required int achievementId});
+  Future<bool> isModuleAchievementGranted(int moduleId);
+Future<void> markModuleAchievementGranted(int moduleId);
 }
