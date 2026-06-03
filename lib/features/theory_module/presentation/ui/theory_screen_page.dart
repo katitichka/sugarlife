@@ -21,6 +21,7 @@ class TheoryScreenPage extends StatelessWidget {
     return Scaffold(
       appBar: MainAppBar(
         backgroundColor: AppColors.white,
+        automaticallyImplyLeading: false,
         leading: null,
         actions: [
           IconButton(

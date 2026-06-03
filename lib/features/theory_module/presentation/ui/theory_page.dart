@@ -60,9 +60,7 @@ class _TheoryPageState extends State<TheoryPage> {
 
                 return LayoutBuilder(
                   builder: (context, constraints) {
-                    // Высота: экран - AppBar - BottomNavBar (100)
                     final availableHeight = constraints.maxHeight - 100;
-                    // Высота одной карточки ~130
                     final totalHeight = modules.length * 130.0;
                     final needScroll = totalHeight > availableHeight;
 

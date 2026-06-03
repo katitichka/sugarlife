@@ -12,6 +12,9 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
   final Color? backgroundColor;
   final Color? titleColor;
   final Color? iconColor;
+  final bool automaticallyImplyLeading;
+  
+  
 
   const MainAppBar({
     this.title,
@@ -23,6 +26,7 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.backgroundColor,
     this.titleColor,
     this.iconColor,
+    this.automaticallyImplyLeading = false,
     super.key,
   });
 
@@ -59,8 +63,8 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
               ],
             )
           : null,
-
       centerTitle: true,
+      automaticallyImplyLeading: automaticallyImplyLeading,
       leading: leading,
       actions: actions,
     );
