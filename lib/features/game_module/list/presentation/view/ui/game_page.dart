@@ -168,7 +168,27 @@ class _GamePageState extends State<GamePage> {
             return _buildGameContent(state.levels, state.progressMap);
           }
           if (state is ReceiveFailed) {
-            return Center(child: Text('Ошибка: ${state.message}'));
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 32),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Text(
+                      'Не удалось загрузить уровни.\nПроверьте соединение с интернетом.',
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 20),
+                    ElevatedButton(
+                      onPressed: () => context.read<GameModuleListBloc>().add(
+                        const GameModuleListEvent.receive(),
+                      ),
+                      child: const Text('Повторить'),
+                    ),
+                  ],
+                ),
+              ),
+            );
           }
           return const Center(child: LottieProgressIndicator());
         },

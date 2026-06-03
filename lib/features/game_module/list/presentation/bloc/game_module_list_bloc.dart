@@ -51,19 +51,31 @@ class GameModuleListBloc
         message: 'Загрузка игрового модуля...',
       ),
     );
-    try {
+
+    Future<GameModuleListState> fetch() async {
       final levels = await _gameModuleLevelListRepository.getAllLevels();
       final allLevelsProgress = await _gameProgressRepository
           .getAllLevelsProgress()
           .timeout(const Duration(seconds: 15));
-      emit(
-        GameModuleListState.receiveSuccess(
-          levels: levels,
-          progressMap: allLevelsProgress,
-        ),
+      return GameModuleListState.receiveSuccess(
+        levels: levels,
+        progressMap: allLevelsProgress,
       );
-    } catch (e) {
-      emit(GameModuleListState.receiveFailed(message: 'Ошибка: $e'));
+    }
+
+    try {
+      emit(await fetch());
+    } catch (_) {
+      await Future.delayed(const Duration(seconds: 5));
+      try {
+        emit(await fetch());
+      } catch (_) {
+        emit(
+          const GameModuleListState.receiveFailed(
+            message: 'Не удалось загрузить уровни. Проверьте соединение.',
+          ),
+        );
+      }
     }
   }
 

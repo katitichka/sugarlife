@@ -35,18 +35,17 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       },
     );
   }
-  
   Future<void> _authCheckStarted({required Emitter<AuthState> emit}) async {
     try {
       emit(const AuthState.loading());
       final currentUser = await _authRepository.getCurrentUser();
       if (currentUser == null) {
-        emit(const AuthState.unauthenticated());
+        emit(AuthState.unauthenticated());
       } else {
         emit(AuthState.authenticated(profile: currentUser));
       }
     } catch (e) {
-      emit(AuthState.failure(message: 'Ошибка проверки авторизации: $e'));
+      emit(AuthState.failure(message: _friendlyAuthError(e)));
     }
   }
 
@@ -63,24 +62,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       );
       emit(AuthState.authenticated(profile: profile));
     } catch (e) {
-      String errorMessage;
-      final errorString = e.toString().toLowerCase();
-      
-      if (errorString.contains('invalid login credentials') ||
-          errorString.contains('user not found') ||
-          errorString.contains('invalid email')) {
-        errorMessage = 'Пользователь не найден.\nПроверьте email и пароль';
-      } else if (errorString.contains('network') ||
-          errorString.contains('connection') ||
-          errorString.contains('timeout') ||
-          errorString.contains('socket') ||
-          errorString.contains('internet')) {
-        errorMessage = 'Отсутствует подключение к интернету';
-      } else {
-        errorMessage = 'Ошибка авторизации.\nПопробуйте позже';
-      }
-      
-      emit(AuthState.failure(message: errorMessage));
+      emit(AuthState.failure(message: _friendlyAuthError(e)));
     }
   }
 
@@ -92,7 +74,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   }) async {
     try {
       emit(const AuthState.loading());
-      
       if (password.length < 6) {
         emit(
           const AuthState.failure(
@@ -101,27 +82,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         );
         return;
       }
-      
-      if (username.isEmpty || username.length < 2) {
-        emit(
-          const AuthState.failure(
-            message: 'Имя должно содержать не менее 2 символов',
-          ),
-        );
-        return;
-      }
-      
-      if (!email.contains('@') || !email.contains('.')) {
-        emit(
-          const AuthState.failure(
-            message: 'Введите корректный email',
-          ),
-        );
-        return;
-      }
-      
-      final isEmailExists = await _authRepository.isEmailExists(email: email);
-      if (isEmailExists) {
+      final isUniqueEmail = await _authRepository.isEmailExists(email: email);
+      if (isUniqueEmail) {
         emit(
           const AuthState.failure(
             message: 'Аккаунт с таким email уже существует',
@@ -129,7 +91,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         );
         return;
       }
-      
       final profile = await _authRepository.signUp(
         email: email,
         password: password,
@@ -137,20 +98,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       );
       emit(AuthState.authenticated(profile: profile));
     } catch (e) {
-      String errorMessage;
-      final errorString = e.toString().toLowerCase();
-      
-      if (errorString.contains('network') ||
-          errorString.contains('connection') ||
-          errorString.contains('timeout')) {
-        errorMessage = 'Отсутствует подключение к интернету';
-      } else if (errorString.contains('user already registered')) {
-        errorMessage = 'Пользователь с таким email уже зарегистрирован';
-      } else {
-        errorMessage = 'Ошибка регистрации. Попробуйте позже';
-      }
-      
-      emit(AuthState.failure(message: errorMessage));
+      emit(AuthState.failure(message: _friendlyAuthError(e)));
     }
   }
 
@@ -159,9 +107,26 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       emit(const AuthState.loading());
       await _authRepository.logout();
       emit(const AuthState.unauthenticated());
-    } catch (e) {
-      emit(AuthState.failure(message: 'Ошибка выхода из аккаунта'));
+    } catch (_) {
+      emit(const AuthState.failure(message: 'Не удалось выйти из аккаунта. Попробуйте ещё раз'));
     }
+  }
+
+  String _friendlyAuthError(Object e) {
+    final s = e.toString().toLowerCase();
+    if (s.contains('invalid login credentials') || s.contains('invalid credentials')) {
+      return 'Неверный email или пароль';
+    }
+    if (s.contains('user already registered') || s.contains('already registered')) {
+      return 'Аккаунт с таким email уже существует';
+    }
+    if (s.contains('network') || s.contains('timeout') || s.contains('socketexception')) {
+      return 'Нет соединения. Проверьте интернет';
+    }
+    if (s.contains('too many requests') || s.contains('rate limit')) {
+      return 'Слишком много попыток. Попробуйте позже';
+    }
+    return 'Что-то пошло не так. Попробуйте ещё раз';
   }
 
   Future<void> _profileUpdate({

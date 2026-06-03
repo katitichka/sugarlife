@@ -38,8 +38,16 @@ class TheoryScreenPage extends StatelessWidget {
           switch (state) {
             case ReceiveInProgress():
               return const Center(child: LottieProgressIndicator());
-            case ReceiveFailed(:final message):
-              return Center(child: Text('Ошибка: $message'));
+            case ReceiveFailed():
+              return Center(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 32),
+                  child: Text(
+                    'Не удалось загрузить информацию.\nПроверьте соединение с интернетом.',
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              );
             case ReceiveSuccess():
               final module = _findModuleById(state.theoryModules, moduleId);
               if (module == null) {

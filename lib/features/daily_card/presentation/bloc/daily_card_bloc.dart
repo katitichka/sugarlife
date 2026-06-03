@@ -50,8 +50,8 @@ class DailyCardBloc extends Bloc<DailyCardEvent, DailyCardState> {
       }
 
       emit(Loaded(card: card, hasAnsweredToday: false));
-    } catch (e) {
-      emit(Error(message: 'Ошибка загрузки: $e'));
+    } catch (_) {
+      emit(const Error(message: 'Не удалось загрузить карточку'));
     }
   }
 
@@ -66,8 +66,8 @@ class DailyCardBloc extends Bloc<DailyCardEvent, DailyCardState> {
     try {
       await _repository.saveUserAnswer(cardId, isCorrect);
       emit(Answered(isCorrect: isCorrect, explanation: explanation, isMyth: isMyth,));
-    } catch (e) {
-      emit(Error(message: 'Ошибка сохранения: $e'));
+    } catch (_) {
+      emit(const Error(message: 'Не удалось сохранить ответ'));
     }
   }
 

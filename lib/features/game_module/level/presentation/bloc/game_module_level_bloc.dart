@@ -61,16 +61,23 @@ class GameModuleLevelBloc
     );
   }
   Future<void> _receiveGameLevel({
-    required Emitter<GameModuleLevelState> emit,
-    required int levelId,
-  }) async {
-    emit(const ReceiveInProgress(message: 'Получение вопросов'));
+  required Emitter<GameModuleLevelState> emit,
+  required int levelId,
+}) async {
+  emit(const ReceiveInProgress(message: 'Получение вопросов'));
+  
+  const maxRetries = 2; // 2 попытки (первая + повторная)
+  const timeout = Duration(seconds: 5);
+  
+  for (int attempt = 1; attempt <= maxRetries; attempt++) {
     try {
-      // Загружаем всё параллельно
+      print('=== ПОПЫТКА ЗАГРУЗКИ $attempt ИЗ $maxRetries ===');
+      
+      // Загружаем всё параллельно с таймаутом
       final results = await Future.wait([
-        _levelProgressRepository.getLevelProgress(levelId: levelId),
-        _gameModuleLevelRepository.getQuestionsForLevel(levelId: levelId),
-        _gameModuleLevelRepository.getCharacterImagesForLevel(levelId: levelId),
+        _levelProgressRepository.getLevelProgress(levelId: levelId).timeout(timeout),
+        _gameModuleLevelRepository.getQuestionsForLevel(levelId: levelId).timeout(timeout),
+        _gameModuleLevelRepository.getCharacterImagesForLevel(levelId: levelId).timeout(timeout),
       ]);
 
       final progressResult = results[0] as LevelProgressEntity?;
@@ -87,10 +94,21 @@ class GameModuleLevelBloc
           characterImages: characterImages,
         ),
       );
+      return; // Успешно завершаем
+      
     } catch (e) {
-      emit(ReceiveFailed(message: 'Ошибка загрузки вопросов: $e'));
+      print('=== ОШИБКА ЗАГРУЗКИ (попытка $attempt): $e ===');
+      
+      if (attempt == maxRetries) {
+        // Последняя попытка - показываем ошибку
+        emit(ReceiveFailed(message: 'Не удалось загрузить уровень. Проверьте подключение к интернету.'));
+      } else {
+        // Ждём 3 секунд перед следующей попыткой
+        await Future.delayed(const Duration(seconds: 3));
+      }
     }
   }
+}
 
   Future<void> _answerMultipleChoice({
     required Emitter<GameModuleLevelState> emit,

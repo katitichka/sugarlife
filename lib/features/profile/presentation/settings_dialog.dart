@@ -134,15 +134,12 @@ void _showEditNameDialog(BuildContext context, ProfileEntity currentProfile) {
                             ),
                           );
                         }
-                      } catch (e) {
+                      } catch (_) {
                         if (!context.mounted) return;
                         ScaffoldMessenger.of(
                           context,
                         ).showSnackBar(
-                          SnackBar(
-                            content: Text('Ошибка: $e'),
-                            backgroundColor: AppColors.red,
-                          ),
+                          const SnackBar(content: Text('Не удалось сохранить изменения')),
                         );
                       }
                     } else if (newUsername == currentProfile.username) {
@@ -319,15 +316,12 @@ Future<bool> _showAvatarSelectionSheet(
         );
         return true;
       }
-    } catch (e) {
+    } catch (_) {
       if (context.mounted) {
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(
-          SnackBar(
-            content: Text('Ошибка: $e'),
-            backgroundColor: AppColors.red,
-          ),
+          const SnackBar(content: Text('Не удалось сохранить изменения')),
         );
       }
     }

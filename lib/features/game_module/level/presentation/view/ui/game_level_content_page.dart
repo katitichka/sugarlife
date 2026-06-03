@@ -30,8 +30,12 @@ class GameLevelContentPage extends StatelessWidget {
         switch (state) {
           case ReceiveInProgress():
             return const _LoadingPage();
-          case ReceiveFailed(:final message):
-            return _ErrorPage(message: message);
+          case ReceiveFailed():
+            return _ErrorPage(
+              onRetry: () => context.read<GameModuleLevelBloc>().add(
+                GameModuleLevelEvent.receive(levelId: levelId),
+              ),
+            );
           case ReceiveSuccess():
             final successState = state;
             if (successState.currentIndex == -1) {
@@ -90,12 +94,32 @@ class _LoadingPage extends StatelessWidget {
 }
 
 class _ErrorPage extends StatelessWidget {
-  final String message;
-  const _ErrorPage({required this.message});
+  final VoidCallback onRetry;
+  const _ErrorPage({required this.onRetry});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(body: Center(child: Text('Ошибка: $message')));
+    return Scaffold(
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 32),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                'Не удалось загрузить уровень.\nПроверьте соединение с интернетом.',
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: onRetry,
+                child: const Text('Повторить'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
 

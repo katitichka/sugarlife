@@ -113,7 +113,10 @@ class _DialogContent extends StatelessWidget {
                   'Карточки закончились, но скоро появятся новые факты!',
                   textAlign: TextAlign.center,
                 ),
-                Error(:final message) => Text('Ошибка: $message'),
+                Error(:final message) => Text(
+                  'Ошибка загрузки карточки. Проверьте интернет соединение',
+                  textAlign: TextAlign.center,
+                ),
                 _ => const SizedBox.shrink(),
               },
             ],
