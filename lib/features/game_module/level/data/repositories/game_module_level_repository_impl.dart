@@ -64,16 +64,13 @@ class GameModuleLevelRepositoryImpl implements GameModuleLevelRepository {
     final imageUrl = response?['image_url'] as String?;
     if (imageUrl == null) return null;
 
-    // Формируем полный URL из имени файла
     return _supabase.storage.from('characters').getPublicUrl(imageUrl);
   }
 
   @override
   Future<Map<int, String>> getCharacterImagesForLevel({required int levelId}) async {
-    // 1. Получаем все вопросы уровня
     final questions = await getQuestionsForLevel(levelId: levelId);
 
-    // 2. Собираем уникальные ID персонажей
     final characterIds = questions
         .map((q) => q.characterId)
         .whereType<int>()
@@ -82,13 +79,11 @@ class GameModuleLevelRepositoryImpl implements GameModuleLevelRepository {
 
     if (characterIds.isEmpty) return {};
 
-    // 3. Загружаем всех персонажей одним запросом
     final response = await _supabase
         .from('characters')
         .select('id, image_url')
         .inFilter('id', characterIds);
 
-    // 4. Возвращаем Map<characterId, imageUrl>
     return {
       for (final row in response)
         row['id'] as int: _publicSvgUrl(row['image_url'] as String),

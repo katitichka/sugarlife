@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:sugarlife/core/enum/question_type.dart';
 import 'package:sugarlife/features/game_module/level/domain/entities/game_module_question_entity.dart';
 
-/// Маппинг строки `questions` из PostgREST в доменную сущность.
 abstract final class GameModuleQuestionSupabaseMapper {
   static GameModuleQuestionEntity toEntity(Map<String, dynamic> row) {
     final id = (row['id'] as num).toInt();
@@ -40,7 +39,6 @@ abstract final class GameModuleQuestionSupabaseMapper {
     );
   }
 
-  /// Индексы правильных вариантов для `multiple_select` (jsonb-массив или строка).
   static List<int>? _parseMultipleSelectIndices(dynamic raw) {
     if (raw == null) return null;
     if (raw is List) {
@@ -92,7 +90,6 @@ abstract final class GameModuleQuestionSupabaseMapper {
     return [];
   }
 
-  /// Приводит `correct_answer` из БД к формату, который ожидает [GameModuleQuestionEntity.isAnswerCorrect].
   static String? _normalizeCorrectAnswer({
     required QuestionType type,
     required dynamic raw,

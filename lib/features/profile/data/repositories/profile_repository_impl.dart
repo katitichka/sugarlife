@@ -12,10 +12,8 @@ class ProfileRepositoryImpl implements ProfileRepository {
   ProfileRepositoryImpl(this._supabase, this._cache);
 
   /// Bucket в Supabase Storage, где лежат SVG (`avatars.image_url` — путь от корня bucket).
-  /// При другом имени bucket в проекте Supabase замените значение.
   static const String _avatarsSvgBucket = 'avatars';
 
-  /// В БД часто хранится только путь в Storage; для сети нужен полный public URL.
   String _publicSvgUrl(String raw) {
     final t = raw.trim();
     if (t.isEmpty) return t;
@@ -24,7 +22,6 @@ class ProfileRepositoryImpl implements ProfileRepository {
       return t;
     }
     var path = t.startsWith('/') ? t.substring(1) : t;
-    // Если в пути уже указан bucket как префикс — убираем, иначе getPublicUrl дублирует папку.
     final bucketPrefix = '$_avatarsSvgBucket/';
     if (path.toLowerCase().startsWith(bucketPrefix)) {
       path = path.substring(bucketPrefix.length);

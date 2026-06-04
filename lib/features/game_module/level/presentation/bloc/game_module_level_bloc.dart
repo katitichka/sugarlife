@@ -66,7 +66,7 @@ class GameModuleLevelBloc
 }) async {
   emit(const ReceiveInProgress(message: 'Получение вопросов'));
   
-  const maxRetries = 2; // 2 попытки (первая + повторная)
+  const maxRetries = 2; 
   const timeout = Duration(seconds: 3);
   
   for (int attempt = 1; attempt <= maxRetries; attempt++) {
@@ -203,7 +203,6 @@ class GameModuleLevelBloc
     final newAnswers = Map<int, bool>.from(successState.answers);
     newAnswers[successState.currentIndex] = isCorrect;
     emit(successState.copyWith(isAnswered: true, answers: newAnswers));
-    // Формирование текста правильного ответа для отображения
     String correctAnswerText = '';
     var indices = currentQuestion.correctAnswerIndices;
     if (indices == null || indices.isEmpty) {
@@ -373,7 +372,6 @@ class GameModuleLevelBloc
         return null;
       }
 
-      // FIX 2: не выдавать повторно, если уже выдавали за этот модуль
       final alreadyGranted = await _achievementRepository
           .isModuleAchievementGranted(currentLevel.theoryModuleId);
       if (alreadyGranted) {

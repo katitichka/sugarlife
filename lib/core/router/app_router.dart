@@ -107,7 +107,6 @@ final appRoute = GoRouter(
                       path: 'question/:questionIndex',
                       name: 'gameLevelQuestion',
                       builder: (context, state) {
-                        // TODO: отдельный экран вопроса по deep link
                         return const SizedBox.shrink();
                       },
                     ),

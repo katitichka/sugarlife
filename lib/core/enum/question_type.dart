@@ -13,7 +13,6 @@ enum QuestionType {
     );
   }
 
-  /// Не бросает при неизвестном значении из БД.
   static QuestionType parseLoose(String? value) {
     if (value == null || value.isEmpty) {
       return QuestionType.multipleChoice;

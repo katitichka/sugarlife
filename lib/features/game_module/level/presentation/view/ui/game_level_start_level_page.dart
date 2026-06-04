@@ -194,7 +194,7 @@ class _NewLevelContent extends StatelessWidget {
         children: [
           const SizedBox(height: 30),
           Text(
-            'Уровень $orderIndex', // orderIndex
+            'Уровень $orderIndex',
             style: const TextStyle(
               fontSize: 32,
               fontWeight: FontWeight.w700,
@@ -203,7 +203,7 @@ class _NewLevelContent extends StatelessWidget {
             textAlign: TextAlign.center,
           ),
           Text(
-            'модуль $theoryModuleId', // moduleId
+            'модуль $theoryModuleId',
             style: const TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.w700,

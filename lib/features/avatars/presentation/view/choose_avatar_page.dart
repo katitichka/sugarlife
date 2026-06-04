@@ -38,7 +38,6 @@ class _ChooseAvatarPageState extends State<ChooseAvatarPage> {
       final avatars = await repository.getAllAvatars();
       print("Avatars: ${avatars.length}");
       
-      // Предзагружаем все изображения
       final Map<int, Uint8List?> preloaded = {};
       for (final avatar in avatars) {
         final bytes = await _loadImageBytes(avatar.imageUrl);

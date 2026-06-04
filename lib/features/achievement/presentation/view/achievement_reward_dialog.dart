@@ -165,7 +165,6 @@ class _CardFace extends StatelessWidget {
 
   Widget _buildImage() {
     if (!isNetworkImage) {
-      // Локальный PNG
       if (imagePath.endsWith('.svg')) {
       return SvgPicture.asset(
         imagePath,
@@ -181,7 +180,6 @@ class _CardFace extends StatelessWidget {
   
     }
 
-    // Сетевой URL
     if (isSvg) {
       return SvgPicture.network(
         imagePath,

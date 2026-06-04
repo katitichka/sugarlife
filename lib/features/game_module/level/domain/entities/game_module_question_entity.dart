@@ -51,7 +51,6 @@ sealed class GameModuleQuestionEntity with _$GameModuleQuestionEntity {
     }
   }
 
-  /// Индексы для `multiple_select`: из поля или из строки `correctAnswer` (кэш/старый формат).
   List<int>? _resolvedMultipleSelectIndices() {
     if (correctAnswerIndices != null && correctAnswerIndices!.isNotEmpty) {
       return correctAnswerIndices;

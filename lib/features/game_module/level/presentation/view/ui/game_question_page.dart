@@ -402,8 +402,8 @@ class _GameQuestionPageState extends State<GameQuestionPage> {
           }
         },
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.blue, // Цвет фона кнопки
-          foregroundColor: AppColors.background, // Цвет текста и иконок
+          backgroundColor: AppColors.blue, 
+          foregroundColor: AppColors.background, 
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(70),
           ),

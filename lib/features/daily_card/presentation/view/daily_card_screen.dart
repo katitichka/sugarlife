@@ -38,17 +38,14 @@ class DailyCardScreen extends StatelessWidget {
                       ),
                       child: _DialogContent(),
                     ),
-                    // Висячая кнопка закрытия в правом верхнем углу
                     Positioned(
                       top: 12,
                       right: 18,
                       child: GestureDetector(
                         onTap: () {
-                          // Отправляем событие в BLoC
                           dialogContext.read<DailyCardBloc>().add(
                             const DailyCardEvent.close(),
                           );
-                          // Закрываем диалог
                           if (dialogContext.mounted) {
                             Navigator.pop(dialogContext);
                           }

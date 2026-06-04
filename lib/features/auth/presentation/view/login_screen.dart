@@ -291,13 +291,11 @@ class _LoginScreenState extends State<LoginScreen> {
                                 : null;
                           });
           
-                          // Если есть ошибки — не отправляем
                           if (_emailController.text.isEmpty ||
                               _passwordController.text.isEmpty) {
                             return;
                           }
           
-                          // Отправляем событие
                           context.read<AuthBloc>().add(
                             AuthEvent.signInRequested(
                               email: _emailController.text,
