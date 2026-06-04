@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -27,6 +29,11 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   late final TextEditingController _usernameController;
   late final ProfileRepository _profileRepository;
+  
+  // Для повторного запроса аватарки
+  int _avatarLoadAttempts = 0;
+  Timer? _retryTimer;
+  String? _cachedAvatarUrl;
 
   @override
   void initState() {
@@ -46,7 +53,37 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   void dispose() {
     _usernameController.dispose();
+    _retryTimer?.cancel();
     super.dispose();
+  }
+
+  /// Загрузка аватарки с повтором при ошибке
+  Future<String> _loadAvatarWithRetry(int avatarId) async {
+    // Если уже есть кэшированный URL, возвращаем его
+    if (_cachedAvatarUrl != null && _cachedAvatarUrl!.isNotEmpty) {
+      return _cachedAvatarUrl!;
+    }
+    
+    try {
+      final url = await _profileRepository.getAvatarUrl(avatarId);
+      if (url.isNotEmpty) {
+        _cachedAvatarUrl = url;
+        _avatarLoadAttempts = 0;
+        return url;
+      }
+      throw Exception('Empty URL');
+    } catch (e) {
+      if (_avatarLoadAttempts < 1) {
+        _avatarLoadAttempts++;
+        _retryTimer?.cancel();
+        _retryTimer = Timer(const Duration(seconds: 3), () {
+          if (mounted) {
+            setState(() {});
+          }
+        });
+      }
+      rethrow;
+    }
   }
 
   @override
@@ -98,9 +135,8 @@ class _ProfilePageState extends State<ProfilePage> {
                         width: 190,
                         height: 190,
                         child: FutureBuilder<String>(
-                          future: _profileRepository.getAvatarUrl(
-                            profile.currentAvatarId,
-                          ),
+                          key: ValueKey(_avatarLoadAttempts),
+                          future: _loadAvatarWithRetry(profile.currentAvatarId),
                           builder: (context, snapshot) {
                             if (snapshot.connectionState ==
                                 ConnectionState.waiting) {

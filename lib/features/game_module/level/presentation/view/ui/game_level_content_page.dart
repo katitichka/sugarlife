@@ -61,7 +61,13 @@ class GameLevelContentPage extends StatelessWidget {
               stars: stars,
               onFinish: () {
                 if (correctAnswers == 0) {
-                  context.go('/game/level/$levelId');
+                  context.go(
+                    '/game/level/$levelId',
+                    extra: {
+                      'orderIndex': orderIndex,
+                      'theoryModuleId': theoryModuleId,
+                    },
+                  );
                 } else {
                   _finishLevelWithAchievementCard(
                     context,

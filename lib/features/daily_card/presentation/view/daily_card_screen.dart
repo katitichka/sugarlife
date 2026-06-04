@@ -244,8 +244,7 @@ class _AnsweredContent extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         SizedBox(
-          width: 190,
-          height: 95,
+          height: 110,
           child: Lottie.asset(
             animationPath,
             repeat: false,

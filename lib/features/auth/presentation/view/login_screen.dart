@@ -72,7 +72,7 @@ class _LoginScreenState extends State<LoginScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                SizedBox(height: 40),
+                SizedBox(height: 45),
                 Text(
                   'Сладкая жизнь',
                   style: GoogleFonts.rubik(

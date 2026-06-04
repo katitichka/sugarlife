@@ -1,12 +1,14 @@
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sugarlife/core/cache/app_cache_service.dart';
 import 'package:sugarlife/features/auth/domain/repositories/auth_repository.dart';
 import 'package:sugarlife/features/profile/domain/entities/profile_entity.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
   final SupabaseClient _supabase;
+  final AppCacheService _cache;
 
-  AuthRepositoryImpl(this._supabase);
+  AuthRepositoryImpl(this._supabase, this._cache);
 
   @override
   Future<ProfileEntity> signIn({
@@ -87,6 +89,12 @@ class AuthRepositoryImpl implements AuthRepository {
       print('Ошибка выхода: $e');
       rethrow;
     }
+   try {
+    await _cache.clearAll();
+    print('Кэш очищен');
+  } catch (e) {
+    print('Ошибка очистки кэша: $e');
+  }
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.clear();

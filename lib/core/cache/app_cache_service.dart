@@ -1,3 +1,4 @@
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sugarlife/features/avatars/domain/entities/avatar_entity.dart';
 import 'package:sugarlife/features/achievement/domain/entities/achievement_entity.dart';
 import 'package:sugarlife/features/game_module/level/domain/entities/game_module_level_entity.dart';
@@ -95,7 +96,7 @@ class AppCacheService {
     _achievements = List.unmodifiable(achievements);
   }
 
-  void clearAll() {
+  Future<void> clearAll()async  {
     _levels = null;
     _questionsByLevel.clear();
     _theoryModules = null;
@@ -103,5 +104,7 @@ class AppCacheService {
     _avatars = null;
     _achievements = null;
     _achievementsById.clear();
+    final prefs = await SharedPreferences.getInstance();
+  await prefs.clear();
   }
 }

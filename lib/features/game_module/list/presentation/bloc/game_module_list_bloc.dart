@@ -66,7 +66,7 @@ class GameModuleListBloc
     try {
       emit(await fetch());
     } catch (_) {
-      await Future.delayed(const Duration(seconds: 5));
+      await Future.delayed(const Duration(seconds: 3));
       try {
         emit(await fetch());
       } catch (_) {
@@ -79,9 +79,6 @@ class GameModuleListBloc
     }
   }
 
-  /// Немедленно обновляет progressMap в текущем состоянии локальными данными,
-  /// не делая запроса к сети. Состояние обновляется синхронно — пользователь
-  /// видит пройденный уровень сразу при возврате на GamePage.
   void _applyOptimisticProgress({
     required Emitter<GameModuleListState> emit,
     required int levelId,
@@ -101,10 +98,6 @@ class GameModuleListBloc
     emit(ReceiveSuccess(levels: current.levels, progressMap: updatedMap));
   }
 
-  /// Обновляет данные без перехода в receiveInProgress.
-  /// Используется после завершения уровня — GamePage остаётся
-  /// в текущем состоянии (не показывает спиннер) и обновляется,
-  /// когда данные придут.
   Future<void> _onSilentRefresh({
     required Emitter<GameModuleListState> emit,
   }) async {
@@ -120,7 +113,6 @@ class GameModuleListBloc
         ),
       );
     } catch (_) {
-      // Молча игнорируем — текущее состояние экрана не трогаем.
     }
   }
 }

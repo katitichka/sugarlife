@@ -77,7 +77,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const SizedBox(height: 40),
+                const SizedBox(height: 45),
                 Text(
                   'Сладкая жизнь',
                   style: GoogleFonts.rubik(

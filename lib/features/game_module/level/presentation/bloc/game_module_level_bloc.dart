@@ -67,7 +67,7 @@ class GameModuleLevelBloc
   emit(const ReceiveInProgress(message: 'Получение вопросов'));
   
   const maxRetries = 2; // 2 попытки (первая + повторная)
-  const timeout = Duration(seconds: 5);
+  const timeout = Duration(seconds: 3);
   
   for (int attempt = 1; attempt <= maxRetries; attempt++) {
     try {

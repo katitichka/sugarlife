@@ -28,30 +28,50 @@ class DailyCardBloc extends Bloc<DailyCardEvent, DailyCardState> {
 
   Future<void> _onLoadTodayCard(Emitter<DailyCardState> emit) async {
     emit(const Loading());
-    try {
-      final answeredCard = await _repository.getAnsweredCardForToday();
+    
+    const maxRetries = 2;
+    const timeout = Duration(seconds: 3);
+    
+    for (int attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        print('=== ПОПЫТКА ЗАГРУЗКИ КАРТОЧКИ $attempt/$maxRetries ===');
+        
+        // Загружаем с таймаутом
+        final answeredCard = await _repository
+            .getAnsweredCardForToday()
+            .timeout(timeout);
 
-      if (answeredCard != null) {
-        final card = answeredCard['card'] as DailyCardEntity;
-        emit(
-          Answered(
-            isCorrect: answeredCard['is_correct'] as bool,
-            explanation: card.explanation,
-            isMyth: card.isMyth,
-          ),
-        );
+        if (answeredCard != null) {
+          final card = answeredCard['card'] as DailyCardEntity;
+          emit(
+            Answered(
+              isCorrect: answeredCard['is_correct'] as bool,
+              explanation: card.explanation,
+              isMyth: card.isMyth,
+            ),
+          );
+          return;
+        }
+
+        final card = await _repository.getTodayCard().timeout(timeout);
+        if (card == null) {
+          emit(const NoMoreCards());
+          return;
+        }
+
+        emit(Loaded(card: card, hasAnsweredToday: false));
         return;
+        
+      } catch (e) {
+        print('=== ОШИБКА ЗАГРУЗКИ (попытка $attempt): $e ===');
+        
+        if (attempt == maxRetries) {
+          emit(const Error(message: 'Не удалось загрузить карточку. Проверьте подключение к интернету.'));
+        } else {
+          // Ждём 1 секунду перед следующей попыткой
+          await Future.delayed(const Duration(seconds: 1));
+        }
       }
-
-      final card = await _repository.getTodayCard();
-      if (card == null) {
-        emit(const NoMoreCards());
-        return;
-      }
-
-      emit(Loaded(card: card, hasAnsweredToday: false));
-    } catch (_) {
-      emit(const Error(message: 'Не удалось загрузить карточку'));
     }
   }
 
@@ -63,11 +83,34 @@ class DailyCardBloc extends Bloc<DailyCardEvent, DailyCardState> {
     bool isMyth,
   ) async {
     emit(const Loading());
-    try {
-      await _repository.saveUserAnswer(cardId, isCorrect);
-      emit(Answered(isCorrect: isCorrect, explanation: explanation, isMyth: isMyth,));
-    } catch (_) {
-      emit(const Error(message: 'Не удалось сохранить ответ'));
+    
+    const maxRetries = 2;
+    const timeout = Duration(seconds: 3);
+    
+    for (int attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        print('=== ПОПЫТКА СОХРАНЕНИЯ ОТВЕТА $attempt/$maxRetries ===');
+        
+        await _repository
+            .saveUserAnswer(cardId, isCorrect)
+            .timeout(timeout);
+            
+        emit(Answered(
+          isCorrect: isCorrect,
+          explanation: explanation,
+          isMyth: isMyth,
+        ));
+        return;
+        
+      } catch (e) {
+        print('=== ОШИБКА СОХРАНЕНИЯ (попытка $attempt): $e ===');
+        
+        if (attempt == maxRetries) {
+          emit(const Error(message: 'Не удалось сохранить ответ. Проверьте подключение к интернету.'));
+        } else {
+          await Future.delayed(const Duration(seconds: 1));
+        }
+      }
     }
   }
 

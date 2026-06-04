@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:sugarlife/core/theme/app_color.dart';
 import 'package:sugarlife/features/achievement/domain/entities/achievement_entity.dart';
 import 'package:sugarlife/shared/ui/lottie_progress_indicator.dart';
@@ -36,15 +37,16 @@ class _AchievementRewardDialogState extends State<AchievementRewardDialog> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Text(
+                SizedBox(height: 30,),
+                Text(
                   'Новое достижение!',
-                  style: TextStyle(
+                  style: GoogleFonts.rubik(
                     fontSize: 24,
                     fontWeight: FontWeight.w700,
                     color: AppColors.blue,
                   ),
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 15),
                 GestureDetector(
                   onTap: () {
                     if (_isOpened) {
@@ -76,7 +78,8 @@ class _AchievementRewardDialogState extends State<AchievementRewardDialog> {
                                 ),
                               )
                             : const _CardFace(
-                                imagePath: 'assets/achievements/closed_card.png',
+                                imagePath:
+                                    'assets/achievements/closed_card.svg',
                                 title: 'Нажми, чтобы открыть',
                                 subtitle: 'Твоя новая награда уже здесь',
                               ),
@@ -84,6 +87,7 @@ class _AchievementRewardDialogState extends State<AchievementRewardDialog> {
                     },
                   ),
                 ),
+                SizedBox(height: 20,),
               ],
             ),
           ),
@@ -92,7 +96,11 @@ class _AchievementRewardDialogState extends State<AchievementRewardDialog> {
             right: 8,
             child: IconButton(
               onPressed: () => Navigator.of(context).pop(),
-              icon: const Icon(Icons.close),
+              icon: const Icon(
+                Icons.cancel_outlined,
+                color: AppColors.blue,
+                size: 40,
+              ),
             ),
           ),
         ],
@@ -118,12 +126,12 @@ class _CardFace extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 260,
-      padding: const EdgeInsets.all(20),
+      width: 250,
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: const Color(0xFFF5FBFF),
+        color: Color.fromRGBO(64, 153, 219, 0.1),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: AppColors.blue.withValues(alpha: 0.25)),
+        border: Border.all(color: Color.fromRGBO(64, 153, 219, 1)),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -133,18 +141,23 @@ class _CardFace extends StatelessWidget {
           Text(
             title,
             textAlign: TextAlign.center,
-            style: const TextStyle(
+            style: GoogleFonts.rubik(
               fontSize: 20,
               fontWeight: FontWeight.w700,
               color: AppColors.blue,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 4),
           Text(
             subtitle,
             textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 14, color: Colors.black87),
+            style: GoogleFonts.rubik(
+              fontSize: 14,
+              fontWeight: FontWeight.w400,
+              color: AppColors.blue,
+            ),
           ),
+          const SizedBox(height: 16),
         ],
       ),
     );
@@ -153,18 +166,28 @@ class _CardFace extends StatelessWidget {
   Widget _buildImage() {
     if (!isNetworkImage) {
       // Локальный PNG
-      return Image.asset(imagePath, width: 140, height: 140, fit: BoxFit.contain);
+      if (imagePath.endsWith('.svg')) {
+      return SvgPicture.asset(
+        imagePath,
+        width: 140,
+        fit: BoxFit.contain,
+      );
     }
-    
+    return Image.asset(
+      imagePath,
+      width: 140,
+      fit: BoxFit.contain,
+    );
+  
+    }
+
     // Сетевой URL
     if (isSvg) {
       return SvgPicture.network(
         imagePath,
         width: 140,
-        height: 140,
         placeholderBuilder: (context) => const SizedBox(
           width: 140,
-          height: 140,
           child: LottieProgressIndicator(),
         ),
       );
@@ -172,7 +195,6 @@ class _CardFace extends StatelessWidget {
       return Image.network(
         imagePath,
         width: 140,
-        height: 140,
         fit: BoxFit.contain,
       );
     }

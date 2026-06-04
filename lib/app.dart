@@ -50,7 +50,7 @@ Future<void> app(SupabaseClient supabase) async {
           ),
         ),
         RepositoryProvider<AuthRepository>(
-          create: (_) => AuthRepositoryImpl(supabase),
+          create: (context) => AuthRepositoryImpl(supabase, context.read<AppCacheService>()),
         ),
         RepositoryProvider<TheoryModuleRepository>(
           create: (context) => TheoryModuleRepositoryImpl(

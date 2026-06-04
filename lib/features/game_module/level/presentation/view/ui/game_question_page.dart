@@ -1,4 +1,3 @@
-import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
@@ -85,11 +84,37 @@ class _GameQuestionPageState extends State<GameQuestionPage> {
     int currentQuestionNumber = 0;
     int totalQuestions = 0;
     if (state is ReceiveSuccess) {
-      currentQuestionNumber = state.currentIndex + 1;
       totalQuestions = state.questions.length;
+      // Проверяем что currentIndex не -1 и не выходит за пределы
+      if (state.currentIndex >= 0 && state.currentIndex < totalQuestions) {
+        currentQuestionNumber = state.currentIndex + 1;
+      }
     } else if (state is AnswerInProgress) {
-      currentQuestionNumber = state.currentIndex + 1;
       totalQuestions = state.questions.length;
+      if (state.currentIndex >= 0 && state.currentIndex < totalQuestions) {
+        currentQuestionNumber = state.currentIndex + 1;
+      }
+    }
+    // URL персонажа следующего вопроса для предзагрузки в кэш
+    String? _nextCharacterImageUrl;
+    {
+      final List<GameModuleQuestionEntity> questions;
+      final int currentIndex;
+      if (state is ReceiveSuccess) {
+        questions = state.questions;
+        currentIndex = state.currentIndex;
+      } else if (state is AnswerInProgress) {
+        questions = state.questions;
+        currentIndex = state.currentIndex;
+      } else {
+        questions = const [];
+        currentIndex = -1;
+      }
+      final nextIndex = currentIndex + 1;
+      if (nextIndex < questions.length) {
+        final nextCharacterId = questions[nextIndex].characterId;
+        _nextCharacterImageUrl = characterImages[nextCharacterId];
+      }
     }
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -113,6 +138,17 @@ class _GameQuestionPageState extends State<GameQuestionPage> {
       ),
       body: Stack(
         children: [
+          // Предзагрузка SVG следующего персонажа в кэш
+          if (_nextCharacterImageUrl != null)
+            Offstage(
+              offstage: true,
+              child: SvgPicture.network(
+                key: ValueKey('preload_${_nextCharacterImageUrl}'),
+                _nextCharacterImageUrl!,
+                width: 1,
+                height: 1,
+              ),
+            ),
           if (currentQuestion != null)
             Column(
               children: [
@@ -159,6 +195,7 @@ class _GameQuestionPageState extends State<GameQuestionPage> {
               right: 0,
               child: _buildExplantationOverlay(context, state),
             ),
+            
         ],
       ),
     );
@@ -180,6 +217,7 @@ class _GameQuestionPageState extends State<GameQuestionPage> {
             height: 100,
             child: imageUrl != null
                 ? SvgPicture.network(
+                   key: ValueKey(question.characterId),
                     imageUrl,
                     width: 100,
                     height: 100,
@@ -469,7 +507,7 @@ class MultipleChoiceWidget extends StatelessWidget {
         crossAxisCount: 2,
         mainAxisSpacing: 12,
         crossAxisSpacing: 12,
-        childAspectRatio: 2.5,
+        childAspectRatio: 2,
         children: question.answers.map((answer) {
           final isSelected = answer == selectedAnswer;
           return _buildAnswerCard(
@@ -515,7 +553,7 @@ class MultipleChoiceWidget extends StatelessWidget {
         ),
         child: Center(
           child: Text(
-            answer,
+            answer.toLowerCase(),
             style: GoogleFonts.comme(
               color: isSelected ? AppColors.background : AppColors.blue,
               fontSize: 20,
@@ -663,7 +701,7 @@ class _FillBlankWidgetState extends State<FillBlankWidget> {
                   ),
                   decoration: InputDecoration(
                     hintText: 'Введите ответ...',
-                    hintStyle: GoogleFonts.rubik(
+                    hintStyle: GoogleFonts.comme(
                       color: AppColors.blue,
                       fontSize: 20,
                       fontWeight: FontWeight.w400,

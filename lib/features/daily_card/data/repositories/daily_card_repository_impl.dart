@@ -53,7 +53,7 @@ Future<DailyCardEntity?> getTodayCard({int retries = 3}) async {
     } catch (e) {
       print('[DailyCardRepository] Attempt ${attempt + 1} failed: $e');
       if (attempt == retries - 1) rethrow;
-      await Future.delayed(Duration(milliseconds: 500 * (attempt + 1)));
+      await Future.delayed(Duration(milliseconds: 300 * (attempt + 1)));
     }
   }
   return null;

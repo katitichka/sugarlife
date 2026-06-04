@@ -88,7 +88,7 @@ class _GamePageState extends State<GamePage> {
     }
     _isAchievementDialogVisible = true;
     try {
-      await Future<void>.delayed(const Duration(milliseconds: 500));
+      await Future<void>.delayed(const Duration(milliseconds: 300));
       if (!mounted) return;
       final rootCtx = rootNavigatorKey.currentContext;
       final dialogContext = (rootCtx != null && rootCtx.mounted)
