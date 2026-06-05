@@ -29,15 +29,12 @@ class GameModuleListBloc
           :final stars,
           :final correctAnswers,
         ):
-          // 1. Оптимистичное обновление — сразу отражаем результат в UI,
-          //    не дожидаясь ответа от Supabase.
           _applyOptimisticProgress(
             emit: emit,
             levelId: levelId,
             stars: stars,
             correctAnswers: correctAnswers,
           );
-          // 2. Тихая синхронизация с сервером в фоне.
           await _onSilentRefresh(emit: emit);
       }
     });
@@ -52,29 +49,43 @@ class GameModuleListBloc
       ),
     );
 
-    Future<GameModuleListState> fetch() async {
-      final levels = await _gameModuleLevelListRepository.getAllLevels();
-      final allLevelsProgress = await _gameProgressRepository
-          .getAllLevelsProgress()
-          .timeout(const Duration(seconds: 15));
-      return GameModuleListState.receiveSuccess(
-        levels: levels,
-        progressMap: allLevelsProgress,
-      );
-    }
+    const maxRetries = 3;
+    const retryDelay = Duration(seconds: 3);
 
-    try {
-      emit(await fetch());
-    } catch (_) {
-      await Future.delayed(const Duration(seconds: 3));
+    for (int attempt = 1; attempt <= maxRetries; attempt++) {
       try {
-        emit(await fetch());
-      } catch (_) {
+        print('=== ПОПЫТКА ЗАГРУЗКИ УРОВНЕЙ $attempt/$maxRetries ===');
+        
+        final levels = await _gameModuleLevelListRepository
+            .getAllLevels()
+            .timeout(const Duration(seconds: 10));
+            
+        final allLevelsProgress = await _gameProgressRepository
+            .getAllLevelsProgress()
+            .timeout(const Duration(seconds: 10));
+            
         emit(
-          const GameModuleListState.receiveFailed(
-            message: 'Не удалось загрузить уровни. Проверьте соединение.',
+          GameModuleListState.receiveSuccess(
+            levels: levels,
+            progressMap: allLevelsProgress,
           ),
         );
+        return; // Успех — выходим
+        
+      } catch (e) {
+        print('=== ОШИБКА ЗАГРУЗКИ (попытка $attempt): $e ===');
+        
+        if (attempt == maxRetries) {
+          // Последняя попытка — показываем ошибку
+          emit(
+            const GameModuleListState.receiveFailed(
+              message: 'Не удалось загрузить уровни. Проверьте соединение.',
+            ),
+          );
+        } else {
+          // Ждём 3 секунды перед следующей попыткой
+          await Future.delayed(retryDelay);
+        }
       }
     }
   }
@@ -113,6 +124,8 @@ class GameModuleListBloc
         ),
       );
     } catch (_) {
+      // Фоновое обновление не должно показывать ошибку пользователю
+      print('Фоновое обновление не удалось, оставляем текущее состояние');
     }
   }
 }

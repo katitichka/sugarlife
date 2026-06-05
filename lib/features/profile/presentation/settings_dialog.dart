@@ -11,8 +11,9 @@ import 'package:sugarlife/features/profile/domain/repositories/profile_repositor
 
 class SettingsDialog extends StatelessWidget {
   final ProfileEntity profile;
+  final VoidCallback onAvatarChanged; 
 
-  const SettingsDialog({super.key, required this.profile});
+  const SettingsDialog({super.key, required this.profile, required this.onAvatarChanged,});
 
   // Диалог изменения имени
   // Диалог изменения имени - обновите метод _showEditNameDialog
@@ -314,6 +315,7 @@ Future<bool> _showAvatarSelectionSheet(
             ),
           ),
         );
+        onAvatarChanged();
         return true;
       }
     } catch (_) {
@@ -441,4 +443,5 @@ Future<bool> _showAvatarSelectionSheet(
       ),
     );
   }
+  
 }

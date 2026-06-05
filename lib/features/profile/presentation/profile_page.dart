@@ -30,10 +30,9 @@ class _ProfilePageState extends State<ProfilePage> {
   late final TextEditingController _usernameController;
   late final ProfileRepository _profileRepository;
   
-  // Для повторного запроса аватарки
-  int _avatarLoadAttempts = 0;
+  // Ключ для принудительного обновления аватара
+  int _avatarVersion = 0;
   Timer? _retryTimer;
-  String? _cachedAvatarUrl;
 
   @override
   void initState() {
@@ -57,31 +56,28 @@ class _ProfilePageState extends State<ProfilePage> {
     super.dispose();
   }
 
+  /// Обновляет аватар (вызывается после изменения)
+  void _refreshAvatar() {
+    setState(() {
+      _avatarVersion++;
+    });
+  }
+
   /// Загрузка аватарки с повтором при ошибке
   Future<String> _loadAvatarWithRetry(int avatarId) async {
-    // Если уже есть кэшированный URL, возвращаем его
-    if (_cachedAvatarUrl != null && _cachedAvatarUrl!.isNotEmpty) {
-      return _cachedAvatarUrl!;
-    }
-    
     try {
       final url = await _profileRepository.getAvatarUrl(avatarId);
       if (url.isNotEmpty) {
-        _cachedAvatarUrl = url;
-        _avatarLoadAttempts = 0;
         return url;
       }
       throw Exception('Empty URL');
     } catch (e) {
-      if (_avatarLoadAttempts < 1) {
-        _avatarLoadAttempts++;
-        _retryTimer?.cancel();
-        _retryTimer = Timer(const Duration(seconds: 3), () {
-          if (mounted) {
-            setState(() {});
-          }
-        });
-      }
+      _retryTimer?.cancel();
+      _retryTimer = Timer(const Duration(seconds: 3), () {
+        if (mounted) {
+          setState(() {});
+        }
+      });
       rethrow;
     }
   }
@@ -109,7 +105,10 @@ class _ProfilePageState extends State<ProfilePage> {
                       context: context,
                       barrierColor: AppColors.blue.withValues(alpha: 0.4),
                       barrierDismissible: true,
-                      builder: (_) => SettingsDialog(profile: profile),
+                      builder: (_) => SettingsDialog(
+                        profile: profile,
+                        onAvatarChanged: _refreshAvatar,
+                      ),
                     ),
                   ),
                 ],
@@ -135,7 +134,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         width: 190,
                         height: 190,
                         child: FutureBuilder<String>(
-                          key: ValueKey(_avatarLoadAttempts),
+                          key: ValueKey('avatar_${profile.currentAvatarId}_$_avatarVersion'),
                           future: _loadAvatarWithRetry(profile.currentAvatarId),
                           builder: (context, snapshot) {
                             if (snapshot.connectionState ==
