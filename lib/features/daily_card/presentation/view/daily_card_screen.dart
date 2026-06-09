@@ -106,13 +106,23 @@ class _DialogContent extends StatelessWidget {
                     explanation: explanation,
                     isMyth: isMyth,
                   ),
-                NoMoreCards() => const Text(
+                NoMoreCards() =>  Text(
                   'Карточки закончились, но скоро появятся новые факты!',
                   textAlign: TextAlign.center,
+                  style: GoogleFonts.rubik(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.blue,
+                  ),
                 ),
                 Error(:final message) => Text(
                   'Ошибка загрузки карточки. Проверьте интернет соединение',
                   textAlign: TextAlign.center,
+                  style: GoogleFonts.rubik(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.blue,
+                  ),
                 ),
                 _ => const SizedBox.shrink(),
               },

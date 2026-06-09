@@ -1,6 +1,7 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:sugarlife/core/router/root_navigator.dart';
 import 'package:sugarlife/core/theme/app_color.dart';
 import 'package:sugarlife/features/achievement/domain/entities/achievement_entity.dart';
@@ -98,7 +99,6 @@ class _LoadingPage extends StatelessWidget {
     );
   }
 }
-
 class _ErrorPage extends StatelessWidget {
   final VoidCallback onRetry;
   const _ErrorPage({required this.onRetry});
@@ -106,20 +106,41 @@ class _ErrorPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.background,
       body: Center(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 32),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text(
+              Text(
                 'Не удалось загрузить уровень.\nПроверьте соединение с интернетом.',
                 textAlign: TextAlign.center,
+                style: GoogleFonts.rubik(
+                  color: AppColors.blue,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 24),
               ElevatedButton(
                 onPressed: onRetry,
-                child: const Text('Повторить'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.blue,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                ),
+                child: Text(
+                  'Повторить',
+                  style: GoogleFonts.rubik(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                  ),
+                ),
               ),
             ],
           ),
