@@ -123,6 +123,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     fontSize: 20,
                     fontWeight: FontWeight.w500,
                   ),
+                  selectionControls: MaterialTextSelectionControls(),
                   decoration: InputDecoration(
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(30),
@@ -183,6 +184,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     fontSize: 20,
                     fontWeight: FontWeight.w500,
                   ),
+                  selectionControls: MaterialTextSelectionControls(),
                   decoration: InputDecoration(
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(30),
@@ -244,6 +246,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     fontSize: 20,
                     fontWeight: FontWeight.w500,
                   ),
+                  selectionControls: MaterialTextSelectionControls(),
                   decoration: InputDecoration(
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(30),

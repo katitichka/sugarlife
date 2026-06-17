@@ -113,6 +113,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   controller: _emailController,
                   focusNode: _emailFocusNode,
                   cursorColor: AppColors.background,
+                  selectionControls: MaterialTextSelectionControls(),
                   style: GoogleFonts.rubik(
                     color: AppColors.blue,
                     fontSize: 20,
@@ -173,6 +174,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   focusNode: _passwordFocusNode,
                   controller: _passwordController,
                   cursorColor: AppColors.background,
+                  selectionControls: MaterialTextSelectionControls(),
                   obscureText: true,
                   style: GoogleFonts.rubik(
                     color: AppColors.blue,
