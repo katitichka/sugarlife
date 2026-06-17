@@ -66,7 +66,7 @@ class GameModuleLevelBloc
 }) async {
   emit(const ReceiveInProgress(message: 'Получение вопросов'));
   
-  const maxRetries = 2; 
+  const maxRetries = 3; 
   const timeout = Duration(seconds: 3);
   
   for (int attempt = 1; attempt <= maxRetries; attempt++) {

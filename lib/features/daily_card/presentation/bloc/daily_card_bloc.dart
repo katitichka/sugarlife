@@ -29,7 +29,7 @@ class DailyCardBloc extends Bloc<DailyCardEvent, DailyCardState> {
   Future<void> _onLoadTodayCard(Emitter<DailyCardState> emit) async {
     emit(const Loading());
     
-    const maxRetries = 2;
+    const maxRetries = 3;
     const timeout = Duration(seconds: 3);
     
     for (int attempt = 1; attempt <= maxRetries; attempt++) {
