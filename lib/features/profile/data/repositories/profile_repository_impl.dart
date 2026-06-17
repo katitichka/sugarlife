@@ -11,7 +11,6 @@ class ProfileRepositoryImpl implements ProfileRepository {
 
   ProfileRepositoryImpl(this._supabase, this._cache);
 
-  /// Bucket в Supabase Storage, где лежат SVG (`avatars.image_url` — путь от корня bucket).
   static const String _avatarsSvgBucket = 'avatars';
 
   String _publicSvgUrl(String raw) {
@@ -79,11 +78,9 @@ Future<List<AvatarEntity>> getAllAvatars() async {
   // Проверяем кэш
   final cachedAvatars = _cache.avatars;
   if (cachedAvatars != null) {
-    print('✅ Возвращаем аватары из кэша: ${cachedAvatars.length}');
     return cachedAvatars;
   }
 
-  print('❌ Кэш пуст, загружаем из Supabase');
   final response = await _supabase
       .from('avatars')
       .select('id, image_url')
@@ -101,7 +98,6 @@ Future<List<AvatarEntity>> getAllAvatars() async {
 
   // Сохраняем в кэш
   _cache.saveAvatars(avatars);
-  print('💾 Сохранили аватары в кэш: ${avatars.length}');
   return avatars;
 }
 }

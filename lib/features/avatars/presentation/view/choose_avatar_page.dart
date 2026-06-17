@@ -32,11 +32,9 @@ class _ChooseAvatarPageState extends State<ChooseAvatarPage> {
   }
 
   Future<void> _loadAvatars() async {
-    print('Начинаю загрузку аватаров...');
     try {
       final repository = context.read<ProfileRepository>();
       final avatars = await repository.getAllAvatars();
-      print("Avatars: ${avatars.length}");
       
       final Map<int, Uint8List?> preloaded = {};
       for (final avatar in avatars) {

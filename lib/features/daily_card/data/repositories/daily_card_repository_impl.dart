@@ -15,7 +15,6 @@ Future<DailyCardEntity?> getTodayCard({int retries = 3}) async {
     try {
       final userId = _supabase.auth.currentUser?.id;
       if (userId == null) {
-        print('Пользователь не авторизован');
         return null;
       }
 
@@ -26,7 +25,7 @@ Future<DailyCardEntity?> getTodayCard({int retries = 3}) async {
           .maybeSingle();
 
       if (userResponse == null) {
-        print('[DailyCardRepository] User profile not found: $_userId');
+        print('Пользователь не найден: $_userId');
         return null;
       }
 
@@ -34,7 +33,6 @@ Future<DailyCardEntity?> getTodayCard({int retries = 3}) async {
       final today = DateTime.now();
       final dayNumber = today.difference(createdAt).inDays + 1;
       
-      print('[DailyCardRepository] Day number: $dayNumber, attempt: ${attempt + 1}');
 
       final response = await _supabase
           .from('daily_cards')
@@ -47,11 +45,9 @@ Future<DailyCardEntity?> getTodayCard({int retries = 3}) async {
         return DailyCardDtoMapper.toEntity(dto: dto);
       }
       
-      print('[DailyCardRepository] No card for day: $dayNumber');
       return null;
       
     } catch (e) {
-      print('[DailyCardRepository] Attempt ${attempt + 1} failed: $e');
       if (attempt == retries - 1) rethrow;
       await Future.delayed(Duration(milliseconds: 300 * (attempt + 1)));
     }
@@ -69,10 +65,8 @@ Future<void> saveUserAnswer(int cardId, bool isCorrect) async {
       'completed_at': DateTime.now().toIso8601String(),
     }, onConflict: 'user_id,card_id');
     
-    print('[DailyCardRepository] Answer saved: cardId=$cardId, isCorrect=$isCorrect');
   } catch (e, stackTrace) {
-    print('[DailyCardRepository] Save answer error: $e');
-    print('[DailyCardRepository] Stack: $stackTrace');
+    print('Ошибка сохранения ответа: $e');
     rethrow;
   }
 }
@@ -93,7 +87,7 @@ Future<bool> hasAnsweredToday() async {
 
     return response.isNotEmpty;
   } catch (e) {
-    print('[DailyCardRepository] Check answered error: $e');
+    print('Ошибка проверки: $e');
     return false;
   }
 }
@@ -125,7 +119,7 @@ Future<Map<String, dynamic>?> getAnsweredCardForToday() async {
       'card': cardEntity,
     };
   } catch (e) {
-    print('[DailyCardRepository] Get answered card error: $e');
+    print('Ошибка сохранения: $e');
     return null;
   }
 }

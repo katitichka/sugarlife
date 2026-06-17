@@ -71,9 +71,6 @@ class GameModuleLevelBloc
   
   for (int attempt = 1; attempt <= maxRetries; attempt++) {
     try {
-      print('=== ПОПЫТКА ЗАГРУЗКИ $attempt ИЗ $maxRetries ===');
-      
-      // Загружаем всё параллельно с таймаутом
       final results = await Future.wait([
         _levelProgressRepository.getLevelProgress(levelId: levelId).timeout(timeout),
         _gameModuleLevelRepository.getQuestionsForLevel(levelId: levelId).timeout(timeout),
@@ -94,16 +91,14 @@ class GameModuleLevelBloc
           characterImages: characterImages,
         ),
       );
-      return; // Успешно завершаем
+      return; 
       
     } catch (e) {
-      print('=== ОШИБКА ЗАГРУЗКИ (попытка $attempt): $e ===');
-      
       if (attempt == maxRetries) {
-        // Последняя попытка - показываем ошибку
+        // Последняя попытка - показыв ошибки
         emit(ReceiveFailed(message: 'Не удалось загрузить уровень. Проверьте подключение к интернету.'));
       } else {
-        // Ждём 3 секунд перед следующей попыткой
+        // 3 секунды перед следующей попыткой
         await Future.delayed(const Duration(seconds: 3));
       }
     }
@@ -282,9 +277,6 @@ class GameModuleLevelBloc
       );
     } else {
       final correctCount = answers.values.where((correct) => correct).length;
-      print('=== РАСЧЁТ ЗВЁЗД ===');
-      print('correctCount: $correctCount');
-      print('answers: $answers');
       int stars;
       if (correctCount >= 3) {
         stars = 3;
@@ -296,7 +288,6 @@ class GameModuleLevelBloc
         stars = 0;
       }
 
-      // FIX 1: try-catch вокруг сетевых вызовов — emit(LevelCompleted) всегда срабатывает
       try {
         await _levelProgressRepository.saveLevelProgress(
           levelId: questions.first.levelId,
@@ -364,10 +355,6 @@ class GameModuleLevelBloc
         final progress = progressMap[level.id];
         return progress != null && (progress.stars ?? 0) > 0;
       });
-
-      print(
-        'Модуль ${currentLevel.theoryModuleId} полностью пройден: $isModuleCompleted',
-      );
       if (!isModuleCompleted) {
         return null;
       }
@@ -375,7 +362,6 @@ class GameModuleLevelBloc
       final alreadyGranted = await _achievementRepository
           .isModuleAchievementGranted(currentLevel.theoryModuleId);
       if (alreadyGranted) {
-        print('Достижение за модуль ${currentLevel.theoryModuleId} уже выдавалось');
         return null;
       }
 
@@ -383,7 +369,6 @@ class GameModuleLevelBloc
       if (achievement != null) {
         await _achievementRepository
             .markModuleAchievementGranted(currentLevel.theoryModuleId);
-        print('Выдано достижение ${achievement.id}: ${achievement.name}');
       }
       return achievement;
     } catch (e) {

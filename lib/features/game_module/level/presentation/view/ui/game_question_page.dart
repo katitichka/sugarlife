@@ -80,12 +80,10 @@ class _GameQuestionPageState extends State<GameQuestionPage> {
         _selectedBoolAnswer ??
         _selectedMultipleSelectAnswer;
 
-    // Получаем текущий номер вопроса
     int currentQuestionNumber = 0;
     int totalQuestions = 0;
     if (state is ReceiveSuccess) {
       totalQuestions = state.questions.length;
-      // Проверяем что currentIndex не -1 и не выходит за пределы
       if (state.currentIndex >= 0 && state.currentIndex < totalQuestions) {
         currentQuestionNumber = state.currentIndex + 1;
       }

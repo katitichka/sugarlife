@@ -15,8 +15,6 @@ class SettingsDialog extends StatelessWidget {
 
   const SettingsDialog({super.key, required this.profile, required this.onAvatarChanged,});
 
-  // Диалог изменения имени
-  // Диалог изменения имени - обновите метод _showEditNameDialog
 void _showEditNameDialog(BuildContext context, ProfileEntity currentProfile) {
   final controller = TextEditingController(text: currentProfile.username);
   final repository = context.read<ProfileRepository>();
@@ -114,7 +112,7 @@ void _showEditNameDialog(BuildContext context, ProfileEntity currentProfile) {
                           AuthEvent.profileUpdate(newProfile: updatedProfile),
                         );
                         if (context.mounted) {
-                          Navigator.pop(context); // закрываем диалог
+                          Navigator.pop(context); 
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Text(
@@ -177,7 +175,6 @@ void _showEditNameDialog(BuildContext context, ProfileEntity currentProfile) {
   );
 }
 
-  // Диалог выхода
   void _showLogoutDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -377,7 +374,7 @@ Future<bool> _showAvatarSelectionSheet(
                             if (result == true && context.mounted) {
                               Navigator.pop(
                                 context,
-                              ); // закрываем SettingsDialog
+                              ); 
                             }
                           },
                           iconPath: 'assets/profile/edit_avatar.svg',

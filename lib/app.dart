@@ -20,7 +20,7 @@ import 'package:sugarlife/features/theory_module/data/providers/implementations/
 import 'package:sugarlife/features/theory_module/data/repositories/theory_module_repository_impl.dart';
 import 'package:sugarlife/features/theory_module/domain/repositories/theory_module_repository.dart';
 import 'package:sugarlife/features/theory_module/presentation/bloc/theory_module_bloc.dart';
-import 'package:sugarlife/features/widgets/sweet_life_app.dart';
+import 'package:sugarlife/shared/ui/sweet_life_app.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 Future<void> app(SupabaseClient supabase) async {

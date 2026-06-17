@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sugarlife/core/theme/app_color.dart';
 
-/// Three horizontally aligned dots with a staggered fade animation.
 class AnimatedLoadingDots extends StatefulWidget {
   const AnimatedLoadingDots({
     super.key,

@@ -16,31 +16,26 @@ class AuthRepositoryImpl implements AuthRepository {
     required String password,
   }) async {
     try {
-      // Аутентификация пользователя в Supabase
       final response = await _supabase.auth.signInWithPassword(
         email: email,
         password: password,
       );
 
-      // Проверка наличия данных пользователя в ответе
       final authUser = response.user;
       if (authUser == null) {
         throw Exception('Не удалось войти');
       }
 
-      // Получение данных профиля из таблицы user_profile
       final profileData = await _supabase
           .from('user_profile')
           .select()
           .eq('id', authUser.id)
           .maybeSingle();
 
-      // Проверка существования профиля
       if (profileData == null) {
         throw Exception('Профиль пользователя не найден');
       }
 
-      // Формирование и возврат сущности профиля
       return ProfileEntity(
         id: authUser.id,
         username: profileData['username'] ?? '',
@@ -55,11 +50,9 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<ProfileEntity?> getCurrentUser() async {
     try {
-      // Получение текущего авторизованного пользователя
       final authUser = _supabase.auth.currentUser;
       if (authUser == null) return null;
 
-      // Получение данных профиля
       final profileData = await _supabase
           .from('user_profile')
           .select()
@@ -68,7 +61,6 @@ class AuthRepositoryImpl implements AuthRepository {
 
       if (profileData == null) return null;
 
-      // Формирование сущности профиля
       return ProfileEntity(
         id: authUser.id,
         username: profileData['username'] ?? '',
@@ -83,7 +75,6 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<void> logout() async {
     try {
-      // Выход из текущей сессии
       await _supabase.auth.signOut();
     } catch (e) {
       print('Ошибка выхода: $e');
@@ -91,7 +82,6 @@ class AuthRepositoryImpl implements AuthRepository {
     }
    try {
     await _cache.clearAll();
-    print('Кэш очищен');
   } catch (e) {
     print('Ошибка очистки кэша: $e');
   }
@@ -110,26 +100,22 @@ class AuthRepositoryImpl implements AuthRepository {
     required String username,
   }) async {
     try {
-      // Регистрация нового пользователя в Supabase Auth
       final response = await _supabase.auth.signUp(
         email: email,
         password: password,
         data: {'username': username},
       );
-      // Проверка успешности создания пользователя
       final authUser = response.user;
       if (authUser == null) {
         throw Exception('Не удалось создать пользователя');
       }
 
-      // Попытка получения профиля (должен создаться триггером)
       final profileData = await _supabase
           .from('user_profile')
           .select()
           .eq('id', authUser.id)
           .maybeSingle();
 
-      // Создание профиля вручную, если триггер не сработал
       if (profileData == null) {
         await _supabase.from('user_profile').insert({
           'id': authUser.id,
@@ -137,7 +123,6 @@ class AuthRepositoryImpl implements AuthRepository {
           'current_avatar_id': 1,
         });
 
-        // Получение созданного профиля
         final newProfileData = await _supabase
             .from('user_profile')
             .select()
@@ -147,7 +132,6 @@ class AuthRepositoryImpl implements AuthRepository {
         return _mapToProfileEntity(authUser, newProfileData);
       }
 
-      // Возврат существующего профиля
       return _mapToProfileEntity(authUser, profileData);
     } catch (e) {
       print('Ошибка регистрации: $e');
@@ -162,21 +146,19 @@ class AuthRepositoryImpl implements AuthRepository {
         'check_email_exists',
         params: {'p_email': email},
       );
-      return result ?? false; // если результат null, возвращаем false
+      return result ?? false;
     } catch (e) {
       print('Ошибка проверки email: $e');
-      return false; // при ошибке считаем, что email свободен
+      return false; 
     }
   }
 }
 
-// Преобразование данных из Supabase в сущность ProfileEntity
 ProfileEntity _mapToProfileEntity(
   User authUser,
   Map<String, dynamic> profileData,
 ) {
 
-  // Формирование сущности профиля
   return ProfileEntity(
     id: authUser.id,
     username: profileData['username'] ?? '',

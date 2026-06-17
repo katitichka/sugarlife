@@ -30,7 +30,6 @@ class _ProfilePageState extends State<ProfilePage> {
   late final TextEditingController _usernameController;
   late final ProfileRepository _profileRepository;
   
-  // Ключ для принудительного обновления аватара
   int _avatarVersion = 0;
   Timer? _retryTimer;
 
@@ -56,14 +55,12 @@ class _ProfilePageState extends State<ProfilePage> {
     super.dispose();
   }
 
-  /// Обновляет аватар (вызывается после изменения)
   void _refreshAvatar() {
     setState(() {
       _avatarVersion++;
     });
   }
 
-  /// Загрузка аватарки с повтором при ошибке
   Future<String> _loadAvatarWithRetry(int avatarId) async {
     try {
       final url = await _profileRepository.getAvatarUrl(avatarId);

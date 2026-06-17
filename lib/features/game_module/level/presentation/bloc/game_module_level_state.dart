@@ -34,7 +34,6 @@ sealed class GameModuleLevelState with _$GameModuleLevelState {
     required int totalQuestions,
     required int stars,
 
-    /// Если модуль только что закрыт — сущность для показа карточки без ожидания prefs.
     AchievementEntity? unlockedAchievement,
   }) = LevelCompleted;
 }

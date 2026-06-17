@@ -135,7 +135,6 @@ class AchievementRepositoryImpl implements AchievementRepository {
         .toList();
 
     if (allAchievements.isEmpty) {
-      print('Нет достижений в БД');
       return null;
     }
 
@@ -147,7 +146,6 @@ class AchievementRepositoryImpl implements AchievementRepository {
         .toList();
 
     if (available.isEmpty) {
-      print('Все достижения уже получены');
       return null;
     }
 
@@ -167,13 +165,10 @@ class AchievementRepositoryImpl implements AchievementRepository {
           .eq('achievement_id', achievement.id)
           .maybeSingle();
       if (relationAfterFailure == null) {
-        print('❌ Ошибка вставки: $e');
+        print('Ошибка вставки: $e');
         return null;
       }
-      print('⚠️ Достижение ${achievement.id} уже есть в БД');
     }
-
-    print('Выдано достижение ${achievement.id}: ${achievement.name}');
 
     final prefs = await _prefs;
     await prefs.setInt(_pendingAchievementKey, achievement.id);

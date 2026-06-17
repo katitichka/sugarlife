@@ -283,7 +283,6 @@ class _LoginScreenState extends State<LoginScreen> {
                           _isLoading)
                       ? null
                       : () async {
-                          // Провека полей
                           setState(() {
                             _emailError = _emailController.text.isEmpty
                                 ? 'Введите email'

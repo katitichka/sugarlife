@@ -34,9 +34,6 @@ class DailyCardBloc extends Bloc<DailyCardEvent, DailyCardState> {
     
     for (int attempt = 1; attempt <= maxRetries; attempt++) {
       try {
-        print('=== ПОПЫТКА ЗАГРУЗКИ КАРТОЧКИ $attempt/$maxRetries ===');
-        
-        // Загружаем с таймаутом
         final answeredCard = await _repository
             .getAnsweredCardForToday()
             .timeout(timeout);
@@ -63,12 +60,10 @@ class DailyCardBloc extends Bloc<DailyCardEvent, DailyCardState> {
         return;
         
       } catch (e) {
-        print('=== ОШИБКА ЗАГРУЗКИ (попытка $attempt): $e ===');
-        
         if (attempt == maxRetries) {
           emit(const Error(message: 'Не удалось загрузить карточку. Проверьте подключение к интернету.'));
         } else {
-          // Ждём 1 секунду перед следующей попыткой
+          // 1 секунда перед следующей попыткой
           await Future.delayed(const Duration(seconds: 1));
         }
       }
@@ -89,8 +84,6 @@ class DailyCardBloc extends Bloc<DailyCardEvent, DailyCardState> {
     
     for (int attempt = 1; attempt <= maxRetries; attempt++) {
       try {
-        print('=== ПОПЫТКА СОХРАНЕНИЯ ОТВЕТА $attempt/$maxRetries ===');
-        
         await _repository
             .saveUserAnswer(cardId, isCorrect)
             .timeout(timeout);
@@ -103,8 +96,6 @@ class DailyCardBloc extends Bloc<DailyCardEvent, DailyCardState> {
         return;
         
       } catch (e) {
-        print('=== ОШИБКА СОХРАНЕНИЯ (попытка $attempt): $e ===');
-        
         if (attempt == maxRetries) {
           emit(const Error(message: 'Не удалось сохранить ответ. Проверьте подключение к интернету.'));
         } else {

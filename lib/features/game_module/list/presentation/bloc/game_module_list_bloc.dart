@@ -54,8 +54,6 @@ class GameModuleListBloc
 
     for (int attempt = 1; attempt <= maxRetries; attempt++) {
       try {
-        print('=== ПОПЫТКА ЗАГРУЗКИ УРОВНЕЙ $attempt/$maxRetries ===');
-        
         final levels = await _gameModuleLevelListRepository
             .getAllLevels()
             .timeout(const Duration(seconds: 10));
@@ -70,20 +68,18 @@ class GameModuleListBloc
             progressMap: allLevelsProgress,
           ),
         );
-        return; // Успех — выходим
+        return; // Успех — выход
         
       } catch (e) {
-        print('=== ОШИБКА ЗАГРУЗКИ (попытка $attempt): $e ===');
-        
         if (attempt == maxRetries) {
-          // Последняя попытка — показываем ошибку
+          // Последняя попытка — показ ошибки
           emit(
             const GameModuleListState.receiveFailed(
               message: 'Не удалось загрузить уровни. Проверьте соединение.',
             ),
           );
         } else {
-          // Ждём 3 секунды перед следующей попыткой
+          // 3 секунды перед следующей попыткой
           await Future.delayed(retryDelay);
         }
       }
@@ -124,8 +120,6 @@ class GameModuleListBloc
         ),
       );
     } catch (_) {
-      // Фоновое обновление не должно показывать ошибку пользователю
-      print('Фоновое обновление не удалось, оставляем текущее состояние');
     }
   }
 }

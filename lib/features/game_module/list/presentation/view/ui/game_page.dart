@@ -309,9 +309,7 @@ class _GamePageState extends State<GamePage> {
           child: Stack(
             alignment: Alignment.center,
             children: [
-              // Иконка уровня
               _getLevelIcon(assetPath, isPressed),
-              // Номер уровня поверх иконки
               _getLevelNumberText(orderIndex, isPressed),
             ],
           ),

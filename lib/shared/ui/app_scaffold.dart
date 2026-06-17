@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sugarlife/core/theme/app_color.dart';
-import 'package:sugarlife/features/widgets/bottom_island.dart';
+import 'package:sugarlife/shared/ui/bottom_island.dart';
 
 class AppScaffold extends StatelessWidget {
   final StatefulNavigationShell navigationShell;
@@ -10,7 +10,6 @@ class AppScaffold extends StatelessWidget {
   const AppScaffold({super.key, required this.navigationShell, required this.showBottomNav});
   @override
   Widget build(BuildContext context) {
-    print('AppScaffold build: showBottomNav = $showBottomNav');
     return Scaffold(
       backgroundColor: AppColors.blue,
       body: Stack(

@@ -14,7 +14,7 @@ import 'package:sugarlife/features/profile/presentation/profile_page.dart';
 import 'package:sugarlife/features/theory_module/presentation/theory_module_provider.dart';
 import 'package:sugarlife/features/theory_module/presentation/ui/theory_page.dart';
 import 'package:sugarlife/features/theory_module/presentation/ui/theory_screen_page.dart';
-import 'package:sugarlife/features/widgets/app_scaffold.dart';
+import 'package:sugarlife/shared/ui/app_scaffold.dart';
 
 final appRoute = GoRouter(
   navigatorKey: rootNavigatorKey,
@@ -43,7 +43,6 @@ final appRoute = GoRouter(
         return ChooseAvatarPage(currentAvatarId: currentAvatarId);
       },
     ),
-    // После авторизации
     StatefulShellRoute.indexedStack(
       builder: (context, state, navigationShell) {
         final fullPath = state.fullPath ?? '';
@@ -138,14 +137,12 @@ final appRoute = GoRouter(
         if (isLoggedIn && (location == '/login' || location == '/register')) {
           return '/game';
         }
-        // Если пользователь НЕ авторизован и пытается зайти в защищённую часть
         if (!isLoggedIn &&
             (location == '/game' ||
                 location == '/theory' ||
                 location == '/profile')) {
           return '/login';
         }
-        // В остальных случаях остаёмся на месте
         return null;
       },
     ),

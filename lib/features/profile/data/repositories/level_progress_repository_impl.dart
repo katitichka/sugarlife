@@ -5,7 +5,6 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 class LevelProgressRepositoryImpl implements LevelProgressRepository {
   final SupabaseClient _supabase;
   LevelProgressRepositoryImpl(this._supabase);
-  // Возвращает прогресс конкретного уровня для текущего пользователя
   @override
   Future<LevelProgressEntity?> getLevelProgress({required int levelId}) async {
     final userId = _supabase.auth.currentUser!.id;
@@ -29,7 +28,6 @@ class LevelProgressRepositoryImpl implements LevelProgressRepository {
     return null;
   }
 
-  // Сохраняет или обновляет прогресс уровня после прохождения
   @override
   Future<void> saveLevelProgress({
     required int levelId,
@@ -69,7 +67,6 @@ class LevelProgressRepositoryImpl implements LevelProgressRepository {
     }
   }
 
-  // Проверяет, пройден ли уровнь (если есть запись со звёздами)
   @override
   Future<bool> isLevelCompleted(int levelId) async {
     final userId = _supabase.auth.currentUser!.id;
@@ -86,7 +83,6 @@ class LevelProgressRepositoryImpl implements LevelProgressRepository {
     return stars != null;
   }
 
-  // Возвращает прогресс по всем уровням текущего пользователя
   @override
   Future<Map<int, LevelProgressEntity>> getAllLevelsProgress() async {
     final userId = _supabase.auth.currentUser!.id;

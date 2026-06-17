@@ -43,7 +43,7 @@ class AchievementBloc extends Bloc<AchievementEvent, AchievementState> {
         ),
       );
     } catch (e) {
-      print('Ошибка получения pending-достижения: $e');
+      print('Ошибка получения достижения: $e');
       emit(
         state.copyWith(
           pendingAchievement: null,
@@ -62,7 +62,7 @@ class AchievementBloc extends Bloc<AchievementEvent, AchievementState> {
         achievementId: achievementId,
       );
     } catch (e) {
-      print('Ошибка сохранения показа достижения: $e');
+      print('Ошибка показа достижения: $e');
     }
 
     emit(

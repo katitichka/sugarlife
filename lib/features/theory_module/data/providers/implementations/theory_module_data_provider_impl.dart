@@ -18,7 +18,6 @@ class TheoryModuleDataProviderImpl implements TheoryModuleDataProvider {
           .map<TheoryModuleDto>((rawData) => _convertToDto(rawData))
           .toList();
     } catch (e) {
-      print('❌ Ошибка в getModules(): $e');
       rethrow;
     }
   }

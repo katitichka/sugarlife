@@ -122,7 +122,7 @@ class _ErrorPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print('❌ Ошибка загрузки модулей: $message');
+    print('Ошибка загрузки модулей: $message');
 
     return Center(
       child: Column(

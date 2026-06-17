@@ -28,8 +28,8 @@ class TheoryListCard extends StatelessWidget {
           boxShadow: [
             BoxShadow(
               color: mixWithBlack(module.color, 0.1),
-              offset: Offset(3, 3), // справа и снизу
-              blurRadius: 0, // без размытия
+              offset: Offset(3, 3),
+              blurRadius: 0,
               spreadRadius: 0,
             ),
           ],
