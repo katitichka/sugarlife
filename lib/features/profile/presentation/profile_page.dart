@@ -146,7 +146,7 @@ class _ProfilePageState extends State<ProfilePage> {
                               return const Center(
                                 child: Icon(
                                   Icons.error_outline,
-                                  color: AppColors.background,
+                                  color: AppColors.error,
                                   size: 48,
                                 ),
                               );

@@ -10,14 +10,14 @@ _GameModuleQuestionDto _$GameModuleQuestionDtoFromJson(
   Map<String, dynamic> json,
 ) => _GameModuleQuestionDto(
   id: (json['id'] as num).toInt(),
-  question: json['question'] as String,
-  questionsType: json['question_type'] as String,
-  answers: (json['answers'] as List<dynamic>).map((e) => e as String).toList(),
-  explanation: json['explanation'] as String,
-  orderIndex: (json['order_index'] as num).toInt(),
+  question: json['question'] as String?,
+  questionType: json['question_type'] as String?,
+  answers: json['answers'] as List<dynamic>?,
+  explanation: json['explanation'] as String?,
+  orderIndex: (json['order_index'] as num?)?.toInt(),
   levelId: (json['level_id'] as num).toInt(),
-  correctAnswer: json['correct_answer'] as String,
-  characterId: (json['character_id'] as num?)?.toInt(),
+  correctAnswer: json['correct_answer'],
+  characterId: json['character_id'] as num?,
 );
 
 Map<String, dynamic> _$GameModuleQuestionDtoToJson(
@@ -25,7 +25,7 @@ Map<String, dynamic> _$GameModuleQuestionDtoToJson(
 ) => <String, dynamic>{
   'id': instance.id,
   'question': instance.question,
-  'question_type': instance.questionsType,
+  'question_type': instance.questionType,
   'answers': instance.answers,
   'explanation': instance.explanation,
   'order_index': instance.orderIndex,

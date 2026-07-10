@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sugarlife/core/theme/app_color.dart';
 import 'package:sugarlife/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:sugarlife/shared/ui/app_inline_error_text.dart';
 import 'package:sugarlife/shared/ui/lottie_progress_indicator.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -329,19 +330,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                 ),
                 SizedBox(height: 30,),
-                if (_authError != null)
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 10),
-                    child: Text(
-                      _authError!,
-                      style: GoogleFonts.rubik(
-                        color: AppColors.error,
-                        fontSize: 17,
-                        fontWeight: FontWeight.w400,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
+                if (_authError != null) AppInlineErrorText(message: _authError!),
                 ElevatedButton(
                   onPressed: (_nameController.text.isEmpty ||
                           _emailController.text.isEmpty ||

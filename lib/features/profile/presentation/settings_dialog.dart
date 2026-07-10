@@ -8,6 +8,7 @@ import 'package:sugarlife/features/avatars/domain/entities/avatar_entity.dart';
 import 'package:sugarlife/features/avatars/presentation/view/choose_avatar_page.dart';
 import 'package:sugarlife/features/profile/domain/entities/profile_entity.dart';
 import 'package:sugarlife/features/profile/domain/repositories/profile_repository.dart';
+import 'package:sugarlife/shared/ui/app_snack_bar.dart';
 
 class SettingsDialog extends StatelessWidget {
   final ProfileEntity profile;
@@ -112,44 +113,17 @@ void _showEditNameDialog(BuildContext context, ProfileEntity currentProfile) {
                           AuthEvent.profileUpdate(newProfile: updatedProfile),
                         );
                         if (context.mounted) {
-                          Navigator.pop(context); 
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                'Имя изменено!',
-                                style: GoogleFonts.rubik(
-                                  color: AppColors.blue,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                              backgroundColor: AppColors.background,
-                              behavior: SnackBarBehavior.floating,
-                              margin: const EdgeInsets.all(16),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                            ),
-                          );
+                          Navigator.pop(context);
+                          AppSnackBar.showSuccess(context, 'Имя изменено!');
                         }
                       } catch (_) {
                         if (!context.mounted) return;
-                        ScaffoldMessenger.of(
-                          context,
-                        ).showSnackBar(
-                          const SnackBar(content: Text('Не удалось сохранить изменения')),
-                        );
+                        AppSnackBar.showError(context, 'Не удалось сохранить изменения');
                       }
                     } else if (newUsername == currentProfile.username) {
                       Navigator.pop(context);
                     } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Имя не может быть пустым'),
-                          backgroundColor: AppColors.red,
-                        ),
-                      );
+                      AppSnackBar.showError(context, 'Имя не может быть пустым');
                     }
                   },
                   style: TextButton.styleFrom(
@@ -293,35 +267,13 @@ Future<bool> _showAvatarSelectionSheet(
       );
 
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              'Аватар обновлён!',
-              style: GoogleFonts.rubik(
-                color: AppColors.blue,
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            backgroundColor: AppColors.background,
-            behavior: SnackBarBehavior.floating,
-            margin: const EdgeInsets.all(16),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-          ),
-        );
+        AppSnackBar.showSuccess(context, 'Аватар обновлён!');
         onAvatarChanged();
         return true;
       }
     } catch (_) {
       if (context.mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(
-          const SnackBar(content: Text('Не удалось сохранить изменения')),
-        );
+        AppSnackBar.showError(context, 'Не удалось сохранить изменения');
       }
     }
   }

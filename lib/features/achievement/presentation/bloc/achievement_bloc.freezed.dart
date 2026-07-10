@@ -310,10 +310,7 @@ as int,
 /// @nodoc
 mixin _$AchievementState {
 
- List<AchievementEntity> get achievements; AchievementEntity? get pendingAchievement;/// Увеличивается при каждой проверке pending из хранилища, чтобы слушатели
-/// срабатывали даже если [pendingAchievement] по значению не изменился
-/// (Bloc не шлёт уведомление при `state == previousState`).
- int get pendingSyncToken;
+ List<AchievementEntity> get achievements; AchievementEntity? get pendingAchievement; int get pendingSyncToken;
 /// Create a copy of AchievementState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -524,9 +521,6 @@ class _AchievementState implements AchievementState {
 }
 
 @override final  AchievementEntity? pendingAchievement;
-/// Увеличивается при каждой проверке pending из хранилища, чтобы слушатели
-/// срабатывали даже если [pendingAchievement] по значению не изменился
-/// (Bloc не шлёт уведомление при `state == previousState`).
 @override@JsonKey() final  int pendingSyncToken;
 
 /// Create a copy of AchievementState

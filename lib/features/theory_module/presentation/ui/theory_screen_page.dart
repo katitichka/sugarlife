@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:sugarlife/core/theme/app_color.dart';
 import 'package:sugarlife/features/theory_module/domain/entities/theory_module_entity.dart';
 import 'package:sugarlife/features/theory_module/presentation/bloc/theory_module_bloc.dart';
+import 'package:sugarlife/shared/ui/app_error_view.dart';
 import 'package:sugarlife/shared/ui/lottie_progress_indicator.dart';
 import 'package:sugarlife/shared/ui/main_app_bar.dart';
 
@@ -38,13 +39,12 @@ class TheoryScreenPage extends StatelessWidget {
           switch (state) {
             case ReceiveInProgress():
               return const Center(child: LottieProgressIndicator());
-            case ReceiveFailed():
+            case ReceiveFailed(:final message):
               return Center(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 32),
-                  child: Text(
-                    'Не удалось загрузить информацию.\nПроверьте соединение с интернетом.',
-                    textAlign: TextAlign.center,
+                child: AppErrorView(
+                  message: message,
+                  onRetry: () => context.read<TheoryModuleBloc>().add(
+                    const TheoryModuleEvent.receive(),
                   ),
                 ),
               );

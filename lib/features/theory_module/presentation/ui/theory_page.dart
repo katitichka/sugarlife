@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sugarlife/core/theme/app_color.dart';
 import 'package:sugarlife/features/theory_module/presentation/bloc/theory_module_bloc.dart';
 import 'package:sugarlife/features/theory_module/presentation/ui/theory_list_card.dart';
+import 'package:sugarlife/shared/ui/app_error_view.dart';
 import 'package:sugarlife/shared/ui/lottie_progress_indicator.dart';
 import 'package:sugarlife/shared/ui/main_app_bar.dart';
 
@@ -122,35 +123,6 @@ class _ErrorPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print('Ошибка загрузки модулей: $message');
-
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Text(
-            'Не удалось загрузить теоретические модули',
-            textAlign: TextAlign.center,
-            style: TextStyle(color: AppColors.background, fontSize: 16),
-          ),
-          const SizedBox(height: 8),
-          const Text(
-            'Проверьте подключение к интернету',
-            textAlign: TextAlign.center,
-            style: TextStyle(color: AppColors.background, fontSize: 14),
-          ),
-          const SizedBox(height: 20),
-          if (onRetry != null)
-            ElevatedButton(
-              onPressed: onRetry,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.blue,
-                foregroundColor: AppColors.background,
-              ),
-              child: const Text('Повторить'),
-            ),
-        ],
-      ),
-    );
+    return Center(child: AppErrorView(message: message, onRetry: onRetry));
   }
 }

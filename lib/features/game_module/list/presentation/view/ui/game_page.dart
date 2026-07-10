@@ -11,6 +11,7 @@ import 'package:sugarlife/features/daily_card/presentation/view/daily_card_scree
 import 'package:sugarlife/features/game_module/level/domain/entities/game_module_level_entity.dart';
 import 'package:sugarlife/features/game_module/list/presentation/bloc/game_module_list_bloc.dart';
 import 'package:sugarlife/features/profile/domain/entities/level_progress_entity.dart';
+import 'package:sugarlife/shared/ui/app_error_view.dart';
 import 'package:sugarlife/shared/ui/lottie_progress_indicator.dart';
 
 class LevelPositionCalculator {
@@ -169,23 +170,10 @@ class _GamePageState extends State<GamePage> {
           }
           if (state is ReceiveFailed) {
             return Center(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 32),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Text(
-                      'Не удалось загрузить уровни.\nПроверьте соединение с интернетом.',
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 20),
-                    ElevatedButton(
-                      onPressed: () => context.read<GameModuleListBloc>().add(
-                        const GameModuleListEvent.receive(),
-                      ),
-                      child: const Text('Повторить'),
-                    ),
-                  ],
+              child: AppErrorView(
+                message: state.message,
+                onRetry: () => context.read<GameModuleListBloc>().add(
+                  const GameModuleListEvent.receive(),
                 ),
               ),
             );

@@ -4,10 +4,12 @@ import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lottie/lottie.dart';
 import 'package:sugarlife/core/theme/app_color.dart';
+import 'package:sugarlife/features/daily_card/data/providers/implementations/daily_card_data_provider_impl.dart';
 import 'package:sugarlife/features/daily_card/data/repositories/daily_card_repository_impl.dart';
 import 'package:sugarlife/features/daily_card/domain/entities/daily_card_entity.dart';
 import 'package:sugarlife/features/daily_card/domain/repositories/daily_card_repository.dart';
 import 'package:sugarlife/features/daily_card/presentation/bloc/daily_card_bloc.dart';
+import 'package:sugarlife/shared/ui/app_error_view.dart';
 import 'package:sugarlife/shared/ui/lottie_progress_indicator.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -19,8 +21,10 @@ class DailyCardScreen extends StatelessWidget {
     final userId = Supabase.instance.client.auth.currentUser!.id;
 
     return RepositoryProvider<DailyCardRepository>(
-      create: (context) =>
-          DailyCardRepositoryImpl(Supabase.instance.client, userId),
+      create: (context) => DailyCardRepositoryImpl(
+        DailyCardDataProviderImpl(Supabase.instance.client),
+        userId,
+      ),
       child: Builder(
         builder: (context) {
           return BlocProvider(
@@ -115,13 +119,10 @@ class _DialogContent extends StatelessWidget {
                     color: AppColors.blue,
                   ),
                 ),
-                Error(:final message) => Text(
-                  'Ошибка загрузки карточки. Проверьте интернет соединение',
-                  textAlign: TextAlign.center,
-                  style: GoogleFonts.rubik(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w500,
-                    color: AppColors.blue,
+                Error(:final message) => AppErrorView(
+                  message: message,
+                  onRetry: () => context.read<DailyCardBloc>().add(
+                    const DailyCardEvent.loadTodayCard(),
                   ),
                 ),
                 _ => const SizedBox.shrink(),

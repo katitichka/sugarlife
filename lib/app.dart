@@ -1,17 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sugarlife/core/cache/app_cache_service.dart';
+import 'package:sugarlife/features/achievement/data/providers/implementations/achievement_data_provider_impl.dart';
 import 'package:sugarlife/features/achievement/data/repositories/achievement_repository_impl.dart';
 import 'package:sugarlife/features/achievement/domain/repositories/achievement_repository.dart';
 import 'package:sugarlife/features/achievement/presentation/bloc/achievement_bloc.dart';
+import 'package:sugarlife/features/auth/data/providers/implementations/auth_data_provider_impl.dart';
 import 'package:sugarlife/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:sugarlife/features/auth/domain/repositories/auth_repository.dart';
+import 'package:sugarlife/features/game_module/level/data/providers/implementations/game_module_level_data_provider_impl.dart';
+import 'package:sugarlife/features/game_module/level/data/providers/implementations/game_module_level_list_data_provider_impl.dart';
 import 'package:sugarlife/features/game_module/level/data/repositories/game_module_level_repository_impl.dart';
 import 'package:sugarlife/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:sugarlife/features/game_module/level/data/repositories/game_module_level_list_repository_impl.dart';
 import 'package:sugarlife/features/game_module/level/domain/repositories/game_module_level_repository.dart';
 import 'package:sugarlife/features/game_module/level/domain/repositories/game_module_level_list_repository.dart';
 import 'package:sugarlife/features/game_module/list/presentation/bloc/game_module_list_bloc.dart';
+import 'package:sugarlife/features/profile/data/providers/implementations/level_progress_data_provider_impl.dart';
+import 'package:sugarlife/features/profile/data/providers/implementations/profile_data_provider_impl.dart';
 import 'package:sugarlife/features/profile/data/repositories/level_progress_repository_impl.dart';
 import 'package:sugarlife/features/profile/data/repositories/profile_repository_impl.dart';
 import 'package:sugarlife/features/profile/domain/repositories/level_progress_repository.dart';
@@ -30,27 +36,31 @@ Future<void> app(SupabaseClient supabase) async {
         RepositoryProvider<AppCacheService>(create: (_) => AppCacheService()),
         RepositoryProvider<AchievementRepository>(
           create: (context) => AchievementRepositoryImpl(
-            supabase,
+            AchievementDataProviderImpl(supabase),
             context.read<AppCacheService>(),
           ),
         ),
         RepositoryProvider<LevelProgressRepository>(
-          create: (_) => LevelProgressRepositoryImpl(supabase),
+          create: (_) =>
+              LevelProgressRepositoryImpl(LevelProgressDataProviderImpl(supabase)),
         ),
         RepositoryProvider<GameModuleLevelListRepository>(
           create: (context) => GameModuleLevelListRepositoryImpl(
-            supabase,
+            GameModuleLevelListDataProviderImpl(supabase),
             context.read<AppCacheService>(),
           ),
         ),
         RepositoryProvider<GameModuleLevelRepository>(
           create: (context) => GameModuleLevelRepositoryImpl(
-            supabase,
+            GameModuleLevelDataProviderImpl(supabase),
             context.read<AppCacheService>(),
           ),
         ),
         RepositoryProvider<AuthRepository>(
-          create: (context) => AuthRepositoryImpl(supabase, context.read<AppCacheService>()),
+          create: (context) => AuthRepositoryImpl(
+            AuthDataProviderImpl(supabase),
+            context.read<AppCacheService>(),
+          ),
         ),
         RepositoryProvider<TheoryModuleRepository>(
           create: (context) => TheoryModuleRepositoryImpl(
@@ -59,8 +69,10 @@ Future<void> app(SupabaseClient supabase) async {
           ),
         ),
         RepositoryProvider<ProfileRepository>(
-          create: (context) =>
-              ProfileRepositoryImpl(supabase, context.read<AppCacheService>()),
+          create: (context) => ProfileRepositoryImpl(
+            ProfileDataProviderImpl(supabase),
+            context.read<AppCacheService>(),
+          ),
         ),
       ],
       child: MultiBlocProvider(

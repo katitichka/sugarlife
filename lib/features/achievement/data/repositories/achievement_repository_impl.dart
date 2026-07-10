@@ -1,37 +1,27 @@
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sugarlife/core/cache/app_cache_service.dart';
+import 'package:sugarlife/features/achievement/data/dtos/achievement_dto.dart';
+import 'package:sugarlife/features/achievement/data/providers/achievement_data_provider.dart';
 import 'package:sugarlife/features/achievement/domain/entities/achievement_entity.dart';
 import 'package:sugarlife/features/achievement/domain/repositories/achievement_repository.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 class AchievementRepositoryImpl implements AchievementRepository {
-  AchievementRepositoryImpl(this._supabase, this._cache);
+  AchievementRepositoryImpl(this._dataProvider, this._cache);
 
-  final SupabaseClient _supabase;
+  final AchievementDataProvider _dataProvider;
   final AppCacheService _cache;
 
   static const String _shownAchievementsKey = 'shown_achievement_ids';
   static const String _pendingAchievementKey = 'pending_achievement_id';
   static const String _moduleAchievementsKey = 'module_achievement_granted_ids';
-  static const String _achievementsBucket = 'achievements';
 
-  AchievementEntity _mapAchievement(Map<String, dynamic> json) {
+  AchievementEntity _mapAchievement(AchievementDto dto) {
     return AchievementEntity(
-      id: _asInt(json['id']),
-      name: (json['name'] as String? ?? '').trim(),
-      description: (json['description'] as String? ?? '').trim(),
-      imageUrl: _resolveimageUrl((json['image_url'] as String? ?? '').trim()),
+      id: dto.id,
+      name: dto.name.trim(),
+      description: dto.description.trim(),
+      imageUrl: _resolveimageUrl(dto.imageUrl.trim()),
     );
-  }
-
-  int _asInt(Object? value) {
-    if (value is int) {
-      return value;
-    }
-    if (value is num) {
-      return value.toInt();
-    }
-    throw FormatException('Expected int-compatible value, got $value');
   }
 
   String _resolveimageUrl(String raw) {
@@ -42,7 +32,7 @@ class AchievementRepositoryImpl implements AchievementRepository {
       return raw;
     }
     final path = raw.startsWith('/') ? raw.substring(1) : raw;
-    return _supabase.storage.from(_achievementsBucket).getPublicUrl(path);
+    return _dataProvider.resolveImageUrl(path);
   }
 
   Future<SharedPreferences> get _prefs async => SharedPreferences.getInstance();
@@ -67,16 +57,12 @@ class AchievementRepositoryImpl implements AchievementRepository {
       return cached;
     }
 
-    final response = await _supabase
-        .from('achievements')
-        .select('id, name, description, image_url')
-        .eq('id', id)
-        .maybeSingle();
-    if (response == null) {
+    final dto = await _dataProvider.getAchievementById(id);
+    if (dto == null) {
       return null;
     }
 
-    final achievement = _mapAchievement(Map<String, dynamic>.from(response));
+    final achievement = _mapAchievement(dto);
     _cache.saveAchievement(achievement);
     return achievement;
   }
@@ -88,51 +74,36 @@ class AchievementRepositoryImpl implements AchievementRepository {
       return cached;
     }
 
-    final userId = _supabase.auth.currentUser?.id;
+    final userId = _dataProvider.currentUserId;
     if (userId == null) {
       return const [];
     }
 
-    final relations = await _supabase
-        .from('user_achievement')
-        .select('achievement_id')
-        .eq('user_id', userId);
-    if (relations.isEmpty) {
+    final achievementIds = await _dataProvider.getUserAchievementIds(userId);
+    if (achievementIds.isEmpty) {
       _cache.saveAchievements(const []);
       return const [];
     }
 
-    final achievementIds = relations
-        .map((row) => _asInt(row['achievement_id']))
-        .toList();
+    final achievementsResponse = await _dataProvider.getAchievementsByIds(
+      achievementIds,
+    );
 
-    final achievementsResponse = await _supabase
-        .from('achievements')
-        .select('id, name, description, image_url')
-        .inFilter('id', achievementIds)
-        .order('id');
-
-    final achievements = achievementsResponse
-        .map((row) => _mapAchievement(Map<String, dynamic>.from(row)))
-        .toList();
+    final achievements = achievementsResponse.map(_mapAchievement).toList();
     _cache.saveAchievements(achievements);
     return achievements;
   }
 
   @override
   Future<AchievementEntity?> unlockRandomAchievement() async {
-    final userId = _supabase.auth.currentUser?.id;
+    final userId = _dataProvider.currentUserId;
     if (userId == null) {
       return null;
     }
 
-    final allAchievementsResponse = await _supabase
-        .from('achievements')
-        .select('id,  name, description, image_url');
+    final allAchievementsResponse = await _dataProvider.getAllAchievements();
 
-    final allAchievements = allAchievementsResponse
-        .map((row) => _mapAchievement(Map<String, dynamic>.from(row)))
-        .toList();
+    final allAchievements = allAchievementsResponse.map(_mapAchievement).toList();
 
     if (allAchievements.isEmpty) {
       return null;
@@ -153,18 +124,16 @@ class AchievementRepositoryImpl implements AchievementRepository {
     final achievement = available[randomIndex];
 
     try {
-      await _supabase.from('user_achievement').insert({
-        'user_id': userId,
-        'achievement_id': achievement.id,
-      });
+      await _dataProvider.insertUserAchievement(
+        userId: userId,
+        achievementId: achievement.id,
+      );
     } catch (e) {
-      final relationAfterFailure = await _supabase
-          .from('user_achievement')
-          .select('achievement_id')
-          .eq('user_id', userId)
-          .eq('achievement_id', achievement.id)
-          .maybeSingle();
-      if (relationAfterFailure == null) {
+      final hasRelation = await _dataProvider.hasUserAchievement(
+        userId: userId,
+        achievementId: achievement.id,
+      );
+      if (!hasRelation) {
         print('Ошибка вставки: $e');
         return null;
       }

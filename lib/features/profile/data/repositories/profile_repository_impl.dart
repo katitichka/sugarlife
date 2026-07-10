@@ -1,17 +1,14 @@
 import 'package:sugarlife/core/cache/app_cache_service.dart';
-import 'package:sugarlife/features/avatars/data/dtos/avatar_dto.dart';
 import 'package:sugarlife/features/avatars/data/mappers/avatar_mapper.dart';
 import 'package:sugarlife/features/avatars/domain/entities/avatar_entity.dart';
+import 'package:sugarlife/features/profile/data/providers/profile_data_provider.dart';
 import 'package:sugarlife/features/profile/domain/repositories/profile_repository.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ProfileRepositoryImpl implements ProfileRepository {
-  final SupabaseClient _supabase;
+  final ProfileDataProvider _dataProvider;
   final AppCacheService _cache;
 
-  ProfileRepositoryImpl(this._supabase, this._cache);
-
-  static const String _avatarsSvgBucket = 'avatars';
+  ProfileRepositoryImpl(this._dataProvider, this._cache);
 
   String _publicSvgUrl(String raw) {
     final t = raw.trim();
@@ -21,11 +18,11 @@ class ProfileRepositoryImpl implements ProfileRepository {
       return t;
     }
     var path = t.startsWith('/') ? t.substring(1) : t;
-    final bucketPrefix = '$_avatarsSvgBucket/';
+    final bucketPrefix = 'avatars/';
     if (path.toLowerCase().startsWith(bucketPrefix)) {
       path = path.substring(bucketPrefix.length);
     }
-    return _supabase.storage.from(_avatarsSvgBucket).getPublicUrl(path);
+    return _dataProvider.resolveAvatarUrl(path);
   }
 
   @override
@@ -39,65 +36,46 @@ class ProfileRepositoryImpl implements ProfileRepository {
       }
     }
 
-    final response = await _supabase
-        .from('avatars')
-        .select('image_url')
-        .eq('id', avatarId)
-        .single();
-    final url = response['image_url'];
-    if (url is! String || url.isEmpty) {
+    final dto = await _dataProvider.getAvatarById(avatarId);
+    if (dto.imageUrl.isEmpty) {
       throw StateError('Пустой image_url для аватара id=$avatarId');
     }
-    return _publicSvgUrl(url);
+    return _publicSvgUrl(dto.imageUrl);
   }
 
   @override
   Future<void> updateUsername(String newUsername) async {
-    final userId = _supabase.auth.currentUser?.id;
+    final userId = _dataProvider.currentUserId;
     if (userId == null) return;
 
-    await _supabase
-        .from('user_profile')
-        .update({'username': newUsername})
-        .eq('id', userId);
+    await _dataProvider.updateUsername(userId: userId, newUsername: newUsername);
   }
 
   @override
   Future<void> updateAvatar(int avatarId) async {
-    final userId = _supabase.auth.currentUser?.id;
+    final userId = _dataProvider.currentUserId;
     if (userId == null) return;
 
-    await _supabase
-        .from('user_profile')
-        .update({'current_avatar_id': avatarId})
-        .eq('id', userId);
+    await _dataProvider.updateAvatar(userId: userId, avatarId: avatarId);
   }
 
   @override
-Future<List<AvatarEntity>> getAllAvatars() async {
-  // Проверяем кэш
-  final cachedAvatars = _cache.avatars;
-  if (cachedAvatars != null) {
-    return cachedAvatars;
-  }
-
-  final response = await _supabase
-      .from('avatars')
-      .select('id, image_url')
-      .order('id');
-
-  final avatars = response.map((row) {
-    final map = Map<String, dynamic>.from(row);
-    final raw = map['image_url'];
-    if (raw is String && raw.isNotEmpty) {
-      map['image_url'] = _publicSvgUrl(raw);
+  Future<List<AvatarEntity>> getAllAvatars() async {
+    final cachedAvatars = _cache.avatars;
+    if (cachedAvatars != null) {
+      return cachedAvatars;
     }
-    final dto = AvatarDto.fromJson(map);
-    return AvatarDtoMapper.toEntity(dto: dto);
-  }).toList();
 
-  // Сохраняем в кэш
-  _cache.saveAvatars(avatars);
-  return avatars;
-}
+    final dtos = await _dataProvider.getAllAvatars();
+
+    final avatars = dtos.map((dto) {
+      final resolvedDto = dto.imageUrl.isNotEmpty
+          ? dto.copyWith(imageUrl: _publicSvgUrl(dto.imageUrl))
+          : dto;
+      return AvatarDtoMapper.toEntity(dto: resolvedDto);
+    }).toList();
+
+    _cache.saveAvatars(avatars);
+    return avatars;
+  }
 }

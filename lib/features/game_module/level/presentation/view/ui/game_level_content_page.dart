@@ -1,7 +1,6 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sugarlife/core/router/root_navigator.dart';
 import 'package:sugarlife/core/theme/app_color.dart';
 import 'package:sugarlife/features/achievement/domain/entities/achievement_entity.dart';
@@ -11,6 +10,7 @@ import 'package:sugarlife/features/game_module/level/presentation/bloc/game_modu
 import 'package:sugarlife/features/game_module/level/presentation/view/ui/game_level_result_page.dart';
 import 'package:sugarlife/features/game_module/level/presentation/view/ui/game_level_start_level_page.dart';
 import 'package:sugarlife/features/game_module/level/presentation/view/ui/game_question_page.dart';
+import 'package:sugarlife/shared/ui/app_error_view.dart';
 import 'package:sugarlife/shared/ui/lottie_progress_indicator.dart';
 
 class GameLevelContentPage extends StatelessWidget {
@@ -31,8 +31,9 @@ class GameLevelContentPage extends StatelessWidget {
         switch (state) {
           case ReceiveInProgress():
             return const _LoadingPage();
-          case ReceiveFailed():
+          case ReceiveFailed(:final message):
             return _ErrorPage(
+              message: message,
               onRetry: () => context.read<GameModuleLevelBloc>().add(
                 GameModuleLevelEvent.receive(levelId: levelId),
               ),
@@ -100,52 +101,15 @@ class _LoadingPage extends StatelessWidget {
   }
 }
 class _ErrorPage extends StatelessWidget {
+  final String message;
   final VoidCallback onRetry;
-  const _ErrorPage({required this.onRetry});
+  const _ErrorPage({required this.message, required this.onRetry});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 32),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                'Не удалось загрузить уровень.\nПроверьте соединение с интернетом.',
-                textAlign: TextAlign.center,
-                style: GoogleFonts.rubik(
-                  color: AppColors.blue,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              const SizedBox(height: 24),
-              ElevatedButton(
-                onPressed: onRetry,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.blue,
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
-                ),
-                child: Text(
-                  'Повторить',
-                  style: GoogleFonts.rubik(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
+      body: Center(child: AppErrorView(message: message, onRetry: onRetry)),
     );
   }
 }

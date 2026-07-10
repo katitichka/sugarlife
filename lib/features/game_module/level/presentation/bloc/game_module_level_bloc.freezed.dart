@@ -1227,7 +1227,6 @@ class LevelCompleted implements GameModuleLevelState {
  final  int correctAnswers;
  final  int totalQuestions;
  final  int stars;
-/// Если модуль только что закрыт — сущность для показа карточки без ожидания prefs.
  final  AchievementEntity? unlockedAchievement;
 
 /// Create a copy of GameModuleLevelState

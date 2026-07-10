@@ -1,41 +1,35 @@
 import 'dart:convert';
 
 import 'package:sugarlife/core/enum/question_type.dart';
+import 'package:sugarlife/features/game_module/level/data/dtos/game_module_question_dto.dart';
 import 'package:sugarlife/features/game_module/level/domain/entities/game_module_question_entity.dart';
 
 abstract final class GameModuleQuestionSupabaseMapper {
-  static GameModuleQuestionEntity toEntity(Map<String, dynamic> row) {
-    final id = (row['id'] as num).toInt();
-    final question = row['question'] as String? ?? '';
-    final type = QuestionType.parseLoose(row['question_type'] as String?);
-    final answers = _parseAnswers(row['answers']);
-    final explanation = row['explanation'] as String? ?? '';
-    final orderIndex = (row['order_index'] as num?)?.toInt() ?? 0;
-    final levelId = (row['level_id'] as num).toInt();
-    final correctRaw = row['correct_answer'];
-    
+  static GameModuleQuestionEntity toEntity(GameModuleQuestionDto dto) {
+    final type = QuestionType.parseLoose(dto.questionType);
+    final answers = _parseAnswers(dto.answers);
+    final correctRaw = dto.correctAnswer;
+
     final correctAnswerIndices = type == QuestionType.multipleSelect
         ? _parseMultipleSelectIndices(correctRaw)
         : null;
-    final characterId = row['character_id'] as int?;
     final correctAnswer = _normalizeCorrectAnswer(
       type: type,
       raw: correctRaw,
       answers: answers,
     );
-    
 
     return GameModuleQuestionEntity(
-      id: id,
-      question: question,
+      id: dto.id,
+      question: dto.question ?? '',
       questionType: type,
       answers: answers,
-      explanation: explanation,
-      orderIndex: orderIndex,
-      levelId: levelId,
+      explanation: dto.explanation ?? '',
+      orderIndex: dto.orderIndex ?? 0,
+      levelId: dto.levelId,
       correctAnswer: correctAnswer,
       correctAnswerIndices: correctAnswerIndices,
-      characterId: characterId,
+      characterId: dto.characterId?.toInt(),
     );
   }
 
@@ -79,15 +73,12 @@ abstract final class GameModuleQuestionSupabaseMapper {
     return single != null ? [single] : null;
   }
 
-  static List<String> _parseAnswers(dynamic value) {
+  static List<String> _parseAnswers(List<Object?>? value) {
     if (value == null) return [];
-    if (value is List) {
-      return value.map((e) {
-        if (e is String) return e;
-        return e.toString();
-      }).toList();
-    }
-    return [];
+    return value.map((e) {
+      if (e is String) return e;
+      return e.toString();
+    }).toList();
   }
 
   static String? _normalizeCorrectAnswer({
