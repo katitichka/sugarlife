@@ -1,5 +1,6 @@
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sugarlife/core/cache/app_cache_service.dart';
+import 'package:sugarlife/core/enum/achievement_type.dart';
 import 'package:sugarlife/features/achievement/data/dtos/achievement_dto.dart';
 import 'package:sugarlife/features/achievement/data/providers/achievement_data_provider.dart';
 import 'package:sugarlife/features/achievement/domain/entities/achievement_entity.dart';
@@ -13,7 +14,6 @@ class AchievementRepositoryImpl implements AchievementRepository {
 
   static const String _shownAchievementsKey = 'shown_achievement_ids';
   static const String _pendingAchievementKey = 'pending_achievement_id';
-  static const String _moduleAchievementsKey = 'module_achievement_granted_ids';
 
   AchievementEntity _mapAchievement(AchievementDto dto) {
     return AchievementEntity(
@@ -21,6 +21,7 @@ class AchievementRepositoryImpl implements AchievementRepository {
       name: dto.name.trim(),
       description: dto.description.trim(),
       imageUrl: _resolveimageUrl(dto.imageUrl.trim()),
+      type: AchievementType.fromString(dto.type),
     );
   }
 
@@ -95,7 +96,9 @@ class AchievementRepositoryImpl implements AchievementRepository {
   }
 
   @override
-  Future<AchievementEntity?> unlockRandomAchievement() async {
+  Future<AchievementEntity?> unlockRandomAchievement({
+    required AchievementType type,
+  }) async {
     final userId = _dataProvider.currentUserId;
     if (userId == null) {
       return null;
@@ -113,7 +116,7 @@ class AchievementRepositoryImpl implements AchievementRepository {
     final unlockedIds = userAchievements.map((a) => a.id).toSet();
 
     final available = allAchievements
-        .where((a) => !unlockedIds.contains(a.id))
+        .where((a) => a.type == type && !unlockedIds.contains(a.id))
         .toList();
 
     if (available.isEmpty) {
@@ -180,25 +183,6 @@ class AchievementRepositoryImpl implements AchievementRepository {
     final pendingId = prefs.getInt(_pendingAchievementKey);
     if (pendingId == achievementId) {
       await prefs.remove(_pendingAchievementKey);
-    }
-  }
-
-  @override
-  Future<bool> isModuleAchievementGranted(int theoryModuleId) async {
-    final prefs = await _prefs;
-    final values = prefs.getStringList(_moduleAchievementsKey) ?? const [];
-    return values.contains(theoryModuleId.toString());
-  }
-
-  @override
-  Future<void> markModuleAchievementGranted(int theoryModuleId) async {
-    final prefs = await _prefs;
-    final values = List<String>.from(
-      prefs.getStringList(_moduleAchievementsKey) ?? const [],
-    );
-    if (!values.contains(theoryModuleId.toString())) {
-      values.add(theoryModuleId.toString());
-      await prefs.setStringList(_moduleAchievementsKey, values);
     }
   }
 }

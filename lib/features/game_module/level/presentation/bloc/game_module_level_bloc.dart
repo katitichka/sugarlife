@@ -1,8 +1,10 @@
 import 'package:bloc/bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:sugarlife/core/enum/achievement_type.dart';
 import 'package:sugarlife/core/utils/retry.dart';
 import 'package:sugarlife/features/achievement/domain/entities/achievement_entity.dart';
 import 'package:sugarlife/features/achievement/domain/repositories/achievement_repository.dart';
+import 'package:sugarlife/features/game_module/level/domain/entities/game_module_level_entity.dart';
 import 'package:sugarlife/features/game_module/level/domain/entities/game_module_question_entity.dart';
 import 'package:sugarlife/features/game_module/level/domain/repositories/game_module_level_repository.dart';
 import 'package:sugarlife/features/game_module/level/domain/repositories/game_module_level_list_repository.dart';
@@ -291,9 +293,7 @@ class GameModuleLevelBloc
       AchievementEntity? unlockedAchievement;
       try {
         if (stars > 0) {
-          unlockedAchievement = await _checkAndUnlockAchievement(
-            levelId: questions.first.levelId,
-          );
+          unlockedAchievement = await _checkAndUnlockAchievement();
         }
       } catch (e) {
         print('Ошибка при проверке достижений: $e');
@@ -320,47 +320,45 @@ class GameModuleLevelBloc
     }
   }
 
-  Future<AchievementEntity?> _checkAndUnlockAchievement({
-    required int levelId,
-  }) async {
+  /// Достижение типа [AchievementType.module] положено один раз за полностью
+  /// пройденный модуль (все уровни модуля хотя бы на 1 звезду). Так как
+  /// achievements в БД не привязаны к конкретному модулю, "уже выдано ли за
+  /// этот модуль" не хранится локально (это стиралось бы при
+  /// логауте/переустановке) — вместо этого сравниваем количество уже
+  /// полученных пользователем достижений типа module с количеством полностью
+  /// пройденных модулей: оба числа считаются из данных сервера, поэтому
+  /// проверка не зависит от локального состояния устройства и не мешает
+  /// достижениям других типов (например, за серию в ежедневной карточке).
+  Future<AchievementEntity?> _checkAndUnlockAchievement() async {
     try {
-      final currentLevel = await _gameModuleLevelListRepository.getLevelById(
-        levelId: levelId,
-      );
       final allLevels = await _gameModuleLevelListRepository.getAllLevels();
-      final moduleLevels =
-          allLevels
-              .where(
-                (level) => level.theoryModuleId == currentLevel.theoryModuleId,
-              )
-              .toList()
-            ..sort((a, b) => a.orderIndex.compareTo(b.orderIndex));
-
-      if (moduleLevels.isEmpty) {
-        return null;
-      }
-
       final progressMap = await _levelProgressRepository.getAllLevelsProgress();
-      final isModuleCompleted = moduleLevels.every((level) {
-        final progress = progressMap[level.id];
-        return progress != null && (progress.stars ?? 0) > 0;
-      });
-      if (!isModuleCompleted) {
+
+      final levelsByModule = <int, List<GameModuleLevelEntity>>{};
+      for (final level in allLevels) {
+        levelsByModule.putIfAbsent(level.theoryModuleId, () => []).add(level);
+      }
+
+      final completedModulesCount = levelsByModule.values.where((levels) {
+        return levels.every((level) => (progressMap[level.id]?.stars ?? 0) > 0);
+      }).length;
+
+      if (completedModulesCount == 0) {
         return null;
       }
 
-      final alreadyGranted = await _achievementRepository
-          .isModuleAchievementGranted(currentLevel.theoryModuleId);
-      if (alreadyGranted) {
+      final userAchievements = await _achievementRepository.getUserAchievements();
+      final unlockedModuleAchievementsCount = userAchievements
+          .where((a) => a.type == AchievementType.module)
+          .length;
+
+      if (unlockedModuleAchievementsCount >= completedModulesCount) {
         return null;
       }
 
-      final achievement = await _achievementRepository.unlockRandomAchievement();
-      if (achievement != null) {
-        await _achievementRepository
-            .markModuleAchievementGranted(currentLevel.theoryModuleId);
-      }
-      return achievement;
+      return await _achievementRepository.unlockRandomAchievement(
+        type: AchievementType.module,
+      );
     } catch (e) {
       print('Ошибка проверки/выдачи достижения: $e');
       return null;

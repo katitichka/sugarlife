@@ -8,7 +8,7 @@ class AchievementDataProviderImpl implements AchievementDataProvider {
   final SupabaseClient _supabase;
 
   static const String _achievementsBucket = 'achievements';
-  static const String _achievementColumns = 'id, name, description, image_url';
+  static const String _achievementColumns = 'id, name, description, image_url, type';
 
   @override
   String? get currentUserId => _supabase.auth.currentUser?.id;

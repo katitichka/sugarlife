@@ -4,6 +4,8 @@ import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lottie/lottie.dart';
 import 'package:sugarlife/core/theme/app_color.dart';
+import 'package:sugarlife/features/achievement/domain/repositories/achievement_repository.dart';
+import 'package:sugarlife/features/achievement/presentation/bloc/achievement_bloc.dart';
 import 'package:sugarlife/features/daily_card/data/providers/implementations/daily_card_data_provider_impl.dart';
 import 'package:sugarlife/features/daily_card/data/repositories/daily_card_repository_impl.dart';
 import 'package:sugarlife/features/daily_card/domain/entities/daily_card_entity.dart';
@@ -31,51 +33,61 @@ class DailyCardScreen extends StatelessWidget {
       child: Builder(
         builder: (context) {
           return BlocProvider(
-            create: (context) =>
-                DailyCardBloc(context.read<DailyCardRepository>())
-                  ..add(const DailyCardEvent.loadTodayCard()),
-            child: Builder(
-              builder: (dialogContext) {
-                return Stack(
-                  clipBehavior: Clip.none,
-                  children: [
-                    const Dialog(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(32)),
+            create: (context) => DailyCardBloc(
+              context.read<DailyCardRepository>(),
+              context.read<AchievementRepository>(),
+            )..add(const DailyCardEvent.loadTodayCard()),
+            child: BlocListener<DailyCardBloc, DailyCardState>(
+              listener: (context, state) {
+                if (state is Answered) {
+                  context.read<AchievementBloc>().add(
+                    const AchievementEvent.checkPendingAchievement(),
+                  );
+                }
+              },
+              child: Builder(
+                builder: (dialogContext) {
+                  return Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      const Dialog(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(32)),
+                        ),
+                        child: _DialogContent(),
                       ),
-                      child: _DialogContent(),
-                    ),
-                    Positioned(
-                      top: 12,
-                      right: 18,
-                      child: GestureDetector(
-                        onTap: () {
-                          dialogContext.read<DailyCardBloc>().add(
-                            const DailyCardEvent.close(),
-                          );
-                          if (dialogContext.mounted) {
-                            Navigator.pop(dialogContext);
-                          }
-                        },
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: AppColors.blue,
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Padding(
-                            padding: EdgeInsets.zero,
-                            child: Icon(
-                              Icons.cancel,
-                              color: AppColors.background,
-                              size: 45,
+                      Positioned(
+                        top: 12,
+                        right: 18,
+                        child: GestureDetector(
+                          onTap: () {
+                            dialogContext.read<DailyCardBloc>().add(
+                              const DailyCardEvent.close(),
+                            );
+                            if (dialogContext.mounted) {
+                              Navigator.pop(dialogContext);
+                            }
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: AppColors.blue,
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Padding(
+                              padding: EdgeInsets.zero,
+                              child: Icon(
+                                Icons.cancel,
+                                color: AppColors.background,
+                                size: 45,
+                              ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                  ],
-                );
-              },
+                    ],
+                  );
+                },
+              ),
             ),
           );
         },

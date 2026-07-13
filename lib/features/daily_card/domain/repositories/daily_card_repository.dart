@@ -12,4 +12,8 @@ abstract interface class DailyCardRepository {
   Future<bool> hasAnsweredToday();
 
   Future<AnsweredDailyCardEntity?> getAnsweredCardForToday();
+
+  /// Верность всех ответов пользователя в хронологическом порядке —
+  /// используется для проверки достижений за серию правильных ответов.
+  Future<List<bool>> getAnswerHistory();
 }

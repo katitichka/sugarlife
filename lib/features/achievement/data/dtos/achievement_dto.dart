@@ -10,6 +10,7 @@ sealed class AchievementDto with _$AchievementDto {
     required String name,
     required String description,
     @JsonKey(name: 'image_url') required String imageUrl,
+    required String type,
   }) = _AchievementDto;
 
   factory AchievementDto.fromJson(Map<String, Object?> json) =>

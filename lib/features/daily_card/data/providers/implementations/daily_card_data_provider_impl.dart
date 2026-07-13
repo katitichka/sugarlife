@@ -79,4 +79,14 @@ class DailyCardDataProviderImpl implements DailyCardDataProvider {
     if (response == null) return null;
     return AnsweredDailyCardDto.fromJson(response);
   }
+
+  @override
+  Future<List<bool>> getAnswerHistory(String userId) async {
+    final response = await _supabase
+        .from('user_daily_cards')
+        .select('is_correct')
+        .eq('user_id', userId)
+        .order('completed_at', ascending: true);
+    return response.map((row) => row['is_correct'] as bool).toList();
+  }
 }

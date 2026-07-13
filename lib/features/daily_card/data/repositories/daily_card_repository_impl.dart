@@ -94,4 +94,9 @@ Future<AnsweredDailyCardEntity?> getAnsweredCardForToday() async {
     return null;
   }
 }
+
+@override
+Future<List<bool>> getAnswerHistory() {
+  return _dataProvider.getAnswerHistory(_userId);
+}
 }

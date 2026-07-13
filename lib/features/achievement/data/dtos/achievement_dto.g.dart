@@ -12,6 +12,7 @@ _AchievementDto _$AchievementDtoFromJson(Map<String, dynamic> json) =>
       name: json['name'] as String,
       description: json['description'] as String,
       imageUrl: json['image_url'] as String,
+      type: json['type'] as String,
     );
 
 Map<String, dynamic> _$AchievementDtoToJson(_AchievementDto instance) =>
@@ -20,4 +21,5 @@ Map<String, dynamic> _$AchievementDtoToJson(_AchievementDto instance) =>
       'name': instance.name,
       'description': instance.description,
       'image_url': instance.imageUrl,
+      'type': instance.type,
     };

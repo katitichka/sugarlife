@@ -14,7 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$AchievementEntity {
 
- int get id; String get name; String get description; String get imageUrl;
+ int get id; String get name; String get description; String get imageUrl; AchievementType get type;
 /// Create a copy of AchievementEntity
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +25,16 @@ $AchievementEntityCopyWith<AchievementEntity> get copyWith => _$AchievementEntit
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is AchievementEntity&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is AchievementEntity&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl)&&(identical(other.type, type) || other.type == type));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,id,name,description,imageUrl);
+int get hashCode => Object.hash(runtimeType,id,name,description,imageUrl,type);
 
 @override
 String toString() {
-  return 'AchievementEntity(id: $id, name: $name, description: $description, imageUrl: $imageUrl)';
+  return 'AchievementEntity(id: $id, name: $name, description: $description, imageUrl: $imageUrl, type: $type)';
 }
 
 
@@ -45,7 +45,7 @@ abstract mixin class $AchievementEntityCopyWith<$Res>  {
   factory $AchievementEntityCopyWith(AchievementEntity value, $Res Function(AchievementEntity) _then) = _$AchievementEntityCopyWithImpl;
 @useResult
 $Res call({
- int id, String name, String description, String imageUrl
+ int id, String name, String description, String imageUrl, AchievementType type
 });
 
 
@@ -62,13 +62,14 @@ class _$AchievementEntityCopyWithImpl<$Res>
 
 /// Create a copy of AchievementEntity
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? description = null,Object? imageUrl = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? description = null,Object? imageUrl = null,Object? type = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,description: null == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
 as String,imageUrl: null == imageUrl ? _self.imageUrl : imageUrl // ignore: cast_nullable_to_non_nullable
-as String,
+as String,type: null == type ? _self.type : type // ignore: cast_nullable_to_non_nullable
+as AchievementType,
   ));
 }
 
@@ -150,10 +151,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int id,  String name,  String description,  String imageUrl)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int id,  String name,  String description,  String imageUrl,  AchievementType type)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _AchievementEntity() when $default != null:
-return $default(_that.id,_that.name,_that.description,_that.imageUrl);case _:
+return $default(_that.id,_that.name,_that.description,_that.imageUrl,_that.type);case _:
   return orElse();
 
 }
@@ -171,10 +172,10 @@ return $default(_that.id,_that.name,_that.description,_that.imageUrl);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int id,  String name,  String description,  String imageUrl)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int id,  String name,  String description,  String imageUrl,  AchievementType type)  $default,) {final _that = this;
 switch (_that) {
 case _AchievementEntity():
-return $default(_that.id,_that.name,_that.description,_that.imageUrl);}
+return $default(_that.id,_that.name,_that.description,_that.imageUrl,_that.type);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -188,10 +189,10 @@ return $default(_that.id,_that.name,_that.description,_that.imageUrl);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int id,  String name,  String description,  String imageUrl)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int id,  String name,  String description,  String imageUrl,  AchievementType type)?  $default,) {final _that = this;
 switch (_that) {
 case _AchievementEntity() when $default != null:
-return $default(_that.id,_that.name,_that.description,_that.imageUrl);case _:
+return $default(_that.id,_that.name,_that.description,_that.imageUrl,_that.type);case _:
   return null;
 
 }
@@ -203,13 +204,14 @@ return $default(_that.id,_that.name,_that.description,_that.imageUrl);case _:
 
 
 class _AchievementEntity implements AchievementEntity {
-  const _AchievementEntity({required this.id, required this.name, required this.description, required this.imageUrl});
+  const _AchievementEntity({required this.id, required this.name, required this.description, required this.imageUrl, required this.type});
   
 
 @override final  int id;
 @override final  String name;
 @override final  String description;
 @override final  String imageUrl;
+@override final  AchievementType type;
 
 /// Create a copy of AchievementEntity
 /// with the given fields replaced by the non-null parameter values.
@@ -221,16 +223,16 @@ _$AchievementEntityCopyWith<_AchievementEntity> get copyWith => __$AchievementEn
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _AchievementEntity&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _AchievementEntity&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl)&&(identical(other.type, type) || other.type == type));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,id,name,description,imageUrl);
+int get hashCode => Object.hash(runtimeType,id,name,description,imageUrl,type);
 
 @override
 String toString() {
-  return 'AchievementEntity(id: $id, name: $name, description: $description, imageUrl: $imageUrl)';
+  return 'AchievementEntity(id: $id, name: $name, description: $description, imageUrl: $imageUrl, type: $type)';
 }
 
 
@@ -241,7 +243,7 @@ abstract mixin class _$AchievementEntityCopyWith<$Res> implements $AchievementEn
   factory _$AchievementEntityCopyWith(_AchievementEntity value, $Res Function(_AchievementEntity) _then) = __$AchievementEntityCopyWithImpl;
 @override @useResult
 $Res call({
- int id, String name, String description, String imageUrl
+ int id, String name, String description, String imageUrl, AchievementType type
 });
 
 
@@ -258,13 +260,14 @@ class __$AchievementEntityCopyWithImpl<$Res>
 
 /// Create a copy of AchievementEntity
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? description = null,Object? imageUrl = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? description = null,Object? imageUrl = null,Object? type = null,}) {
   return _then(_AchievementEntity(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,description: null == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
 as String,imageUrl: null == imageUrl ? _self.imageUrl : imageUrl // ignore: cast_nullable_to_non_nullable
-as String,
+as String,type: null == type ? _self.type : type // ignore: cast_nullable_to_non_nullable
+as AchievementType,
   ));
 }
 

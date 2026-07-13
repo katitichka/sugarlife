@@ -24,4 +24,8 @@ abstract class DailyCardDataProvider {
     required DateTime start,
     required DateTime end,
   });
+
+  /// Верность всех ответов пользователя в хронологическом порядке
+  /// (от самого раннего к самому позднему) — нужно для подсчёта серий.
+  Future<List<bool>> getAnswerHistory(String userId);
 }

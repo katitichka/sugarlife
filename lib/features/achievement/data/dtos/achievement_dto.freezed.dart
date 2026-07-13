@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$AchievementDto {
 
- int get id; String get name; String get description;@JsonKey(name: 'image_url') String get imageUrl;
+ int get id; String get name; String get description;@JsonKey(name: 'image_url') String get imageUrl; String get type;
 /// Create a copy of AchievementDto
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $AchievementDtoCopyWith<AchievementDto> get copyWith => _$AchievementDtoCopyWith
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is AchievementDto&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is AchievementDto&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl)&&(identical(other.type, type) || other.type == type));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,description,imageUrl);
+int get hashCode => Object.hash(runtimeType,id,name,description,imageUrl,type);
 
 @override
 String toString() {
-  return 'AchievementDto(id: $id, name: $name, description: $description, imageUrl: $imageUrl)';
+  return 'AchievementDto(id: $id, name: $name, description: $description, imageUrl: $imageUrl, type: $type)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $AchievementDtoCopyWith<$Res>  {
   factory $AchievementDtoCopyWith(AchievementDto value, $Res Function(AchievementDto) _then) = _$AchievementDtoCopyWithImpl;
 @useResult
 $Res call({
- int id, String name, String description,@JsonKey(name: 'image_url') String imageUrl
+ int id, String name, String description,@JsonKey(name: 'image_url') String imageUrl, String type
 });
 
 
@@ -65,12 +65,13 @@ class _$AchievementDtoCopyWithImpl<$Res>
 
 /// Create a copy of AchievementDto
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? description = null,Object? imageUrl = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? description = null,Object? imageUrl = null,Object? type = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,description: null == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
 as String,imageUrl: null == imageUrl ? _self.imageUrl : imageUrl // ignore: cast_nullable_to_non_nullable
+as String,type: null == type ? _self.type : type // ignore: cast_nullable_to_non_nullable
 as String,
   ));
 }
@@ -153,10 +154,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int id,  String name,  String description, @JsonKey(name: 'image_url')  String imageUrl)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int id,  String name,  String description, @JsonKey(name: 'image_url')  String imageUrl,  String type)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _AchievementDto() when $default != null:
-return $default(_that.id,_that.name,_that.description,_that.imageUrl);case _:
+return $default(_that.id,_that.name,_that.description,_that.imageUrl,_that.type);case _:
   return orElse();
 
 }
@@ -174,10 +175,10 @@ return $default(_that.id,_that.name,_that.description,_that.imageUrl);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int id,  String name,  String description, @JsonKey(name: 'image_url')  String imageUrl)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int id,  String name,  String description, @JsonKey(name: 'image_url')  String imageUrl,  String type)  $default,) {final _that = this;
 switch (_that) {
 case _AchievementDto():
-return $default(_that.id,_that.name,_that.description,_that.imageUrl);}
+return $default(_that.id,_that.name,_that.description,_that.imageUrl,_that.type);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -191,10 +192,10 @@ return $default(_that.id,_that.name,_that.description,_that.imageUrl);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int id,  String name,  String description, @JsonKey(name: 'image_url')  String imageUrl)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int id,  String name,  String description, @JsonKey(name: 'image_url')  String imageUrl,  String type)?  $default,) {final _that = this;
 switch (_that) {
 case _AchievementDto() when $default != null:
-return $default(_that.id,_that.name,_that.description,_that.imageUrl);case _:
+return $default(_that.id,_that.name,_that.description,_that.imageUrl,_that.type);case _:
   return null;
 
 }
@@ -206,13 +207,14 @@ return $default(_that.id,_that.name,_that.description,_that.imageUrl);case _:
 @JsonSerializable()
 
 class _AchievementDto implements AchievementDto {
-  const _AchievementDto({required this.id, required this.name, required this.description, @JsonKey(name: 'image_url') required this.imageUrl});
+  const _AchievementDto({required this.id, required this.name, required this.description, @JsonKey(name: 'image_url') required this.imageUrl, required this.type});
   factory _AchievementDto.fromJson(Map<String, dynamic> json) => _$AchievementDtoFromJson(json);
 
 @override final  int id;
 @override final  String name;
 @override final  String description;
 @override@JsonKey(name: 'image_url') final  String imageUrl;
+@override final  String type;
 
 /// Create a copy of AchievementDto
 /// with the given fields replaced by the non-null parameter values.
@@ -227,16 +229,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _AchievementDto&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _AchievementDto&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl)&&(identical(other.type, type) || other.type == type));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,description,imageUrl);
+int get hashCode => Object.hash(runtimeType,id,name,description,imageUrl,type);
 
 @override
 String toString() {
-  return 'AchievementDto(id: $id, name: $name, description: $description, imageUrl: $imageUrl)';
+  return 'AchievementDto(id: $id, name: $name, description: $description, imageUrl: $imageUrl, type: $type)';
 }
 
 
@@ -247,7 +249,7 @@ abstract mixin class _$AchievementDtoCopyWith<$Res> implements $AchievementDtoCo
   factory _$AchievementDtoCopyWith(_AchievementDto value, $Res Function(_AchievementDto) _then) = __$AchievementDtoCopyWithImpl;
 @override @useResult
 $Res call({
- int id, String name, String description,@JsonKey(name: 'image_url') String imageUrl
+ int id, String name, String description,@JsonKey(name: 'image_url') String imageUrl, String type
 });
 
 
@@ -264,12 +266,13 @@ class __$AchievementDtoCopyWithImpl<$Res>
 
 /// Create a copy of AchievementDto
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? description = null,Object? imageUrl = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? description = null,Object? imageUrl = null,Object? type = null,}) {
   return _then(_AchievementDto(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,description: null == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
 as String,imageUrl: null == imageUrl ? _self.imageUrl : imageUrl // ignore: cast_nullable_to_non_nullable
+as String,type: null == type ? _self.type : type // ignore: cast_nullable_to_non_nullable
 as String,
   ));
 }
