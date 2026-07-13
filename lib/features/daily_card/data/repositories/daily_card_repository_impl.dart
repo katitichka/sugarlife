@@ -1,5 +1,7 @@
+import 'package:sugarlife/core/utils/retry.dart';
 import 'package:sugarlife/features/daily_card/data/mappers/daily_card_dto_mapper.dart';
 import 'package:sugarlife/features/daily_card/data/providers/daily_card_data_provider.dart';
+import 'package:sugarlife/features/daily_card/domain/entities/answered_daily_card_entity.dart';
 import 'package:sugarlife/features/daily_card/domain/entities/daily_card_entity.dart';
 import 'package:sugarlife/features/daily_card/domain/repositories/daily_card_repository.dart';
 
@@ -9,14 +11,9 @@ class DailyCardRepositoryImpl implements DailyCardRepository {
 
   DailyCardRepositoryImpl(this._dataProvider, this._userId);
 
-Future<DailyCardEntity?> getTodayCard({int retries = 3}) async {
-  for (int attempt = 0; attempt < retries; attempt++) {
-    try {
-      final userId = _dataProvider.currentUserId;
-      if (userId == null) {
-        return null;
-      }
-
+Future<DailyCardEntity?> getTodayCard({int retries = 3}) {
+  return withRetry(
+    () async {
       final createdAt = await _dataProvider.getUserProfileCreatedAt(_userId);
 
       if (createdAt == null) {
@@ -27,7 +24,6 @@ Future<DailyCardEntity?> getTodayCard({int retries = 3}) async {
       final today = DateTime.now();
       final dayNumber = today.difference(createdAt).inDays + 1;
 
-
       final dto = await _dataProvider.getDailyCardByDayNumber(dayNumber);
 
       if (dto != null) {
@@ -35,13 +31,10 @@ Future<DailyCardEntity?> getTodayCard({int retries = 3}) async {
       }
 
       return null;
-
-    } catch (e) {
-      if (attempt == retries - 1) rethrow;
-      await Future.delayed(Duration(milliseconds: 300 * (attempt + 1)));
-    }
-  }
-  return null;
+    },
+    maxAttempts: retries,
+    delayBuilder: (attempt) => Duration(milliseconds: 300 * attempt),
+  );
 }
 
 @override
@@ -78,7 +71,7 @@ Future<bool> hasAnsweredToday() async {
   }
 }
 @override
-Future<Map<String, dynamic>?> getAnsweredCardForToday() async {
+Future<AnsweredDailyCardEntity?> getAnsweredCardForToday() async {
   try {
     final now = DateTime.now();
     final startOfDay = DateTime(now.year, now.month, now.day);
@@ -92,12 +85,10 @@ Future<Map<String, dynamic>?> getAnsweredCardForToday() async {
 
     if (answered == null) return null;
 
-    final cardEntity = DailyCardDtoMapper.toEntity(dto: answered.card);
-
-    return {
-      'is_correct': answered.isCorrect,
-      'card': cardEntity,
-    };
+    return AnsweredDailyCardEntity(
+      isCorrect: answered.isCorrect,
+      card: DailyCardDtoMapper.toEntity(dto: answered.card),
+    );
   } catch (e) {
     print('Ошибка сохранения: $e');
     return null;

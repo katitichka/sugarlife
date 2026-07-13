@@ -1,5 +1,6 @@
 ﻿import 'package:bloc/bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:sugarlife/core/utils/retry.dart';
 import 'package:sugarlife/features/game_module/level/domain/entities/game_module_level_entity.dart';
 import 'package:sugarlife/features/game_module/level/domain/repositories/game_module_level_list_repository.dart';
 import 'package:sugarlife/features/profile/domain/entities/level_progress_entity.dart';
@@ -49,40 +50,29 @@ class GameModuleListBloc
       ),
     );
 
-    const maxRetries = 3;
-    const retryDelay = Duration(seconds: 3);
-
-    for (int attempt = 1; attempt <= maxRetries; attempt++) {
-      try {
+    try {
+      final result = await withRetry(() async {
         final levels = await _gameModuleLevelListRepository
             .getAllLevels()
             .timeout(const Duration(seconds: 10));
-            
         final allLevelsProgress = await _gameProgressRepository
             .getAllLevelsProgress()
             .timeout(const Duration(seconds: 10));
-            
-        emit(
-          GameModuleListState.receiveSuccess(
-            levels: levels,
-            progressMap: allLevelsProgress,
-          ),
-        );
-        return; // Успех — выход
-        
-      } catch (e) {
-        if (attempt == maxRetries) {
-          // Последняя попытка — показ ошибки
-          emit(
-            const GameModuleListState.receiveFailed(
-              message: 'Не удалось загрузить уровни. Проверьте соединение.',
-            ),
-          );
-        } else {
-          // 3 секунды перед следующей попыткой
-          await Future.delayed(retryDelay);
-        }
-      }
+        return (levels: levels, progressMap: allLevelsProgress);
+      });
+
+      emit(
+        GameModuleListState.receiveSuccess(
+          levels: result.levels,
+          progressMap: result.progressMap,
+        ),
+      );
+    } catch (e) {
+      emit(
+        const GameModuleListState.receiveFailed(
+          message: 'Не удалось загрузить уровни. Проверьте соединение.',
+        ),
+      );
     }
   }
 

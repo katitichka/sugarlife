@@ -1,4 +1,3 @@
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sugarlife/core/cache/app_cache_service.dart';
 import 'package:sugarlife/features/auth/data/providers/auth_data_provider.dart';
 import 'package:sugarlife/features/auth/domain/repositories/auth_repository.dart';
@@ -64,16 +63,10 @@ class AuthRepositoryImpl implements AuthRepository {
       print('Ошибка выхода: $e');
       rethrow;
     }
-   try {
-    await _cache.clearAll();
-  } catch (e) {
-    print('Ошибка очистки кэша: $e');
-  }
     try {
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.clear();
+      await _cache.clearAll();
     } catch (e) {
-      print('Ошибка очистки локального кеша: $e');
+      print('Ошибка очистки кэша: $e');
     }
   }
 
@@ -117,15 +110,6 @@ class AuthRepositoryImpl implements AuthRepository {
     }
   }
 
-  @override
-  Future<bool> isEmailExists({required String email}) async {
-    try {
-      return await _dataProvider.checkEmailExists(email);
-    } catch (e) {
-      print('Ошибка проверки email: $e');
-      return false;
-    }
-  }
 }
 
 ProfileEntity _mapToProfileEntity(String userId, ProfileDto profileData) {

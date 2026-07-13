@@ -1,5 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:sugarlife/core/utils/retry.dart';
+import 'package:sugarlife/features/daily_card/domain/entities/answered_daily_card_entity.dart';
 import 'package:sugarlife/features/daily_card/domain/entities/daily_card_entity.dart';
 import 'package:sugarlife/features/daily_card/domain/repositories/daily_card_repository.dart';
 
@@ -28,45 +30,39 @@ class DailyCardBloc extends Bloc<DailyCardEvent, DailyCardState> {
 
   Future<void> _onLoadTodayCard(Emitter<DailyCardState> emit) async {
     emit(const Loading());
-    
-    const maxRetries = 3;
+
     const timeout = Duration(seconds: 3);
-    
-    for (int attempt = 1; attempt <= maxRetries; attempt++) {
-      try {
+
+    try {
+      final result = await withRetry<
+          ({AnsweredDailyCardEntity? answered, DailyCardEntity? card})>(() async {
         final answeredCard = await _repository
             .getAnsweredCardForToday()
             .timeout(timeout);
-
         if (answeredCard != null) {
-          final card = answeredCard['card'] as DailyCardEntity;
-          emit(
-            Answered(
-              isCorrect: answeredCard['is_correct'] as bool,
-              explanation: card.explanation,
-              isMyth: card.isMyth,
-            ),
-          );
-          return;
+          return (answered: answeredCard, card: null);
         }
-
         final card = await _repository.getTodayCard().timeout(timeout);
-        if (card == null) {
-          emit(const NoMoreCards());
-          return;
-        }
+        return (answered: null, card: card);
+      }, delay: const Duration(seconds: 1));
 
+      final answeredCard = result.answered;
+      final card = result.card;
+      if (answeredCard != null) {
+        emit(
+          Answered(
+            isCorrect: answeredCard.isCorrect,
+            explanation: answeredCard.card.explanation,
+            isMyth: answeredCard.card.isMyth,
+          ),
+        );
+      } else if (card != null) {
         emit(Loaded(card: card, hasAnsweredToday: false));
-        return;
-        
-      } catch (e) {
-        if (attempt == maxRetries) {
-          emit(const Error(message: 'Не удалось загрузить карточку. Проверьте подключение к интернету.'));
-        } else {
-          // 1 секунда перед следующей попыткой
-          await Future.delayed(const Duration(seconds: 1));
-        }
+      } else {
+        emit(const NoMoreCards());
       }
+    } catch (e) {
+      emit(const Error(message: 'Не удалось загрузить карточку. Проверьте подключение к интернету.'));
     }
   }
 
@@ -78,30 +74,23 @@ class DailyCardBloc extends Bloc<DailyCardEvent, DailyCardState> {
     bool isMyth,
   ) async {
     emit(const Loading());
-    
-    const maxRetries = 2;
+
     const timeout = Duration(seconds: 3);
-    
-    for (int attempt = 1; attempt <= maxRetries; attempt++) {
-      try {
-        await _repository
-            .saveUserAnswer(cardId, isCorrect)
-            .timeout(timeout);
-            
-        emit(Answered(
-          isCorrect: isCorrect,
-          explanation: explanation,
-          isMyth: isMyth,
-        ));
-        return;
-        
-      } catch (e) {
-        if (attempt == maxRetries) {
-          emit(const Error(message: 'Не удалось сохранить ответ. Проверьте подключение к интернету.'));
-        } else {
-          await Future.delayed(const Duration(seconds: 1));
-        }
-      }
+
+    try {
+      await withRetry(
+        () => _repository.saveUserAnswer(cardId, isCorrect).timeout(timeout),
+        maxAttempts: 2,
+        delay: const Duration(seconds: 1),
+      );
+
+      emit(Answered(
+        isCorrect: isCorrect,
+        explanation: explanation,
+        isMyth: isMyth,
+      ));
+    } catch (e) {
+      emit(const Error(message: 'Не удалось сохранить ответ. Проверьте подключение к интернету.'));
     }
   }
 

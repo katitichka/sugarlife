@@ -23,6 +23,4 @@ abstract class AuthDataProvider {
     required String username,
     required int currentAvatarId,
   });
-
-  Future<bool> checkEmailExists(String email);
 }

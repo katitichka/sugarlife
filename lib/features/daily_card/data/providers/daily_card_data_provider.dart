@@ -2,8 +2,6 @@ import 'package:sugarlife/features/daily_card/data/dtos/answered_daily_card_dto.
 import 'package:sugarlife/features/daily_card/data/dtos/daily_card_dto.dart';
 
 abstract class DailyCardDataProvider {
-  String? get currentUserId;
-
   Future<DateTime?> getUserProfileCreatedAt(String userId);
 
   Future<DailyCardDto?> getDailyCardByDayNumber(int dayNumber);

@@ -16,6 +16,4 @@ abstract interface class AuthRepository {
   Future<void> logout();
   // Проверка сессии
   Future<ProfileEntity?> getCurrentUser();
-  // Проверка уникальности email при регистрации
-  Future<bool> isEmailExists({required String email});
 }

@@ -18,7 +18,10 @@ class DailyCardScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final userId = Supabase.instance.client.auth.currentUser!.id;
+    final userId = Supabase.instance.client.auth.currentUser?.id;
+    if (userId == null) {
+      throw StateError('DailyCardScreen открыт без авторизованного пользователя');
+    }
 
     return RepositoryProvider<DailyCardRepository>(
       create: (context) => DailyCardRepositoryImpl(

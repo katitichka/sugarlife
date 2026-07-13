@@ -9,7 +9,13 @@ class LevelProgressDataProviderImpl implements LevelProgressDataProvider {
   final SupabaseClient _supabase;
 
   @override
-  String get currentUserId => _supabase.auth.currentUser!.id;
+  String get currentUserId {
+    final userId = _supabase.auth.currentUser?.id;
+    if (userId == null) {
+      throw StateError('Нет авторизованного пользователя');
+    }
+    return userId;
+  }
 
   @override
   Future<LevelProgressDto?> getLevelProgress({

@@ -101,15 +101,6 @@ final appRoute = GoRouter(
                       ),
                     );
                   },
-                  routes: [
-                    GoRoute(
-                      path: 'question/:questionIndex',
-                      name: 'gameLevelQuestion',
-                      builder: (context, state) {
-                        return const SizedBox.shrink();
-                      },
-                    ),
-                  ],
                 ),
               ],
             ),

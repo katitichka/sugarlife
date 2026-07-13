@@ -29,16 +29,13 @@ class _GameQuestionPageState extends State<GameQuestionPage> {
     final state = context.watch<GameModuleLevelBloc>().state;
 
     int? currentQuestionId;
-    int? currentCharacterId;
     GameModuleQuestionEntity? currentQuestion;
     if (state is ReceiveSuccess) {
       currentQuestion = state.questions[state.currentIndex];
       currentQuestionId = currentQuestion.id;
-      currentCharacterId = currentQuestion.characterId;
     } else if (state is AnswerInProgress) {
       currentQuestion = state.question;
       currentQuestionId = currentQuestion.id;
-      currentCharacterId = currentQuestion.characterId;
     }
 
     if (_lastQuestionId != currentQuestionId) {
@@ -93,27 +90,6 @@ class _GameQuestionPageState extends State<GameQuestionPage> {
         currentQuestionNumber = state.currentIndex + 1;
       }
     }
-    // URL персонажа следующего вопроса для предзагрузки в кэш
-    String? _nextCharacterImageUrl;
-    {
-      final List<GameModuleQuestionEntity> questions;
-      final int currentIndex;
-      if (state is ReceiveSuccess) {
-        questions = state.questions;
-        currentIndex = state.currentIndex;
-      } else if (state is AnswerInProgress) {
-        questions = state.questions;
-        currentIndex = state.currentIndex;
-      } else {
-        questions = const [];
-        currentIndex = -1;
-      }
-      final nextIndex = currentIndex + 1;
-      if (nextIndex < questions.length) {
-        final nextCharacterId = questions[nextIndex].characterId;
-        _nextCharacterImageUrl = characterImages[nextCharacterId];
-      }
-    }
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: MainAppBar(
@@ -136,17 +112,6 @@ class _GameQuestionPageState extends State<GameQuestionPage> {
       ),
       body: Stack(
         children: [
-          // Предзагрузка SVG следующего персонажа в кэш
-          if (_nextCharacterImageUrl != null)
-            Offstage(
-              offstage: true,
-              child: SvgPicture.network(
-                key: ValueKey('preload_${_nextCharacterImageUrl}'),
-                _nextCharacterImageUrl!,
-                width: 1,
-                height: 1,
-              ),
-            ),
           if (currentQuestion != null)
             Column(
               children: [

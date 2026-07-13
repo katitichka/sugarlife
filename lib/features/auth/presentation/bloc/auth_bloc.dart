@@ -82,15 +82,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         );
         return;
       }
-      final isUniqueEmail = await _authRepository.isEmailExists(email: email);
-      if (isUniqueEmail) {
-        emit(
-          const AuthState.failure(
-            message: 'Аккаунт с таким email уже существует',
-          ),
-        );
-        return;
-      }
       final profile = await _authRepository.signUp(
         email: email,
         password: password,

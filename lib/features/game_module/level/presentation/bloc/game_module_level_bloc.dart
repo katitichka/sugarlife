@@ -1,5 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:sugarlife/core/utils/retry.dart';
 import 'package:sugarlife/features/achievement/domain/entities/achievement_entity.dart';
 import 'package:sugarlife/features/achievement/domain/repositories/achievement_repository.dart';
 import 'package:sugarlife/features/game_module/level/domain/entities/game_module_question_entity.dart';
@@ -65,43 +66,32 @@ class GameModuleLevelBloc
   required int levelId,
 }) async {
   emit(const ReceiveInProgress(message: 'Получение вопросов'));
-  
-  const maxRetries = 3; 
+
   const timeout = Duration(seconds: 3);
-  
-  for (int attempt = 1; attempt <= maxRetries; attempt++) {
-    try {
-      final results = await Future.wait([
-        _levelProgressRepository.getLevelProgress(levelId: levelId).timeout(timeout),
-        _gameModuleLevelRepository.getQuestionsForLevel(levelId: levelId).timeout(timeout),
-        _gameModuleLevelRepository.getCharacterImagesForLevel(levelId: levelId).timeout(timeout),
-      ]);
 
-      final progressResult = results[0] as LevelProgressEntity?;
-      final questionsResult = results[1] as List<GameModuleQuestionEntity>;
-      final characterImages = results[2] as Map<int, String>;
+  try {
+    final results = await withRetry(() => Future.wait([
+      _levelProgressRepository.getLevelProgress(levelId: levelId).timeout(timeout),
+      _gameModuleLevelRepository.getQuestionsForLevel(levelId: levelId).timeout(timeout),
+      _gameModuleLevelRepository.getCharacterImagesForLevel(levelId: levelId).timeout(timeout),
+    ]));
 
-      emit(
-        ReceiveSuccess(
-          questions: questionsResult,
-          currentIndex: -1,
-          progress: progressResult,
-          isAnswered: false,
-          answers: {},
-          characterImages: characterImages,
-        ),
-      );
-      return; 
-      
-    } catch (e) {
-      if (attempt == maxRetries) {
-        // Последняя попытка - показыв ошибки
-        emit(ReceiveFailed(message: 'Не удалось загрузить уровень. Проверьте подключение к интернету.'));
-      } else {
-        // 3 секунды перед следующей попыткой
-        await Future.delayed(const Duration(seconds: 3));
-      }
-    }
+    final progressResult = results[0] as LevelProgressEntity?;
+    final questionsResult = results[1] as List<GameModuleQuestionEntity>;
+    final characterImages = results[2] as Map<int, String>;
+
+    emit(
+      ReceiveSuccess(
+        questions: questionsResult,
+        currentIndex: -1,
+        progress: progressResult,
+        isAnswered: false,
+        answers: {},
+        characterImages: characterImages,
+      ),
+    );
+  } catch (e) {
+    emit(ReceiveFailed(message: 'Не удалось загрузить уровень. Проверьте подключение к интернету.'));
   }
 }
 

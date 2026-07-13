@@ -9,9 +9,6 @@ class DailyCardDataProviderImpl implements DailyCardDataProvider {
   final SupabaseClient _supabase;
 
   @override
-  String? get currentUserId => _supabase.auth.currentUser?.id;
-
-  @override
   Future<DateTime?> getUserProfileCreatedAt(String userId) async {
     final response = await _supabase
         .from('user_profile')

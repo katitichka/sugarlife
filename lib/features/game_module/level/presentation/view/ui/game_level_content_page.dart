@@ -1,5 +1,8 @@
-﻿import 'package:flutter/material.dart';
+﻿import 'dart:typed_data';
+
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sugarlife/core/router/root_navigator.dart';
 import 'package:sugarlife/core/theme/app_color.dart';
@@ -26,66 +29,81 @@ class GameLevelContentPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<GameModuleLevelBloc, GameModuleLevelState>(
-      builder: (context, state) {
-        switch (state) {
-          case ReceiveInProgress():
-            return const _LoadingPage();
-          case ReceiveFailed(:final message):
-            return _ErrorPage(
-              message: message,
-              onRetry: () => context.read<GameModuleLevelBloc>().add(
-                GameModuleLevelEvent.receive(levelId: levelId),
-              ),
-            );
-          case ReceiveSuccess():
-            final successState = state;
-            if (successState.currentIndex == -1) {
-              return GameLevelStartLevelPage(
+    return BlocListener<GameModuleLevelBloc, GameModuleLevelState>(
+      listenWhen: (previous, current) =>
+          current is ReceiveSuccess && current.currentIndex == -1,
+      listener: (context, state) => _precacheCharacterImages(context, state),
+      child: BlocBuilder<GameModuleLevelBloc, GameModuleLevelState>(
+        builder: (context, state) {
+          switch (state) {
+            case ReceiveInProgress():
+              return const _LoadingPage();
+            case ReceiveFailed(:final message):
+              return _ErrorPage(
+                message: message,
+                onRetry: () => context.read<GameModuleLevelBloc>().add(
+                  GameModuleLevelEvent.receive(levelId: levelId),
+                ),
+              );
+            case ReceiveSuccess():
+              final successState = state;
+              if (successState.currentIndex == -1) {
+                return GameLevelStartLevelPage(
+                  levelId: levelId,
+                  orderIndex: orderIndex,
+                  theoryModuleId: theoryModuleId,
+                );
+              } else {
+                return GameQuestionPage(levelOrderIndex: orderIndex);
+              }
+            case AnswerInProgress():
+              return GameQuestionPage(levelOrderIndex: orderIndex);
+            case LevelCompleted(
+              :final correctAnswers,
+              :final totalQuestions,
+              :final stars,
+              :final unlockedAchievement,
+            ):
+              return GameLevelResultPage(
+                correctAnswers: correctAnswers,
+                totalQuestions: totalQuestions,
+                stars: stars,
+                onFinish: () {
+                  if (correctAnswers == 0) {
+                    context.go(
+                      '/game/level/$levelId',
+                      extra: {
+                        'orderIndex': orderIndex,
+                        'theoryModuleId': theoryModuleId,
+                      },
+                    );
+                  } else {
+                    _finishLevelWithAchievementCard(
+                      context,
+                      unlockedOnThisRun: unlockedAchievement,
+                    );
+                  }
+                },
                 levelId: levelId,
                 orderIndex: orderIndex,
                 theoryModuleId: theoryModuleId,
               );
-            } else {
-              return GameQuestionPage(levelOrderIndex: orderIndex);
-            }
-          case AnswerInProgress():
-            return GameQuestionPage(levelOrderIndex: orderIndex);
-          case LevelCompleted(
-            :final correctAnswers,
-            :final totalQuestions,
-            :final stars,
-            :final unlockedAchievement,
-          ):
-            return GameLevelResultPage(
-              correctAnswers: correctAnswers,
-              totalQuestions: totalQuestions,
-              stars: stars,
-              onFinish: () {
-                if (correctAnswers == 0) {
-                  context.go(
-                    '/game/level/$levelId',
-                    extra: {
-                      'orderIndex': orderIndex,
-                      'theoryModuleId': theoryModuleId,
-                    },
-                  );
-                } else {
-                  _finishLevelWithAchievementCard(
-                    context,
-                    unlockedOnThisRun: unlockedAchievement,
-                  );
-                }
-              },
-              levelId: levelId,
-              orderIndex: orderIndex,
-              theoryModuleId: theoryModuleId,
-            );
-          default:
-            return const SizedBox.shrink();
-        }
-      },
+            default:
+              return const SizedBox.shrink();
+          }
+        },
+      ),
     );
+  }
+}
+
+/// Прогревает кэш flutter_svg для всех персонажей уровня сразу после
+/// загрузки вопросов — пока показывается экран "Начать уровень", чтобы
+/// картинка не мигала при открытии первого вопроса.
+void _precacheCharacterImages(BuildContext context, GameModuleLevelState state) {
+  final images = (state as ReceiveSuccess).characterImages.values.toSet();
+  for (final url in images) {
+    SvgNetworkLoader(url).loadBytes(context).catchError((_) => ByteData(0));
   }
 }
 

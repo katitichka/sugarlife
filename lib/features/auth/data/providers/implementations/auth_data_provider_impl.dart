@@ -63,13 +63,4 @@ class AuthDataProviderImpl implements AuthDataProvider {
       'current_avatar_id': currentAvatarId,
     });
   }
-
-  @override
-  Future<bool> checkEmailExists(String email) async {
-    final result = await _supabase.rpc(
-      'check_email_exists',
-      params: {'p_email': email},
-    );
-    return result ?? false;
-  }
 }
