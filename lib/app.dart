@@ -64,7 +64,7 @@ Future<void> app(SupabaseClient supabase) async {
         ),
         RepositoryProvider<TheoryModuleRepository>(
           create: (context) => TheoryModuleRepositoryImpl(
-            dataProvider: TheoryModuleDataProviderImpl(supabase),
+            dataProvider: TheoryModuleDataProviderImpl(),
             cache: context.read<AppCacheService>(),
           ),
         ),

@@ -1,0 +1,44 @@
+[
+  {
+    "id": 1,
+    "title": "Модуль 1",
+    "subtitle": "что такое сахарный диабет",
+    "color_hex": "FFDDA9",
+    "order_index": 1
+  },
+  {
+    "id": 2,
+    "title": "Модуль 2",
+    "subtitle": "физическая нагрузка при сахарном диабете и осложнения",
+    "color_hex": "EDF6FF",
+    "order_index": 2
+  },
+  {
+    "id": 3,
+    "title": "Модуль 3",
+    "subtitle": "самоконтроль",
+    "color_hex": "FFD7D5",
+    "order_index": 3
+  },
+  {
+    "id": 4,
+    "title": "Модуль 4",
+    "subtitle": "питание",
+    "color_hex": "FFE5EB",
+    "order_index": 4
+  },
+  {
+    "id": 5,
+    "title": "Модуль 5",
+    "subtitle": "инсулинотерапия",
+    "color_hex": "FDFFD9",
+    "order_index": 5
+  },
+  {
+    "id": 6,
+    "title": "Модуль 6",
+    "subtitle": "гипогликемия и гипергликемия",
+    "color_hex": "FDFFD9",
+    "order_index": 6
+  }
+]
