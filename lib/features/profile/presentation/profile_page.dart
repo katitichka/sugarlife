@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -9,9 +8,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:sugarlife/core/theme/app_color.dart';
 import 'package:sugarlife/features/achievement/presentation/bloc/achievement_bloc.dart';
 import 'package:sugarlife/features/auth/presentation/bloc/auth_bloc.dart';
-import 'package:sugarlife/features/avatars/domain/entities/avatar_entity.dart';
-import 'package:sugarlife/features/avatars/presentation/view/choose_avatar_page.dart';
-import 'package:sugarlife/features/profile/domain/entities/profile_entity.dart';
 import 'package:sugarlife/features/profile/domain/repositories/profile_repository.dart';
 import 'package:sugarlife/features/profile/presentation/achievements_sections.dart';
 import 'package:sugarlife/features/profile/presentation/settings_dialog.dart';
