@@ -284,7 +284,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           _passwordController.text.isEmpty ||
                           _isLoading)
                       ? null
-                      : () async {
+                      : () {
                           setState(() {
                             _emailError = _emailController.text.isEmpty
                                 ? 'Введите email'
@@ -292,12 +292,15 @@ class _LoginScreenState extends State<LoginScreen> {
                             _passwordError = _passwordController.text.isEmpty
                                 ? 'Введите пароль'
                                 : null;
+                            _authError = null;
                           });
 
                           if (_emailController.text.isEmpty ||
                               _passwordController.text.isEmpty) {
                             return;
                           }
+
+                          setState(() => _isLoading = true);
 
                           context.read<AuthBloc>().add(
                             AuthEvent.signInRequested(

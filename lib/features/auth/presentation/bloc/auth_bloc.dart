@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:sugarlife/features/auth/domain/repositories/auth_repository.dart';
@@ -9,9 +11,14 @@ part 'auth_bloc.freezed.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final AuthRepository _authRepository;
-  AuthBloc({required AuthRepository authRepository})
-    : _authRepository = authRepository,
-      super(const _Initial()) {
+  final Duration _serverTimeout;
+
+  AuthBloc({
+    required AuthRepository authRepository,
+    Duration serverTimeout = const Duration(seconds: 10),
+  }) : _serverTimeout = serverTimeout,
+       _authRepository = authRepository,
+       super(const _Initial()) {
     on<AuthEvent>(
       (event, emit) => switch (event) {
         _AuthCheckStarted() => _authCheckStarted(emit: emit),
@@ -38,7 +45,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   Future<void> _authCheckStarted({required Emitter<AuthState> emit}) async {
     try {
       emit(const AuthState.loading());
-      final currentUser = await _authRepository.getCurrentUser();
+      final currentUser = await _authRepository.getCurrentUser().timeout(
+        _serverTimeout,
+      );
       if (currentUser == null) {
         emit(AuthState.unauthenticated());
       } else {
@@ -56,10 +65,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   }) async {
     try {
       emit(const AuthState.loading());
-      final profile = await _authRepository.signIn(
-        email: email,
-        password: password,
-      );
+      final profile = await _authRepository
+          .signIn(email: email, password: password)
+          .timeout(_serverTimeout);
       emit(AuthState.authenticated(profile: profile));
     } catch (e) {
       emit(AuthState.failure(message: _friendlyAuthError(e)));
@@ -82,11 +90,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         );
         return;
       }
-      final profile = await _authRepository.signUp(
-        email: email,
-        password: password,
-        username: username,
-      );
+      final profile = await _authRepository
+          .signUp(email: email, password: password, username: username)
+          .timeout(_serverTimeout);
       emit(AuthState.authenticated(profile: profile));
     } catch (e) {
       emit(AuthState.failure(message: _friendlyAuthError(e)));
@@ -96,22 +102,34 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   Future<void> _logoutPressed({required Emitter<AuthState> emit}) async {
     try {
       emit(const AuthState.loading());
-      await _authRepository.logout();
+      await _authRepository.logout().timeout(_serverTimeout);
       emit(const AuthState.unauthenticated());
     } catch (_) {
-      emit(const AuthState.failure(message: 'Не удалось выйти из аккаунта. Попробуйте ещё раз'));
+      emit(
+        const AuthState.failure(
+          message: 'Не удалось выйти из аккаунта. Попробуйте ещё раз',
+        ),
+      );
     }
   }
 
   String _friendlyAuthError(Object e) {
+    if (e is TimeoutException) {
+      return 'Сервер не отвечает. Попробуйте ещё раз';
+    }
+
     final s = e.toString().toLowerCase();
-    if (s.contains('invalid login credentials') || s.contains('invalid credentials')) {
+    if (s.contains('invalid login credentials') ||
+        s.contains('invalid credentials')) {
       return 'Неверный email или пароль';
     }
-    if (s.contains('user already registered') || s.contains('already registered')) {
+    if (s.contains('user already registered') ||
+        s.contains('already registered')) {
       return 'Аккаунт с таким email уже существует';
     }
-    if (s.contains('network') || s.contains('timeout') || s.contains('socketexception')) {
+    if (s.contains('network') ||
+        s.contains('timeout') ||
+        s.contains('socketexception')) {
       return 'Нет соединения. Проверьте интернет';
     }
     if (s.contains('too many requests') || s.contains('rate limit')) {
