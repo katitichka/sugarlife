@@ -1,7 +1,7 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:sugarlife/core/theme/app_color.dart';
+import 'package:sugarlife/core/theme/app_colors.dart';
 import 'package:lottie/lottie.dart';
 
 class GameLevelResultPage extends StatelessWidget {

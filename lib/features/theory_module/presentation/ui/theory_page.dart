@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:sugarlife/core/theme/app_color.dart';
+import 'package:sugarlife/core/theme/app_colors.dart';
 import 'package:sugarlife/features/theory_module/presentation/bloc/theory_module_bloc.dart';
 import 'package:sugarlife/features/theory_module/presentation/ui/theory_list_card.dart';
 import 'package:sugarlife/shared/ui/app_error_view.dart';
@@ -75,7 +75,7 @@ class _TheoryPageState extends State<TheoryPage> {
                             trackVisibility: needScroll,
                             thickness: 4,
                             radius: const Radius.circular(2),
-                            thumbColor: AppColors.white.withValues(alpha: 0.8),
+                            thumbColor: AppColors.white80,
                             child: ListView.builder(
                               controller: _scrollController,
                               physics: needScroll
@@ -123,6 +123,8 @@ class _ErrorPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(child: AppErrorView(message: message, onRetry: onRetry));
+    return Center(
+      child: AppErrorView(message: message, onRetry: onRetry),
+    );
   }
 }

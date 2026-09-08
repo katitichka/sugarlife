@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:sugarlife/core/theme/app_color.dart';
+import 'package:sugarlife/core/theme/app_colors.dart';
 import 'package:sugarlife/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:sugarlife/shared/ui/app_inline_error_text.dart';
 import 'package:sugarlife/shared/ui/lottie_progress_indicator.dart';
@@ -144,11 +144,17 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     errorBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(30),
-                      borderSide: const BorderSide(color: Colors.red, width: 3),
+                      borderSide: const BorderSide(
+                        color: AppColors.danger,
+                        width: 3,
+                      ),
                     ),
                     focusedErrorBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(30),
-                      borderSide: const BorderSide(color: Colors.red, width: 3),
+                      borderSide: const BorderSide(
+                        color: AppColors.danger,
+                        width: 3,
+                      ),
                     ),
                     contentPadding: const EdgeInsets.symmetric(
                       horizontal: 30,
@@ -156,12 +162,12 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     hintText: 'Введите почту',
                     hintStyle: GoogleFonts.rubik(
-                      color: const Color.fromRGBO(250, 243, 235, 0.8),
+                      color: AppColors.inputHint,
                       fontSize: 20,
                       fontWeight: FontWeight.w400,
                     ),
                     errorStyle: GoogleFonts.rubik(
-                      color: Colors.red,
+                      color: AppColors.danger,
                       fontSize: 12,
                     ),
                     filled: true,
@@ -206,11 +212,17 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     errorBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(30),
-                      borderSide: const BorderSide(color: Colors.red, width: 3),
+                      borderSide: const BorderSide(
+                        color: AppColors.danger,
+                        width: 3,
+                      ),
                     ),
                     focusedErrorBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(30),
-                      borderSide: const BorderSide(color: Colors.red, width: 3),
+                      borderSide: const BorderSide(
+                        color: AppColors.danger,
+                        width: 3,
+                      ),
                     ),
                     contentPadding: const EdgeInsets.symmetric(
                       horizontal: 30,
@@ -218,12 +230,12 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     hintText: 'Введите пароль',
                     hintStyle: GoogleFonts.rubik(
-                      color: const Color.fromRGBO(250, 243, 235, 0.8),
+                      color: AppColors.inputHint,
                       fontSize: 20,
                       fontWeight: FontWeight.w400,
                     ),
                     errorStyle: GoogleFonts.rubik(
-                      color: Colors.red,
+                      color: AppColors.danger,
                       fontSize: 12,
                     ),
                     filled: true,
@@ -263,8 +275,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                 ),
-                SizedBox(height: 30,),
-                if (_authError != null) AppInlineErrorText(message: _authError!),
+                SizedBox(height: 30),
+                if (_authError != null)
+                  AppInlineErrorText(message: _authError!),
                 ElevatedButton(
                   onPressed:
                       (_emailController.text.isEmpty ||
@@ -280,12 +293,12 @@ class _LoginScreenState extends State<LoginScreen> {
                                 ? 'Введите пароль'
                                 : null;
                           });
-          
+
                           if (_emailController.text.isEmpty ||
                               _passwordController.text.isEmpty) {
                             return;
                           }
-          
+
                           context.read<AuthBloc>().add(
                             AuthEvent.signInRequested(
                               email: _emailController.text,
@@ -298,7 +311,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         _emailController.text.isEmpty ||
                             _passwordController.text.isEmpty ||
                             _isLoading
-                        ? const Color.fromRGBO(64, 153, 219, 0.6)
+                        ? AppColors.disabledPrimary
                         : AppColors.blue,
                     minimumSize: const Size(230, 70),
                     shape: RoundedRectangleBorder(
@@ -315,8 +328,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                 _emailController.text.isEmpty ||
                                     _passwordController.text.isEmpty ||
                                     _isLoading
-                                ? const Color.fromRGBO(255, 255, 255, 0.6)
-                                : const Color.fromRGBO(250, 243, 235, 1),
+                                ? AppColors.disabledOnPrimary
+                                : AppColors.background,
                             fontSize: 32,
                           ),
                           textAlign: TextAlign.center,

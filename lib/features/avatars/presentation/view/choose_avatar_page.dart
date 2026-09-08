@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:sugarlife/core/theme/app_color.dart';
+import 'package:sugarlife/core/theme/app_colors.dart';
 import 'package:sugarlife/features/avatars/domain/entities/avatar_entity.dart';
 import 'package:sugarlife/features/profile/domain/repositories/profile_repository.dart';
 import 'package:sugarlife/shared/ui/app_error_view.dart';

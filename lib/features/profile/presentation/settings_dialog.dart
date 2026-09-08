@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:sugarlife/core/theme/app_color.dart';
+import 'package:sugarlife/core/theme/app_colors.dart';
 import 'package:sugarlife/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:sugarlife/features/avatars/domain/entities/avatar_entity.dart';
 import 'package:sugarlife/features/avatars/presentation/view/choose_avatar_page.dart';
@@ -12,142 +12,152 @@ import 'package:sugarlife/shared/ui/app_snack_bar.dart';
 
 class SettingsDialog extends StatelessWidget {
   final ProfileEntity profile;
-  final VoidCallback onAvatarChanged; 
+  final VoidCallback onAvatarChanged;
 
-  const SettingsDialog({super.key, required this.profile, required this.onAvatarChanged,});
+  const SettingsDialog({
+    super.key,
+    required this.profile,
+    required this.onAvatarChanged,
+  });
 
-void _showEditNameDialog(BuildContext context, ProfileEntity currentProfile) {
-  final controller = TextEditingController(text: currentProfile.username);
-  final repository = context.read<ProfileRepository>();
+  void _showEditNameDialog(BuildContext context, ProfileEntity currentProfile) {
+    final controller = TextEditingController(text: currentProfile.username);
+    final repository = context.read<ProfileRepository>();
 
-  showDialog(
-    context: context,
-    builder: (context) => Dialog(
-      insetPadding: const EdgeInsets.symmetric(horizontal: 44),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Изменить имя',
-              style: GoogleFonts.rubik(
-                fontSize: 20,
-                fontWeight: FontWeight.w600,
-                color: AppColors.blue,
-              ),
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: controller,
-              decoration: InputDecoration(
-                hintText: 'Введите новое имя',
-                hintStyle: GoogleFonts.rubik(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w400,
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        insetPadding: const EdgeInsets.symmetric(horizontal: 44),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Изменить имя',
+                style: GoogleFonts.rubik(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
                   color: AppColors.blue,
                 ),
-                contentPadding: const EdgeInsets.all(10),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(
-                    color: AppColors.blue,
-                    width: 2,
-                  ),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(
-                    color: AppColors.blue,
-                    width: 2,
-                  ),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(
-                    color: AppColors.blue,
-                    width: 2,
-                  ),
-                ),
               ),
-              style: GoogleFonts.rubik(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: AppColors.blue,
-              ),
-            ),
-            const SizedBox(height: 16),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  style: TextButton.styleFrom(
-                    padding: EdgeInsets.zero,
-                    minimumSize: Size.zero,
-                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              const SizedBox(height: 12),
+              TextField(
+                controller: controller,
+                decoration: InputDecoration(
+                  hintText: 'Введите новое имя',
+                  hintStyle: GoogleFonts.rubik(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w400,
+                    color: AppColors.blue,
                   ),
-                  child: Text(
-                    'Отмена',
-                    style: GoogleFonts.rubik(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.grey,
-                    ),
-                  ),
-                ),
-                TextButton(
-                  onPressed: () async {
-                    final newUsername = controller.text.trim();
-                    if (newUsername.isNotEmpty &&
-                        newUsername != currentProfile.username) {
-                      try {
-                        await repository.updateUsername(newUsername);
-                        if (!context.mounted) return;
-                        final updatedProfile = currentProfile.copyWith(
-                          username: newUsername,
-                        );
-                        context.read<AuthBloc>().add(
-                          AuthEvent.profileUpdate(newProfile: updatedProfile),
-                        );
-                        if (context.mounted) {
-                          Navigator.pop(context);
-                          AppSnackBar.showSuccess(context, 'Имя изменено!');
-                        }
-                      } catch (_) {
-                        if (!context.mounted) return;
-                        AppSnackBar.showError(context, 'Не удалось сохранить изменения');
-                      }
-                    } else if (newUsername == currentProfile.username) {
-                      Navigator.pop(context);
-                    } else {
-                      AppSnackBar.showError(context, 'Имя не может быть пустым');
-                    }
-                  },
-                  style: TextButton.styleFrom(
-                    padding: EdgeInsets.zero,
-                    minimumSize: Size.zero,
-                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  ),
-                  child: Text(
-                    'Изменить',
-                    style: GoogleFonts.rubik(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
+                  contentPadding: const EdgeInsets.all(10),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(
                       color: AppColors.blue,
+                      width: 2,
+                    ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(
+                      color: AppColors.blue,
+                      width: 2,
+                    ),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(
+                      color: AppColors.blue,
+                      width: 2,
                     ),
                   ),
                 ),
-              ],
-            ),
-          ],
+                style: GoogleFonts.rubik(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: AppColors.blue,
+                ),
+              ),
+              const SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    style: TextButton.styleFrom(
+                      padding: EdgeInsets.zero,
+                      minimumSize: Size.zero,
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    ),
+                    child: Text(
+                      'Отмена',
+                      style: GoogleFonts.rubik(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.grey,
+                      ),
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () async {
+                      final newUsername = controller.text.trim();
+                      if (newUsername.isNotEmpty &&
+                          newUsername != currentProfile.username) {
+                        try {
+                          await repository.updateUsername(newUsername);
+                          if (!context.mounted) return;
+                          final updatedProfile = currentProfile.copyWith(
+                            username: newUsername,
+                          );
+                          context.read<AuthBloc>().add(
+                            AuthEvent.profileUpdate(newProfile: updatedProfile),
+                          );
+                          if (context.mounted) {
+                            Navigator.pop(context);
+                            AppSnackBar.showSuccess(context, 'Имя изменено!');
+                          }
+                        } catch (_) {
+                          if (!context.mounted) return;
+                          AppSnackBar.showError(
+                            context,
+                            'Не удалось сохранить изменения',
+                          );
+                        }
+                      } else if (newUsername == currentProfile.username) {
+                        Navigator.pop(context);
+                      } else {
+                        AppSnackBar.showError(
+                          context,
+                          'Имя не может быть пустым',
+                        );
+                      }
+                    },
+                    style: TextButton.styleFrom(
+                      padding: EdgeInsets.zero,
+                      minimumSize: Size.zero,
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    ),
+                    child: Text(
+                      'Изменить',
+                      style: GoogleFonts.rubik(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.blue,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
-    ),
-  );
-}
+    );
+  }
 
   void _showLogoutDialog(BuildContext context) {
     showDialog(
@@ -194,13 +204,12 @@ void _showEditNameDialog(BuildContext context, ProfileEntity currentProfile) {
                       style: GoogleFonts.rubik(
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
-                        color: Colors.grey,
+                        color: AppColors.grey,
                       ),
                     ),
                   ),
                   TextButton(
                     onPressed: () {
-                      
                       context.read<AuthBloc>().add(
                         const AuthEvent.logoutPressed(),
                       );
@@ -215,7 +224,7 @@ void _showEditNameDialog(BuildContext context, ProfileEntity currentProfile) {
                       style: GoogleFonts.rubik(
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
-                        color: Colors.red,
+                        color: AppColors.danger,
                       ),
                     ),
                   ),
@@ -227,64 +236,66 @@ void _showEditNameDialog(BuildContext context, ProfileEntity currentProfile) {
       ),
     );
   }
-Future<bool> _showAvatarSelectionSheet(
-  BuildContext context,
-  ProfileEntity currentProfile,
-) async {
-  final result = await showDialog<AvatarEntity>(
-    context: context,
-    barrierDismissible: true,
-    barrierColor: AppColors.blue.withValues(alpha: 0.4),
-    builder: (context) => Dialog(
-      insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(44)),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(44),
-        child: ConstrainedBox(
-          constraints: BoxConstraints(
-            maxWidth: MediaQuery.of(context).size.width * 0.9,
-            maxHeight: MediaQuery.of(context).size.height * 0.75,
-          ),
-          child: ChooseAvatarPage(
-            currentAvatarId: currentProfile.currentAvatarId,
+
+  Future<bool> _showAvatarSelectionSheet(
+    BuildContext context,
+    ProfileEntity currentProfile,
+  ) async {
+    final result = await showDialog<AvatarEntity>(
+      context: context,
+      barrierDismissible: true,
+      barrierColor: AppColors.modalBarrier,
+      builder: (context) => Dialog(
+        insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(44)),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(44),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxWidth: MediaQuery.of(context).size.width * 0.9,
+              maxHeight: MediaQuery.of(context).size.height * 0.75,
+            ),
+            child: ChooseAvatarPage(
+              currentAvatarId: currentProfile.currentAvatarId,
+            ),
           ),
         ),
       ),
-    ),
-  );
+    );
 
-  if (result != null) {
-    try {
-      final repository = context.read<ProfileRepository>();
-      await repository.updateAvatar(result.id);
-      if (!context.mounted) return false;
+    if (result != null) {
+      try {
+        final repository = context.read<ProfileRepository>();
+        await repository.updateAvatar(result.id);
+        if (!context.mounted) return false;
 
-      final updatedProfile = currentProfile.copyWith(
-        currentAvatarId: result.id,
-      );
-      context.read<AuthBloc>().add(
-        AuthEvent.profileUpdate(newProfile: updatedProfile),
-      );
+        final updatedProfile = currentProfile.copyWith(
+          currentAvatarId: result.id,
+        );
+        context.read<AuthBloc>().add(
+          AuthEvent.profileUpdate(newProfile: updatedProfile),
+        );
 
-      if (context.mounted) {
-        AppSnackBar.showSuccess(context, 'Аватар обновлён!');
-        onAvatarChanged();
-        return true;
-      }
-    } catch (_) {
-      if (context.mounted) {
-        AppSnackBar.showError(context, 'Не удалось сохранить изменения');
+        if (context.mounted) {
+          AppSnackBar.showSuccess(context, 'Аватар обновлён!');
+          onAvatarChanged();
+          return true;
+        }
+      } catch (_) {
+        if (context.mounted) {
+          AppSnackBar.showError(context, 'Не удалось сохранить изменения');
+        }
       }
     }
+    return false;
   }
-  return false;
-}
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () => Navigator.pop(context),
       child: Material(
-        color: Colors.transparent,
+        color: AppColors.transparent,
         child: Align(
           alignment: Alignment.topCenter,
           child: GestureDetector(
@@ -324,9 +335,7 @@ Future<bool> _showAvatarSelectionSheet(
                               profile,
                             );
                             if (result == true && context.mounted) {
-                              Navigator.pop(
-                                context,
-                              ); 
+                              Navigator.pop(context);
                             }
                           },
                           iconPath: 'assets/profile/edit_avatar.svg',
@@ -392,5 +401,4 @@ Future<bool> _showAvatarSelectionSheet(
       ),
     );
   }
-  
 }

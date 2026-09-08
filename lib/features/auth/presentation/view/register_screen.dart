@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:sugarlife/core/theme/app_color.dart';
+import 'package:sugarlife/core/theme/app_colors.dart';
 import 'package:sugarlife/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:sugarlife/shared/ui/app_inline_error_text.dart';
 import 'package:sugarlife/shared/ui/lottie_progress_indicator.dart';
@@ -149,11 +149,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                     errorBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(30),
-                      borderSide: const BorderSide(color: Colors.red, width: 3),
+                      borderSide: const BorderSide(
+                        color: AppColors.danger,
+                        width: 3,
+                      ),
                     ),
                     focusedErrorBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(30),
-                      borderSide: const BorderSide(color: Colors.red, width: 3),
+                      borderSide: const BorderSide(
+                        color: AppColors.danger,
+                        width: 3,
+                      ),
                     ),
                     contentPadding: const EdgeInsets.symmetric(
                       horizontal: 30,
@@ -161,12 +167,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                     hintText: 'Введите имя',
                     hintStyle: GoogleFonts.rubik(
-                      color: const Color.fromRGBO(250, 243, 235, 0.8),
+                      color: AppColors.inputHint,
                       fontSize: 20,
                       fontWeight: FontWeight.w400,
                     ),
                     errorStyle: GoogleFonts.rubik(
-                      color: Colors.red,
+                      color: AppColors.danger,
                       fontSize: 12,
                     ),
                     filled: true,
@@ -210,11 +216,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                     errorBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(30),
-                      borderSide: const BorderSide(color: Colors.red, width: 3),
+                      borderSide: const BorderSide(
+                        color: AppColors.danger,
+                        width: 3,
+                      ),
                     ),
                     focusedErrorBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(30),
-                      borderSide: const BorderSide(color: Colors.red, width: 3),
+                      borderSide: const BorderSide(
+                        color: AppColors.danger,
+                        width: 3,
+                      ),
                     ),
                     contentPadding: const EdgeInsets.symmetric(
                       horizontal: 30,
@@ -222,12 +234,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                     hintText: 'Введите почту',
                     hintStyle: GoogleFonts.rubik(
-                      color: const Color.fromRGBO(250, 243, 235, 0.8),
+                      color: AppColors.inputHint,
                       fontSize: 20,
                       fontWeight: FontWeight.w400,
                     ),
                     errorStyle: GoogleFonts.rubik(
-                      color: Colors.red,
+                      color: AppColors.danger,
                       fontSize: 12,
                     ),
                     filled: true,
@@ -272,11 +284,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                     errorBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(30),
-                      borderSide: const BorderSide(color: Colors.red, width: 3),
+                      borderSide: const BorderSide(
+                        color: AppColors.danger,
+                        width: 3,
+                      ),
                     ),
                     focusedErrorBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(30),
-                      borderSide: const BorderSide(color: Colors.red, width: 3),
+                      borderSide: const BorderSide(
+                        color: AppColors.danger,
+                        width: 3,
+                      ),
                     ),
                     contentPadding: const EdgeInsets.symmetric(
                       horizontal: 30,
@@ -284,12 +302,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                     hintText: 'Введите пароль',
                     hintStyle: GoogleFonts.rubik(
-                      color: const Color.fromRGBO(250, 243, 235, 0.8),
+                      color: AppColors.inputHint,
                       fontSize: 20,
                       fontWeight: FontWeight.w400,
                     ),
                     errorStyle: GoogleFonts.rubik(
-                      color: Colors.red,
+                      color: AppColors.danger,
                       fontSize: 12,
                     ),
                     filled: true,
@@ -329,15 +347,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                   ),
                 ),
-                SizedBox(height: 30,),
-                if (_authError != null) AppInlineErrorText(message: _authError!),
+                SizedBox(height: 30),
+                if (_authError != null)
+                  AppInlineErrorText(message: _authError!),
                 ElevatedButton(
-                  onPressed: (_nameController.text.isEmpty ||
+                  onPressed:
+                      (_nameController.text.isEmpty ||
                           _emailController.text.isEmpty ||
                           _passwordController.text.isEmpty ||
                           _isLoading)
                       ? null
-                      : () async {
+                      : () {
                           setState(() {
                             _nameError = _nameController.text.isEmpty
                                 ? 'Введите имя'
@@ -350,13 +370,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 : null;
                             _authError = null;
                           });
-          
+
                           if (_nameController.text.isEmpty ||
                               _emailController.text.isEmpty ||
                               _passwordController.text.isEmpty) {
                             return;
                           }
-          
+
+                          setState(() => _isLoading = true);
+
                           context.read<AuthBloc>().add(
                             AuthEvent.signUpRequested(
                               email: _emailController.text,
@@ -366,11 +388,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           );
                         },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: (_nameController.text.isEmpty ||
+                    backgroundColor:
+                        (_nameController.text.isEmpty ||
                             _emailController.text.isEmpty ||
                             _passwordController.text.isEmpty ||
                             _isLoading)
-                        ? const Color.fromRGBO(64, 153, 219, 0.6)
+                        ? AppColors.disabledPrimary
                         : AppColors.blue,
                     minimumSize: const Size(230, 70),
                     shape: RoundedRectangleBorder(
@@ -383,18 +406,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           'СОЗДАТЬ',
                           style: TextStyle(
                             fontWeight: FontWeight.w700,
-                            color: (_nameController.text.isEmpty ||
+                            color:
+                                (_nameController.text.isEmpty ||
                                     _emailController.text.isEmpty ||
                                     _passwordController.text.isEmpty ||
                                     _isLoading)
-                                ? const Color.fromRGBO(255, 255, 255, 0.6)
-                                : const Color.fromRGBO(250, 243, 235, 1),
+                                ? AppColors.disabledOnPrimary
+                                : AppColors.background,
                             fontSize: 32,
                           ),
                           textAlign: TextAlign.center,
                         ),
                 ),
-                SizedBox(height:20),
+                SizedBox(height: 20),
               ],
             ),
           ),

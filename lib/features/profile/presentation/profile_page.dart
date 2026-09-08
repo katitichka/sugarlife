@@ -5,7 +5,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:sugarlife/core/theme/app_color.dart';
+import 'package:sugarlife/core/theme/app_colors.dart';
 import 'package:sugarlife/features/achievement/presentation/bloc/achievement_bloc.dart';
 import 'package:sugarlife/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:sugarlife/features/profile/domain/repositories/profile_repository.dart';
@@ -25,7 +25,7 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   late final TextEditingController _usernameController;
   late final ProfileRepository _profileRepository;
-  
+
   int _avatarVersion = 0;
   Timer? _retryTimer;
 
@@ -96,7 +96,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   AnimatedSettingsButton(
                     onPressed: () => showDialog(
                       context: context,
-                      barrierColor: AppColors.blue.withValues(alpha: 0.4),
+                      barrierColor: AppColors.modalBarrier,
                       barrierDismissible: true,
                       builder: (_) => SettingsDialog(
                         profile: profile,
@@ -127,7 +127,9 @@ class _ProfilePageState extends State<ProfilePage> {
                         width: 190,
                         height: 190,
                         child: FutureBuilder<String>(
-                          key: ValueKey('avatar_${profile.currentAvatarId}_$_avatarVersion'),
+                          key: ValueKey(
+                            'avatar_${profile.currentAvatarId}_$_avatarVersion',
+                          ),
                           future: _loadAvatarWithRetry(profile.currentAvatarId),
                           builder: (context, snapshot) {
                             if (snapshot.connectionState ==
@@ -155,7 +157,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                   color: AppColors.blue,
                                   width: 3,
                                 ),
-                                color: const Color(0xFFF5F5DC),
+                                color: AppColors.avatarPlaceholderBackground,
                               ),
                               child: ClipOval(
                                 child: SvgPicture.network(

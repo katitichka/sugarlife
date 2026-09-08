@@ -3,7 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:sugarlife/core/theme/app_color.dart';
+import 'package:sugarlife/core/theme/app_colors.dart';
 import 'package:sugarlife/features/achievement/domain/entities/achievement_entity.dart';
 import 'package:sugarlife/shared/ui/lottie_progress_indicator.dart';
 
@@ -24,7 +24,7 @@ class _AchievementRewardDialogState extends State<AchievementRewardDialog> {
   Widget build(BuildContext context) {
     return Dialog(
       insetPadding: const EdgeInsets.symmetric(horizontal: 24),
-      backgroundColor: Colors.transparent,
+      backgroundColor: AppColors.transparent,
       child: Stack(
         children: [
           Container(
@@ -37,7 +37,7 @@ class _AchievementRewardDialogState extends State<AchievementRewardDialog> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                SizedBox(height: 30,),
+                SizedBox(height: 30),
                 Text(
                   'Новое достижение!',
                   style: GoogleFonts.rubik(
@@ -87,7 +87,7 @@ class _AchievementRewardDialogState extends State<AchievementRewardDialog> {
                     },
                   ),
                 ),
-                SizedBox(height: 20,),
+                SizedBox(height: 20),
               ],
             ),
           ),
@@ -129,9 +129,9 @@ class _CardFace extends StatelessWidget {
       width: 250,
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Color.fromRGBO(64, 153, 219, 0.1),
+        color: AppColors.primaryTint,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Color.fromRGBO(64, 153, 219, 1)),
+        border: Border.all(color: AppColors.blue),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -166,35 +166,20 @@ class _CardFace extends StatelessWidget {
   Widget _buildImage() {
     if (!isNetworkImage) {
       if (imagePath.endsWith('.svg')) {
-      return SvgPicture.asset(
-        imagePath,
-        width: 140,
-        fit: BoxFit.contain,
-      );
-    }
-    return Image.asset(
-      imagePath,
-      width: 140,
-      fit: BoxFit.contain,
-    );
-  
+        return SvgPicture.asset(imagePath, width: 140, fit: BoxFit.contain);
+      }
+      return Image.asset(imagePath, width: 140, fit: BoxFit.contain);
     }
 
     if (isSvg) {
       return SvgPicture.network(
         imagePath,
         width: 140,
-        placeholderBuilder: (context) => const SizedBox(
-          width: 140,
-          child: LottieProgressIndicator(),
-        ),
+        placeholderBuilder: (context) =>
+            const SizedBox(width: 140, child: LottieProgressIndicator()),
       );
     } else {
-      return Image.network(
-        imagePath,
-        width: 140,
-        fit: BoxFit.contain,
-      );
+      return Image.network(imagePath, width: 140, fit: BoxFit.contain);
     }
   }
 }

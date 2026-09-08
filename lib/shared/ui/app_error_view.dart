@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:sugarlife/core/theme/app_color.dart';
+import 'package:sugarlife/core/theme/app_colors.dart';
 
 /// Единый виджет отображения ошибки загрузки данных с опциональной кнопкой повтора.
 class AppErrorView extends StatelessWidget {
@@ -33,7 +33,7 @@ class AppErrorView extends StatelessWidget {
               onPressed: onRetry,
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.blue,
-                foregroundColor: Colors.white,
+                foregroundColor: AppColors.white,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(30),
                 ),
@@ -47,7 +47,7 @@ class AppErrorView extends StatelessWidget {
                 style: GoogleFonts.rubik(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
-                  color: Colors.white,
+                  color: AppColors.white,
                 ),
               ),
             ),

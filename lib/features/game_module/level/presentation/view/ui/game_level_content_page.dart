@@ -1,11 +1,11 @@
-﻿import 'dart:typed_data';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sugarlife/core/router/root_navigator.dart';
-import 'package:sugarlife/core/theme/app_color.dart';
+import 'package:sugarlife/core/theme/app_colors.dart';
 import 'package:sugarlife/features/achievement/domain/entities/achievement_entity.dart';
 import 'package:sugarlife/features/achievement/presentation/bloc/achievement_bloc.dart';
 import 'package:sugarlife/features/achievement/presentation/view/achievement_reward_dialog.dart';
@@ -100,7 +100,10 @@ class GameLevelContentPage extends StatelessWidget {
 /// Прогревает кэш flutter_svg для всех персонажей уровня сразу после
 /// загрузки вопросов — пока показывается экран "Начать уровень", чтобы
 /// картинка не мигала при открытии первого вопроса.
-void _precacheCharacterImages(BuildContext context, GameModuleLevelState state) {
+void _precacheCharacterImages(
+  BuildContext context,
+  GameModuleLevelState state,
+) {
   final images = (state as ReceiveSuccess).characterImages.values.toSet();
   for (final url in images) {
     SvgNetworkLoader(url).loadBytes(context).catchError((_) => ByteData(0));
@@ -118,6 +121,7 @@ class _LoadingPage extends StatelessWidget {
     );
   }
 }
+
 class _ErrorPage extends StatelessWidget {
   final String message;
   final VoidCallback onRetry;
@@ -127,7 +131,9 @@ class _ErrorPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      body: Center(child: AppErrorView(message: message, onRetry: onRetry)),
+      body: Center(
+        child: AppErrorView(message: message, onRetry: onRetry),
+      ),
     );
   }
 }
@@ -147,7 +153,7 @@ Future<void> _finishLevelWithAchievementCard(
     await showDialog<void>(
       context: dialogContext,
       barrierDismissible: false,
-      barrierColor: AppColors.blue.withValues(alpha: 0.4),
+      barrierColor: AppColors.modalBarrier,
       builder: (_) => AchievementRewardDialog(achievement: achievement),
     );
   }

@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sugarlife/core/enum/question_type.dart';
-import 'package:sugarlife/core/theme/app_color.dart';
+import 'package:sugarlife/core/theme/app_colors.dart';
 import 'package:sugarlife/features/game_module/level/domain/entities/game_module_question_entity.dart';
 import 'package:sugarlife/features/game_module/level/presentation/bloc/game_module_level_bloc.dart';
 import 'package:sugarlife/shared/ui/lottie_progress_indicator.dart';
@@ -158,7 +158,6 @@ class _GameQuestionPageState extends State<GameQuestionPage> {
               right: 0,
               child: _buildExplantationOverlay(context, state),
             ),
-            
         ],
       ),
     );
@@ -180,7 +179,7 @@ class _GameQuestionPageState extends State<GameQuestionPage> {
             height: 100,
             child: imageUrl != null
                 ? SvgPicture.network(
-                   key: ValueKey(question.characterId),
+                    key: ValueKey(question.characterId),
                     imageUrl,
                     width: 100,
                     height: 100,
@@ -189,7 +188,7 @@ class _GameQuestionPageState extends State<GameQuestionPage> {
                       width: 100,
                       height: 100,
                       child: Center(
-                        child: Icon(Icons.error, color: Colors.red),
+                        child: Icon(Icons.error, color: AppColors.danger),
                       ),
                     ),
                   )
@@ -365,8 +364,8 @@ class _GameQuestionPageState extends State<GameQuestionPage> {
           }
         },
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.blue, 
-          foregroundColor: AppColors.background, 
+          backgroundColor: AppColors.blue,
+          foregroundColor: AppColors.background,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(70),
           ),
@@ -508,9 +507,7 @@ class MultipleChoiceWidget extends StatelessWidget {
           color: isSelected ? AppColors.blue : AppColors.background,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isSelected
-                ? AppColors.blue
-                : Color.fromRGBO(220, 213, 205, 1),
+            color: isSelected ? AppColors.blue : AppColors.neutralBorder,
             width: isSelected ? 3 : 2,
           ),
         ),
@@ -587,7 +584,7 @@ class TrueFalseWidget extends StatelessWidget {
           color: isSelected ? AppColors.blue : AppColors.background,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isSelected ? AppColors.blue : Colors.grey,
+            color: isSelected ? AppColors.blue : AppColors.grey,
             width: isSelected ? 2 : 1,
           ),
         ),
@@ -595,7 +592,7 @@ class TrueFalseWidget extends StatelessWidget {
           child: Text(
             answer,
             style: TextStyle(
-              color: isSelected ? AppColors.background : Colors.black87,
+              color: isSelected ? AppColors.background : AppColors.black87,
               fontSize: 16,
               fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
             ),
@@ -605,6 +602,7 @@ class TrueFalseWidget extends StatelessWidget {
     );
   }
 }
+
 class FillBlankWidget extends StatefulWidget {
   final GameModuleQuestionEntity question;
   final bool selectionLocked;
@@ -648,10 +646,7 @@ class _FillBlankWidgetState extends State<FillBlankWidget> {
                 decoration: BoxDecoration(
                   color: AppColors.background,
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: AppColors.blue,
-                    width: 3,
-                  ),
+                  border: Border.all(color: AppColors.blue, width: 3),
                 ),
                 child: TextField(
                   controller: _controller,
@@ -676,7 +671,7 @@ class _FillBlankWidgetState extends State<FillBlankWidget> {
                     ),
                     errorText: _errorText,
                     errorStyle: GoogleFonts.rubik(
-                      color: Colors.red,
+                      color: AppColors.danger,
                       fontSize: 12,
                     ),
                   ),
@@ -696,10 +691,7 @@ class _FillBlankWidgetState extends State<FillBlankWidget> {
             const SizedBox(height: 8),
             Text(
               'Введите слово или фразу в поле выше',
-              style: GoogleFonts.rubik(
-                fontSize: 12,
-                color: AppColors.blue.withOpacity(0.7),
-              ),
+              style: GoogleFonts.rubik(fontSize: 12, color: AppColors.blue70),
             ),
           ],
         ),
@@ -707,6 +699,7 @@ class _FillBlankWidgetState extends State<FillBlankWidget> {
     );
   }
 }
+
 class MultipleSelectWidget extends StatefulWidget {
   final GameModuleQuestionEntity question;
   final bool selectionLocked;
@@ -769,9 +762,7 @@ class _MultipleSelectWidgetState extends State<MultipleSelectWidget> {
                 color: isSelected ? AppColors.blue : AppColors.background,
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: isSelected
-                      ? AppColors.blue
-                      : const Color.fromRGBO(220, 213, 205, 1),
+                  color: isSelected ? AppColors.blue : AppColors.neutralBorder,
                   width: 3,
                 ),
               ),
@@ -800,7 +791,7 @@ class _MultipleSelectWidgetState extends State<MultipleSelectWidget> {
                         if (states.contains(WidgetState.selected)) {
                           return AppColors.blue;
                         }
-                        return Colors.transparent;
+                        return AppColors.transparent;
                       }),
                       checkColor: AppColors.background,
                       side: const BorderSide(color: AppColors.blue, width: 2),

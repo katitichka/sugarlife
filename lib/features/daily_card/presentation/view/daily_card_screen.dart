@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lottie/lottie.dart';
-import 'package:sugarlife/core/theme/app_color.dart';
+import 'package:sugarlife/core/theme/app_colors.dart';
 import 'package:sugarlife/features/achievement/domain/repositories/achievement_repository.dart';
 import 'package:sugarlife/features/achievement/presentation/bloc/achievement_bloc.dart';
 import 'package:sugarlife/features/daily_card/data/providers/implementations/daily_card_data_provider_impl.dart';
@@ -22,7 +22,9 @@ class DailyCardScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final userId = Supabase.instance.client.auth.currentUser?.id;
     if (userId == null) {
-      throw StateError('DailyCardScreen открыт без авторизованного пользователя');
+      throw StateError(
+        'DailyCardScreen открыт без авторизованного пользователя',
+      );
     }
 
     return RepositoryProvider<DailyCardRepository>(
@@ -125,7 +127,7 @@ class _DialogContent extends StatelessWidget {
                     explanation: explanation,
                     isMyth: isMyth,
                   ),
-                NoMoreCards() =>  Text(
+                NoMoreCards() => Text(
                   'Карточки закончились, но скоро появятся новые факты!',
                   textAlign: TextAlign.center,
                   style: GoogleFonts.rubik(
@@ -227,12 +229,12 @@ class _LoadedContent extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: Colors.grey[100],
+              color: AppColors.lightGrey,
               borderRadius: BorderRadius.circular(12),
             ),
             child: const Text(
               'Вы уже отвечали на эту карточку сегодня',
-              style: TextStyle(color: Colors.grey),
+              style: TextStyle(color: AppColors.grey),
               textAlign: TextAlign.center,
             ),
           ),
@@ -258,7 +260,7 @@ class _AnsweredContent extends StatelessWidget {
     String animationPath;
     if (isCorrect) {
       resultText = isMyth ? 'ВЕРНО\n ЭТО МИФ' : 'ВЕРНО\n ЭТО ПРАВДА';
-      animationPath = 'assets/animations/correct_animation.json'; 
+      animationPath = 'assets/animations/correct_animation.json';
     } else {
       resultText = isMyth ? 'НЕВЕРНО\n ЭТО МИФ' : 'НЕВЕРНО\n ЭТО ПРАВДА';
       animationPath = 'assets/animations/wrong_animation.json';

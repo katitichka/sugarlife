@@ -4,7 +4,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sugarlife/core/router/root_navigator.dart';
-import 'package:sugarlife/core/theme/app_color.dart';
+import 'package:sugarlife/core/theme/app_colors.dart';
 import 'package:sugarlife/features/achievement/presentation/bloc/achievement_bloc.dart';
 import 'package:sugarlife/features/achievement/presentation/view/achievement_reward_dialog.dart';
 import 'package:sugarlife/features/daily_card/presentation/view/daily_card_screen.dart';
@@ -99,7 +99,7 @@ class _GamePageState extends State<GamePage> {
       await showDialog<void>(
         context: dialogContext,
         barrierDismissible: false,
-        barrierColor: AppColors.blue.withValues(alpha: 0.4),
+        barrierColor: AppColors.modalBarrier,
         builder: (_) => AchievementRewardDialog(achievement: achievement),
       );
       if (!mounted) return;
@@ -539,7 +539,7 @@ class _GamePageState extends State<GamePage> {
                 borderRadius: BorderRadius.circular(12),
                 boxShadow: [
                   BoxShadow(
-                    color: AppColors.white.withOpacity(0.2),
+                    color: AppColors.white20,
                     blurRadius: 5,
                     offset: const Offset(0, 4),
                   ),
@@ -556,7 +556,7 @@ class _GamePageState extends State<GamePage> {
               showDialog(
                 context: context,
                 barrierDismissible: false,
-                barrierColor: AppColors.blue.withValues(alpha: 0.4),
+                barrierColor: AppColors.modalBarrier,
                 builder: (_) => const DailyCardScreen(),
               );
             },

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:sugarlife/core/theme/app_color.dart';
+import 'package:sugarlife/core/theme/app_colors.dart';
 import 'package:sugarlife/features/theory_module/domain/entities/theory_module_entity.dart';
 
 class TheoryListCard extends StatelessWidget {
@@ -16,7 +16,7 @@ class TheoryListCard extends StatelessWidget {
   });
 
   Color mixWithBlack(Color color, [double amount = 0.2]) {
-    return Color.lerp(color, Colors.black, amount)!;
+    return Color.lerp(color, AppColors.black, amount)!;
   }
 
   @override

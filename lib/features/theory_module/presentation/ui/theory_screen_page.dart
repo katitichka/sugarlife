@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:sugarlife/core/theme/app_color.dart';
+import 'package:sugarlife/core/theme/app_colors.dart';
 import 'package:sugarlife/features/theory_module/domain/entities/theory_module_entity.dart';
 import 'package:sugarlife/features/theory_module/presentation/bloc/theory_module_bloc.dart';
 import 'package:sugarlife/shared/ui/app_error_view.dart';
@@ -14,7 +14,7 @@ class TheoryScreenPage extends StatelessWidget {
   const TheoryScreenPage({required this.moduleId, super.key});
 
   Color mixWithBlack(Color color, [double amount = 0.1]) {
-    return Color.lerp(color, Colors.black, amount)!;
+    return Color.lerp(color, AppColors.black, amount)!;
   }
 
   @override
@@ -129,7 +129,7 @@ class TheoryScreenPage extends StatelessWidget {
                         fit: BoxFit.contain,
                         errorBuilder: (context, error, stackTrace) => Container(
                           height: 200,
-                          color: Colors.grey[200],
+                          color: AppColors.lighterGrey,
                           child: const Center(
                             child: Text('Изображение не найдено'),
                           ),

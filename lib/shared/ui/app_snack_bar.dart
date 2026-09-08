@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:sugarlife/core/theme/app_color.dart';
+import 'package:sugarlife/core/theme/app_colors.dart';
 
 /// Единый стиль всплывающих уведомлений (успех/ошибка) во всём приложении.
 class AppSnackBar {
