@@ -8,7 +8,8 @@ class AchievementDataProviderImpl implements AchievementDataProvider {
   final SupabaseClient _supabase;
 
   static const String _achievementsBucket = 'achievements';
-  static const String _achievementColumns = 'id, name, description, image_url, type';
+  static const String _achievementColumns =
+      'id, name, description, image_url, type';
 
   @override
   String? get currentUserId => _supabase.auth.currentUser?.id;
@@ -30,7 +31,10 @@ class AchievementDataProviderImpl implements AchievementDataProvider {
 
   @override
   Future<List<AchievementDto>> getAllAchievements() async {
-    final response = await _supabase.from('achievements').select(_achievementColumns);
+    final response = await _supabase
+        .from('achievements')
+        .select(_achievementColumns)
+        .order('id');
     return response.map((row) => AchievementDto.fromJson(row)).toList();
   }
 
@@ -40,7 +44,9 @@ class AchievementDataProviderImpl implements AchievementDataProvider {
         .from('user_achievement')
         .select('achievement_id')
         .eq('user_id', userId);
-    return response.map((row) => (row['achievement_id'] as num).toInt()).toList();
+    return response
+        .map((row) => (row['achievement_id'] as num).toInt())
+        .toList();
   }
 
   @override

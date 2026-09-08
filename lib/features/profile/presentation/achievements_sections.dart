@@ -114,9 +114,9 @@ class _AchievementsSectionState extends State<AchievementsSection> {
                                   child: SizedBox(
                                     width: 100,
                                     height: 100,
-                                    child: achievement != null
+                                    child: achievement?.isUnlocked == true
                                         ? _AchievementIcon(
-                                            url: achievement.imageUrl,
+                                            url: achievement!.imageUrl,
                                           )
                                         : const _AchievementPlaceholderCard(),
                                   ),
@@ -167,7 +167,7 @@ class _AchievementPlaceholderCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.end,
-      mainAxisSize: MainAxisSize.min, 
+      mainAxisSize: MainAxisSize.min,
       children: [
         SizedBox(
           width: 100,
@@ -195,7 +195,7 @@ class _AchievementIcon extends StatelessWidget {
 
   static Widget _placeholder() => Column(
     mainAxisAlignment: MainAxisAlignment.end,
-      mainAxisSize: MainAxisSize.min,
+    mainAxisSize: MainAxisSize.min,
     children: [
       SizedBox(
         width: 100,
@@ -211,7 +211,7 @@ class _AchievementIcon extends StatelessWidget {
     ],
   );
 
-   @override
+  @override
   Widget build(BuildContext context) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.end,
@@ -251,5 +251,4 @@ class _AchievementIcon extends StatelessWidget {
       ],
     );
   }
-
 }

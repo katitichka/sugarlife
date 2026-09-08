@@ -14,7 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$AchievementEntity {
 
- int get id; String get name; String get description; String get imageUrl; AchievementType get type;
+ int get id; String get name; String get description; String get imageUrl; AchievementType get type; bool get isUnlocked;
 /// Create a copy of AchievementEntity
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +25,16 @@ $AchievementEntityCopyWith<AchievementEntity> get copyWith => _$AchievementEntit
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is AchievementEntity&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl)&&(identical(other.type, type) || other.type == type));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is AchievementEntity&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl)&&(identical(other.type, type) || other.type == type)&&(identical(other.isUnlocked, isUnlocked) || other.isUnlocked == isUnlocked));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,id,name,description,imageUrl,type);
+int get hashCode => Object.hash(runtimeType,id,name,description,imageUrl,type,isUnlocked);
 
 @override
 String toString() {
-  return 'AchievementEntity(id: $id, name: $name, description: $description, imageUrl: $imageUrl, type: $type)';
+  return 'AchievementEntity(id: $id, name: $name, description: $description, imageUrl: $imageUrl, type: $type, isUnlocked: $isUnlocked)';
 }
 
 
@@ -45,7 +45,7 @@ abstract mixin class $AchievementEntityCopyWith<$Res>  {
   factory $AchievementEntityCopyWith(AchievementEntity value, $Res Function(AchievementEntity) _then) = _$AchievementEntityCopyWithImpl;
 @useResult
 $Res call({
- int id, String name, String description, String imageUrl, AchievementType type
+ int id, String name, String description, String imageUrl, AchievementType type, bool isUnlocked
 });
 
 
@@ -62,14 +62,15 @@ class _$AchievementEntityCopyWithImpl<$Res>
 
 /// Create a copy of AchievementEntity
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? description = null,Object? imageUrl = null,Object? type = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? description = null,Object? imageUrl = null,Object? type = null,Object? isUnlocked = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,description: null == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
 as String,imageUrl: null == imageUrl ? _self.imageUrl : imageUrl // ignore: cast_nullable_to_non_nullable
 as String,type: null == type ? _self.type : type // ignore: cast_nullable_to_non_nullable
-as AchievementType,
+as AchievementType,isUnlocked: null == isUnlocked ? _self.isUnlocked : isUnlocked // ignore: cast_nullable_to_non_nullable
+as bool,
   ));
 }
 
@@ -151,10 +152,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int id,  String name,  String description,  String imageUrl,  AchievementType type)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int id,  String name,  String description,  String imageUrl,  AchievementType type,  bool isUnlocked)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _AchievementEntity() when $default != null:
-return $default(_that.id,_that.name,_that.description,_that.imageUrl,_that.type);case _:
+return $default(_that.id,_that.name,_that.description,_that.imageUrl,_that.type,_that.isUnlocked);case _:
   return orElse();
 
 }
@@ -172,10 +173,10 @@ return $default(_that.id,_that.name,_that.description,_that.imageUrl,_that.type)
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int id,  String name,  String description,  String imageUrl,  AchievementType type)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int id,  String name,  String description,  String imageUrl,  AchievementType type,  bool isUnlocked)  $default,) {final _that = this;
 switch (_that) {
 case _AchievementEntity():
-return $default(_that.id,_that.name,_that.description,_that.imageUrl,_that.type);}
+return $default(_that.id,_that.name,_that.description,_that.imageUrl,_that.type,_that.isUnlocked);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -189,10 +190,10 @@ return $default(_that.id,_that.name,_that.description,_that.imageUrl,_that.type)
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int id,  String name,  String description,  String imageUrl,  AchievementType type)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int id,  String name,  String description,  String imageUrl,  AchievementType type,  bool isUnlocked)?  $default,) {final _that = this;
 switch (_that) {
 case _AchievementEntity() when $default != null:
-return $default(_that.id,_that.name,_that.description,_that.imageUrl,_that.type);case _:
+return $default(_that.id,_that.name,_that.description,_that.imageUrl,_that.type,_that.isUnlocked);case _:
   return null;
 
 }
@@ -204,7 +205,7 @@ return $default(_that.id,_that.name,_that.description,_that.imageUrl,_that.type)
 
 
 class _AchievementEntity implements AchievementEntity {
-  const _AchievementEntity({required this.id, required this.name, required this.description, required this.imageUrl, required this.type});
+  const _AchievementEntity({required this.id, required this.name, required this.description, required this.imageUrl, required this.type, this.isUnlocked = false});
   
 
 @override final  int id;
@@ -212,6 +213,7 @@ class _AchievementEntity implements AchievementEntity {
 @override final  String description;
 @override final  String imageUrl;
 @override final  AchievementType type;
+@override@JsonKey() final  bool isUnlocked;
 
 /// Create a copy of AchievementEntity
 /// with the given fields replaced by the non-null parameter values.
@@ -223,16 +225,16 @@ _$AchievementEntityCopyWith<_AchievementEntity> get copyWith => __$AchievementEn
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _AchievementEntity&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl)&&(identical(other.type, type) || other.type == type));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _AchievementEntity&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl)&&(identical(other.type, type) || other.type == type)&&(identical(other.isUnlocked, isUnlocked) || other.isUnlocked == isUnlocked));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,id,name,description,imageUrl,type);
+int get hashCode => Object.hash(runtimeType,id,name,description,imageUrl,type,isUnlocked);
 
 @override
 String toString() {
-  return 'AchievementEntity(id: $id, name: $name, description: $description, imageUrl: $imageUrl, type: $type)';
+  return 'AchievementEntity(id: $id, name: $name, description: $description, imageUrl: $imageUrl, type: $type, isUnlocked: $isUnlocked)';
 }
 
 
@@ -243,7 +245,7 @@ abstract mixin class _$AchievementEntityCopyWith<$Res> implements $AchievementEn
   factory _$AchievementEntityCopyWith(_AchievementEntity value, $Res Function(_AchievementEntity) _then) = __$AchievementEntityCopyWithImpl;
 @override @useResult
 $Res call({
- int id, String name, String description, String imageUrl, AchievementType type
+ int id, String name, String description, String imageUrl, AchievementType type, bool isUnlocked
 });
 
 
@@ -260,14 +262,15 @@ class __$AchievementEntityCopyWithImpl<$Res>
 
 /// Create a copy of AchievementEntity
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? description = null,Object? imageUrl = null,Object? type = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? description = null,Object? imageUrl = null,Object? type = null,Object? isUnlocked = null,}) {
   return _then(_AchievementEntity(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,description: null == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
 as String,imageUrl: null == imageUrl ? _self.imageUrl : imageUrl // ignore: cast_nullable_to_non_nullable
 as String,type: null == type ? _self.type : type // ignore: cast_nullable_to_non_nullable
-as AchievementType,
+as AchievementType,isUnlocked: null == isUnlocked ? _self.isUnlocked : isUnlocked // ignore: cast_nullable_to_non_nullable
+as bool,
   ));
 }
 

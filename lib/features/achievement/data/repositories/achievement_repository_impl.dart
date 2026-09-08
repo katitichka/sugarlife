@@ -15,13 +15,17 @@ class AchievementRepositoryImpl implements AchievementRepository {
   static const String _shownAchievementsKey = 'shown_achievement_ids';
   static const String _pendingAchievementKey = 'pending_achievement_id';
 
-  AchievementEntity _mapAchievement(AchievementDto dto) {
+  AchievementEntity _mapAchievement(
+    AchievementDto dto, {
+    bool isUnlocked = false,
+  }) {
     return AchievementEntity(
       id: dto.id,
       name: dto.name.trim(),
       description: dto.description.trim(),
       imageUrl: _resolveimageUrl(dto.imageUrl.trim()),
       type: AchievementType.fromString(dto.type),
+      isUnlocked: isUnlocked,
     );
   }
 
@@ -63,9 +67,15 @@ class AchievementRepositoryImpl implements AchievementRepository {
       return null;
     }
 
-    final achievement = _mapAchievement(dto);
+    final achievement = _mapAchievement(dto, isUnlocked: true);
     _cache.saveAchievement(achievement);
     return achievement;
+  }
+
+  @override
+  Future<List<AchievementEntity>> getAllAchievements() async {
+    final achievements = await _dataProvider.getAllAchievements();
+    return achievements.map(_mapAchievement).toList();
   }
 
   @override
@@ -90,7 +100,9 @@ class AchievementRepositoryImpl implements AchievementRepository {
       achievementIds,
     );
 
-    final achievements = achievementsResponse.map(_mapAchievement).toList();
+    final achievements = achievementsResponse
+        .map((dto) => _mapAchievement(dto, isUnlocked: true))
+        .toList();
     _cache.saveAchievements(achievements);
     return achievements;
   }
@@ -106,7 +118,9 @@ class AchievementRepositoryImpl implements AchievementRepository {
 
     final allAchievementsResponse = await _dataProvider.getAllAchievements();
 
-    final allAchievements = allAchievementsResponse.map(_mapAchievement).toList();
+    final allAchievements = allAchievementsResponse
+        .map(_mapAchievement)
+        .toList();
 
     if (allAchievements.isEmpty) {
       return null;
@@ -123,8 +137,9 @@ class AchievementRepositoryImpl implements AchievementRepository {
       return null;
     }
 
-    final randomIndex = DateTime.now().millisecondsSinceEpoch % available.length;
-    final achievement = available[randomIndex];
+    final randomIndex =
+        DateTime.now().millisecondsSinceEpoch % available.length;
+    final achievement = available[randomIndex].copyWith(isUnlocked: true);
 
     try {
       await _dataProvider.insertUserAchievement(

@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sugarlife/core/theme/app_colors.dart';
 import 'package:sugarlife/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:sugarlife/features/auth/presentation/view/widgets/auth_screen_layout.dart';
 import 'package:sugarlife/shared/ui/app_inline_error_text.dart';
 import 'package:sugarlife/shared/ui/lottie_progress_indicator.dart';
 
@@ -67,280 +68,258 @@ class _LoginScreenState extends State<LoginScreen> {
       child: Scaffold(
         backgroundColor: AppColors.background,
         resizeToAvoidBottomInset: true,
-        body: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 40),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SizedBox(height: 45),
-                Text(
-                  'Сладкая жизнь',
-                  style: GoogleFonts.rubik(
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.blue,
-                    fontSize: 24,
-                  ),
-                ),
-                SizedBox(height: 8),
-                Text(
-                  'Приветствуем Вас!',
-                  style: GoogleFonts.rubik(
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.blue,
-                    fontSize: 24,
-                  ),
-                ),
-                SizedBox(height: 8),
-                SvgPicture.asset(
-                  'assets/common/login_icon.svg',
-                  width: 100,
-                  height: 100,
-                  fit: BoxFit.contain,
-                  alignment: Alignment.bottomCenter,
-                ),
-                SizedBox(height: 20),
-                Text(
-                  'Войти в аккаунт',
-                  style: GoogleFonts.rubik(
-                    fontWeight: FontWeight.w500,
-                    color: AppColors.blue,
-                    fontSize: 20,
-                  ),
-                  textAlign: TextAlign.start,
-                ),
-                SizedBox(height: 15),
-                TextFormField(
-                  controller: _emailController,
-                  focusNode: _emailFocusNode,
-                  cursorColor: AppColors.background,
-                  selectionControls: MaterialTextSelectionControls(),
-                  style: GoogleFonts.rubik(
-                    color: AppColors.blue,
-                    fontSize: 20,
-                    fontWeight: FontWeight.w500,
-                  ),
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(30),
-                      borderSide: const BorderSide(
-                        color: AppColors.blue,
-                        width: 3,
-                      ),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(30),
-                      borderSide: const BorderSide(
-                        color: AppColors.blue,
-                        width: 3,
-                      ),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(30),
-                      borderSide: const BorderSide(
-                        color: AppColors.blue,
-                        width: 3,
-                      ),
-                    ),
-                    errorBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(30),
-                      borderSide: const BorderSide(
-                        color: AppColors.danger,
-                        width: 3,
-                      ),
-                    ),
-                    focusedErrorBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(30),
-                      borderSide: const BorderSide(
-                        color: AppColors.danger,
-                        width: 3,
-                      ),
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 30,
-                      vertical: 18,
-                    ),
-                    hintText: 'Введите почту',
-                    hintStyle: GoogleFonts.rubik(
-                      color: AppColors.inputHint,
-                      fontSize: 20,
-                      fontWeight: FontWeight.w400,
-                    ),
-                    errorStyle: GoogleFonts.rubik(
-                      color: AppColors.danger,
-                      fontSize: 12,
-                    ),
-                    filled: true,
-                    fillColor: _emailController.text.isNotEmpty
-                        ? AppColors.background
-                        : AppColors.blue,
-                  ),
-                ),
-                const SizedBox(height: 15),
-                TextFormField(
-                  focusNode: _passwordFocusNode,
-                  controller: _passwordController,
-                  cursorColor: AppColors.background,
-                  selectionControls: MaterialTextSelectionControls(),
-                  obscureText: true,
-                  style: GoogleFonts.rubik(
-                    color: AppColors.blue,
-                    fontSize: 20,
-                    fontWeight: FontWeight.w500,
-                  ),
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(30),
-                      borderSide: const BorderSide(
-                        color: AppColors.blue,
-                        width: 3,
-                      ),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(30),
-                      borderSide: const BorderSide(
-                        color: AppColors.blue,
-                        width: 3,
-                      ),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(30),
-                      borderSide: const BorderSide(
-                        color: AppColors.blue,
-                        width: 3,
-                      ),
-                    ),
-                    errorBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(30),
-                      borderSide: const BorderSide(
-                        color: AppColors.danger,
-                        width: 3,
-                      ),
-                    ),
-                    focusedErrorBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(30),
-                      borderSide: const BorderSide(
-                        color: AppColors.danger,
-                        width: 3,
-                      ),
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 30,
-                      vertical: 18,
-                    ),
-                    hintText: 'Введите пароль',
-                    hintStyle: GoogleFonts.rubik(
-                      color: AppColors.inputHint,
-                      fontSize: 20,
-                      fontWeight: FontWeight.w400,
-                    ),
-                    errorStyle: GoogleFonts.rubik(
-                      color: AppColors.danger,
-                      fontSize: 12,
-                    ),
-                    filled: true,
-                    fillColor: _passwordController.text.isNotEmpty
-                        ? AppColors.background
-                        : AppColors.blue,
-                  ),
-                ),
-                SizedBox(height: 12),
-                Padding(
-                  padding: const EdgeInsets.only(left: 30),
-                  child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Нет аккаунта?',
-                          style: GoogleFonts.rubik(
-                            color: AppColors.blue,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
-                        GestureDetector(
-                          onTap: () => context.go('/register'),
-                          child: Text(
-                            'Зарегистрироваться',
-                            style: GoogleFonts.rubik(
-                              color: AppColors.blue,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                SizedBox(height: 30),
-                if (_authError != null)
-                  AppInlineErrorText(message: _authError!),
-                ElevatedButton(
-                  onPressed:
-                      (_emailController.text.isEmpty ||
-                          _passwordController.text.isEmpty ||
-                          _isLoading)
-                      ? null
-                      : () {
-                          setState(() {
-                            _emailError = _emailController.text.isEmpty
-                                ? 'Введите email'
-                                : null;
-                            _passwordError = _passwordController.text.isEmpty
-                                ? 'Введите пароль'
-                                : null;
-                            _authError = null;
-                          });
-
-                          if (_emailController.text.isEmpty ||
-                              _passwordController.text.isEmpty) {
-                            return;
-                          }
-
-                          setState(() => _isLoading = true);
-
-                          context.read<AuthBloc>().add(
-                            AuthEvent.signInRequested(
-                              email: _emailController.text,
-                              password: _passwordController.text,
-                            ),
-                          );
-                        },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor:
-                        _emailController.text.isEmpty ||
-                            _passwordController.text.isEmpty ||
-                            _isLoading
-                        ? AppColors.disabledPrimary
-                        : AppColors.blue,
-                    minimumSize: const Size(230, 70),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(70),
-                    ),
-                  ),
-                  child: _isLoading
-                      ? LottieProgressIndicator()
-                      : Text(
-                          'ВОЙТИ',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w700,
-                            color:
-                                _emailController.text.isEmpty ||
-                                    _passwordController.text.isEmpty ||
-                                    _isLoading
-                                ? AppColors.disabledOnPrimary
-                                : AppColors.background,
-                            fontSize: 32,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                ),
-              ],
+        body: AuthScreenLayout(
+          children: [
+            SizedBox(height: 45),
+            Text(
+              'Сладкая жизнь',
+              style: GoogleFonts.rubik(
+                fontWeight: FontWeight.w700,
+                color: AppColors.blue,
+                fontSize: 24,
+              ),
             ),
-          ),
+            SizedBox(height: 8),
+            Text(
+              'Приветствуем Вас!',
+              style: GoogleFonts.rubik(
+                fontWeight: FontWeight.w700,
+                color: AppColors.blue,
+                fontSize: 24,
+              ),
+            ),
+            SizedBox(height: 8),
+            SvgPicture.asset(
+              'assets/common/login_icon.svg',
+              width: 100,
+              height: 100,
+              fit: BoxFit.contain,
+              alignment: Alignment.bottomCenter,
+            ),
+            SizedBox(height: 20),
+            Text(
+              'Войти в аккаунт',
+              style: GoogleFonts.rubik(
+                fontWeight: FontWeight.w500,
+                color: AppColors.blue,
+                fontSize: 20,
+              ),
+              textAlign: TextAlign.start,
+            ),
+            SizedBox(height: 15),
+            TextFormField(
+              controller: _emailController,
+              focusNode: _emailFocusNode,
+              cursorColor: AppColors.background,
+              selectionControls: MaterialTextSelectionControls(),
+              style: GoogleFonts.rubik(
+                color: AppColors.blue,
+                fontSize: 20,
+                fontWeight: FontWeight.w500,
+              ),
+              decoration: InputDecoration(
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(30),
+                  borderSide: const BorderSide(color: AppColors.blue, width: 3),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(30),
+                  borderSide: const BorderSide(color: AppColors.blue, width: 3),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(30),
+                  borderSide: const BorderSide(color: AppColors.blue, width: 3),
+                ),
+                errorBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(30),
+                  borderSide: const BorderSide(
+                    color: AppColors.danger,
+                    width: 3,
+                  ),
+                ),
+                focusedErrorBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(30),
+                  borderSide: const BorderSide(
+                    color: AppColors.danger,
+                    width: 3,
+                  ),
+                ),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 30,
+                  vertical: 18,
+                ),
+                hintText: 'Введите почту',
+                hintStyle: GoogleFonts.rubik(
+                  color: AppColors.inputHint,
+                  fontSize: 20,
+                  fontWeight: FontWeight.w400,
+                ),
+                errorStyle: GoogleFonts.rubik(
+                  color: AppColors.danger,
+                  fontSize: 12,
+                ),
+                filled: true,
+                fillColor: _emailController.text.isNotEmpty
+                    ? AppColors.background
+                    : AppColors.blue,
+              ),
+            ),
+            const SizedBox(height: 15),
+            TextFormField(
+              focusNode: _passwordFocusNode,
+              controller: _passwordController,
+              cursorColor: AppColors.background,
+              selectionControls: MaterialTextSelectionControls(),
+              obscureText: true,
+              style: GoogleFonts.rubik(
+                color: AppColors.blue,
+                fontSize: 20,
+                fontWeight: FontWeight.w500,
+              ),
+              decoration: InputDecoration(
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(30),
+                  borderSide: const BorderSide(color: AppColors.blue, width: 3),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(30),
+                  borderSide: const BorderSide(color: AppColors.blue, width: 3),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(30),
+                  borderSide: const BorderSide(color: AppColors.blue, width: 3),
+                ),
+                errorBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(30),
+                  borderSide: const BorderSide(
+                    color: AppColors.danger,
+                    width: 3,
+                  ),
+                ),
+                focusedErrorBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(30),
+                  borderSide: const BorderSide(
+                    color: AppColors.danger,
+                    width: 3,
+                  ),
+                ),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 30,
+                  vertical: 18,
+                ),
+                hintText: 'Введите пароль',
+                hintStyle: GoogleFonts.rubik(
+                  color: AppColors.inputHint,
+                  fontSize: 20,
+                  fontWeight: FontWeight.w400,
+                ),
+                errorStyle: GoogleFonts.rubik(
+                  color: AppColors.danger,
+                  fontSize: 12,
+                ),
+                filled: true,
+                fillColor: _passwordController.text.isNotEmpty
+                    ? AppColors.background
+                    : AppColors.blue,
+              ),
+            ),
+            SizedBox(height: 12),
+            Padding(
+              padding: const EdgeInsets.only(left: 30),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Нет аккаунта?',
+                      style: GoogleFonts.rubik(
+                        color: AppColors.blue,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () => context.go('/register'),
+                      child: Text(
+                        'Зарегистрироваться',
+                        style: GoogleFonts.rubik(
+                          color: AppColors.blue,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+            const Spacer(),
+            ElevatedButton(
+              onPressed:
+                  (_emailController.text.isEmpty ||
+                      _passwordController.text.isEmpty ||
+                      _isLoading)
+                  ? null
+                  : () {
+                      setState(() {
+                        _emailError = _emailController.text.isEmpty
+                            ? 'Введите email'
+                            : null;
+                        _passwordError = _passwordController.text.isEmpty
+                            ? 'Введите пароль'
+                            : null;
+                        _authError = null;
+                      });
+
+                      if (_emailController.text.isEmpty ||
+                          _passwordController.text.isEmpty) {
+                        return;
+                      }
+
+                      setState(() => _isLoading = true);
+
+                      context.read<AuthBloc>().add(
+                        AuthEvent.signInRequested(
+                          email: _emailController.text,
+                          password: _passwordController.text,
+                        ),
+                      );
+                    },
+              style: ElevatedButton.styleFrom(
+                backgroundColor:
+                    _emailController.text.isEmpty ||
+                        _passwordController.text.isEmpty ||
+                        _isLoading
+                    ? AppColors.disabledPrimary
+                    : AppColors.blue,
+                minimumSize: const Size(230, 70),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(70),
+                ),
+              ),
+              child: _isLoading
+                  ? LottieProgressIndicator()
+                  : Text(
+                      'ВОЙТИ',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w700,
+                        color:
+                            _emailController.text.isEmpty ||
+                                _passwordController.text.isEmpty ||
+                                _isLoading
+                            ? AppColors.disabledOnPrimary
+                            : AppColors.background,
+                        fontSize: 32,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+            ),
+            if (_authError != null) const SizedBox(height: 10),
+            if (_authError != null) AppInlineErrorText(message: _authError!),
+            const SizedBox(height: 20),
+          ],
         ),
       ),
     );

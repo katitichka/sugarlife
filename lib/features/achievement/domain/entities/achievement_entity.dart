@@ -11,5 +11,6 @@ sealed class AchievementEntity with _$AchievementEntity {
     required String description,
     required String imageUrl,
     required AchievementType type,
+    @Default(false) bool isUnlocked,
   }) = _AchievementEntity;
 }

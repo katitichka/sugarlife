@@ -107,7 +107,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     } catch (_) {
       emit(
         const AuthState.failure(
-          message: 'Не удалось выйти из аккаунта. Попробуйте ещё раз',
+          message: 'Не удалось выйти из аккаунта.\nПопробуйте ещё раз',
         ),
       );
     }
@@ -115,7 +115,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
   String _friendlyAuthError(Object e) {
     if (e is TimeoutException) {
-      return 'Сервер не отвечает. Попробуйте ещё раз';
+      return 'Сервер не отвечает.\nПопробуйте ещё раз';
     }
 
     final s = e.toString().toLowerCase();
@@ -133,7 +133,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       return 'Нет соединения. Проверьте интернет';
     }
     if (s.contains('too many requests') || s.contains('rate limit')) {
-      return 'Слишком много попыток. Попробуйте позже';
+      return 'Слишком много попыток.\nПопробуйте позже';
     }
     return 'Что-то пошло не так. Попробуйте ещё раз';
   }
