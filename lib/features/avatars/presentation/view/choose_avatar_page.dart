@@ -73,6 +73,9 @@ class _ChooseAvatarPageState extends State<ChooseAvatarPage> {
 
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: AppColors.background,
+        surfaceTintColor: AppColors.transparent,
+        foregroundColor: AppColors.blue,
         centerTitle: true,
         toolbarHeight: 90,
         titleSpacing: 0,

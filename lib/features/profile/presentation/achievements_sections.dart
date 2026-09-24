@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_cached_svg/flutter_cached_svg.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:sugarlife/core/theme/app_colors.dart';
+import 'package:sugarlife/features/achievement/domain/entities/achievement_entity.dart';
 import 'package:sugarlife/features/achievement/presentation/bloc/achievement_bloc.dart';
 
 class AchievementsSection extends StatefulWidget {
@@ -92,39 +93,21 @@ class _AchievementsSectionState extends State<AchievementsSection> {
                               )
                             : [];
 
-                        final displayItems = List.generate(2, (index) {
-                          if (index < pageAchievements.length) {
-                            return pageAchievements[index];
-                          }
-                          return null;
-                        });
+                        final List<AchievementEntity?> displayItems =
+                            List.generate(2, (index) {
+                              if (index < pageAchievements.length) {
+                                return pageAchievements[index];
+                              }
+                              return null;
+                            });
 
-                        return Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: List.generate(displayItems.length, (index) {
-                            final achievement = displayItems[index];
-                            return Column(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 4,
-                                  ),
-                                  child: SizedBox(
-                                    width: 100,
-                                    height: 100,
-                                    child: achievement?.isUnlocked == true
-                                        ? _AchievementIcon(
-                                            url: achievement!.imageUrl,
-                                          )
-                                        : const _AchievementPlaceholderCard(),
-                                  ),
-                                ),
-                              ],
-                            );
-                          }),
+                        return _AchievementPage(
+                          key: ValueKey(
+                            displayItems
+                                .map((achievement) => achievement?.id ?? 0)
+                                .join('-'),
+                          ),
+                          achievements: displayItems,
                         );
                       },
                     ),
@@ -161,6 +144,46 @@ class _AchievementsSectionState extends State<AchievementsSection> {
   }
 }
 
+class _AchievementPage extends StatefulWidget {
+  const _AchievementPage({required this.achievements, super.key});
+
+  final List<AchievementEntity?> achievements;
+
+  @override
+  State<_AchievementPage> createState() => _AchievementPageState();
+}
+
+class _AchievementPageState extends State<_AchievementPage>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
+  Widget build(BuildContext context) {
+    super.build(context);
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: widget.achievements.map((achievement) {
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 4),
+          child: SizedBox(
+            width: 100,
+            height: 100,
+            child: achievement?.isUnlocked == true
+                ? _AchievementIcon(
+                    key: ValueKey(achievement!.id),
+                    url: achievement.imageUrl,
+                  )
+                : const _AchievementPlaceholderCard(),
+          ),
+        );
+      }).toList(),
+    );
+  }
+}
+
 class _AchievementPlaceholderCard extends StatelessWidget {
   const _AchievementPlaceholderCard();
 
@@ -190,7 +213,7 @@ class _AchievementPlaceholderCard extends StatelessWidget {
 }
 
 class _AchievementIcon extends StatelessWidget {
-  const _AchievementIcon({required this.url});
+  const _AchievementIcon({required this.url, super.key});
 
   final String url;
 

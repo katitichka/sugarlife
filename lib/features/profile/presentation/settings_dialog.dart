@@ -9,6 +9,7 @@ import 'package:sugarlife/features/avatars/presentation/view/choose_avatar_page.
 import 'package:sugarlife/features/profile/domain/entities/profile_entity.dart';
 import 'package:sugarlife/features/profile/domain/repositories/profile_repository.dart';
 import 'package:sugarlife/shared/ui/app_snack_bar.dart';
+import 'package:sugarlife/shared/ui/lottie_progress_indicator.dart';
 
 class SettingsDialog extends StatelessWidget {
   final ProfileEntity profile;
@@ -24,163 +25,22 @@ class SettingsDialog extends StatelessWidget {
     BuildContext context,
     ProfileEntity currentProfile,
   ) async {
-    final controller = TextEditingController(text: currentProfile.username);
     final repository = context.read<ProfileRepository>();
     final authBloc = context.read<AuthBloc>();
-    var isSaving = false;
-    var isClosing = false;
+    final newUsername = await showDialog<String>(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => _EditNameDialog(
+        currentUsername: currentProfile.username,
+        onSave: repository.updateUsername,
+      ),
+    );
 
-    try {
-      await showDialog<void>(
-        context: context,
-        barrierDismissible: false,
-        builder: (dialogContext) => Dialog(
-          insetPadding: const EdgeInsets.symmetric(horizontal: 44),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Изменить имя',
-                  style: GoogleFonts.rubik(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.blue,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: controller,
-                  decoration: InputDecoration(
-                    hintText: 'Введите новое имя',
-                    hintStyle: GoogleFonts.rubik(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w400,
-                      color: AppColors.blue,
-                    ),
-                    contentPadding: const EdgeInsets.all(10),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(
-                        color: AppColors.blue,
-                        width: 2,
-                      ),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(
-                        color: AppColors.blue,
-                        width: 2,
-                      ),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(
-                        color: AppColors.blue,
-                        width: 2,
-                      ),
-                    ),
-                  ),
-                  style: GoogleFonts.rubik(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: AppColors.blue,
-                  ),
-                ),
-                const SizedBox(height: 16),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    TextButton(
-                      onPressed: () {
-                        if (isClosing || isSaving) return;
-                        isClosing = true;
-                        Navigator.pop(dialogContext);
-                      },
-                      style: TextButton.styleFrom(
-                        padding: EdgeInsets.zero,
-                        minimumSize: Size.zero,
-                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      ),
-                      child: Text(
-                        'Отмена',
-                        style: GoogleFonts.rubik(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                          color: AppColors.grey,
-                        ),
-                      ),
-                    ),
-                    TextButton(
-                      onPressed: () async {
-                        if (isClosing || isSaving) return;
-                        final newUsername = controller.text.trim();
-                        if (newUsername.isNotEmpty &&
-                            newUsername != currentProfile.username) {
-                          isSaving = true;
-                          try {
-                            await repository.updateUsername(newUsername);
-                            if (!context.mounted) return;
-                            final updatedProfile = currentProfile.copyWith(
-                              username: newUsername,
-                            );
-                            authBloc.add(
-                              AuthEvent.profileUpdate(
-                                newProfile: updatedProfile,
-                              ),
-                            );
-                            AppSnackBar.showSuccess(context, 'Имя изменено!');
-                            isClosing = true;
-                            if (dialogContext.mounted) {
-                              Navigator.pop(dialogContext);
-                            }
-                          } catch (_) {
-                            isSaving = false;
-                            if (!context.mounted) return;
-                            AppSnackBar.showError(
-                              context,
-                              'Не удалось сохранить изменения',
-                            );
-                          }
-                        } else if (newUsername == currentProfile.username) {
-                          isClosing = true;
-                          Navigator.pop(dialogContext);
-                        } else {
-                          AppSnackBar.showError(
-                            context,
-                            'Имя не может быть пустым',
-                          );
-                        }
-                      },
-                      style: TextButton.styleFrom(
-                        padding: EdgeInsets.zero,
-                        minimumSize: Size.zero,
-                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      ),
-                      child: Text(
-                        'Изменить',
-                        style: GoogleFonts.rubik(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                          color: AppColors.blue,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ),
-      );
-    } finally {
-      controller.dispose();
-    }
+    if (newUsername == null || !context.mounted) return;
+
+    final updatedProfile = currentProfile.copyWith(username: newUsername);
+    authBloc.add(AuthEvent.profileUpdate(newProfile: updatedProfile));
+    AppSnackBar.showSuccess(context, 'Имя изменено!');
   }
 
   void _showLogoutDialog(BuildContext context) {
@@ -454,6 +314,172 @@ class SettingsDialog extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class _EditNameDialog extends StatefulWidget {
+  const _EditNameDialog({required this.currentUsername, required this.onSave});
+
+  final String currentUsername;
+  final Future<void> Function(String username) onSave;
+
+  @override
+  State<_EditNameDialog> createState() => _EditNameDialogState();
+}
+
+class _EditNameDialogState extends State<_EditNameDialog> {
+  late final TextEditingController _controller;
+  bool _isSaving = false;
+  bool _isClosing = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(text: widget.currentUsername);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _close() {
+    if (_isSaving || _isClosing) return;
+    _isClosing = true;
+    Navigator.pop(context);
+  }
+
+  Future<void> _save() async {
+    if (_isSaving || _isClosing) return;
+
+    final username = _controller.text.trim();
+    if (username.isEmpty) {
+      AppSnackBar.showError(context, 'Имя не может быть пустым');
+      return;
+    }
+    if (username == widget.currentUsername) {
+      _isClosing = true;
+      Navigator.pop(context);
+      return;
+    }
+
+    setState(() => _isSaving = true);
+    try {
+      await widget.onSave(username).timeout(const Duration(seconds: 5));
+      if (!mounted) return;
+      _isClosing = true;
+      Navigator.pop(context, username);
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _isSaving = false);
+      AppSnackBar.showError(
+        context,
+        'Не удалось изменить имя. Попробуйте ещё раз',
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final border = OutlineInputBorder(
+      borderRadius: BorderRadius.circular(12),
+      borderSide: const BorderSide(color: AppColors.blue, width: 2),
+    );
+
+    return Dialog(
+      insetPadding: const EdgeInsets.symmetric(horizontal: 44),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Изменить имя',
+              style: GoogleFonts.rubik(
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
+                color: AppColors.blue,
+              ),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: _controller,
+              enabled: !_isSaving,
+              textInputAction: TextInputAction.done,
+              onSubmitted: (_) => _save(),
+              decoration: InputDecoration(
+                hintText: 'Введите новое имя',
+                filled: true,
+                fillColor: AppColors.background,
+                hintStyle: GoogleFonts.rubik(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w400,
+                  color: AppColors.blue,
+                ),
+                contentPadding: const EdgeInsets.all(10),
+                border: border,
+                enabledBorder: border,
+                focusedBorder: border,
+              ),
+              style: GoogleFonts.rubik(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: AppColors.blue,
+              ),
+            ),
+            const SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                TextButton(
+                  onPressed: _isSaving ? null : _close,
+                  style: _dialogButtonStyle(),
+                  child: Text(
+                    'Отмена',
+                    style: GoogleFonts.rubik(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      color: AppColors.grey,
+                    ),
+                  ),
+                ),
+                TextButton(
+                  onPressed: _isSaving ? null : _save,
+                  style: _dialogButtonStyle(),
+                  child: SizedBox(
+                    width: 82,
+                    height: 28,
+                    child: Center(
+                      child: _isSaving
+                          ? const LottieProgressIndicator(size: 28)
+                          : Text(
+                              'Изменить',
+                              style: GoogleFonts.rubik(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                                color: AppColors.blue,
+                              ),
+                            ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  ButtonStyle _dialogButtonStyle() {
+    return TextButton.styleFrom(
+      padding: EdgeInsets.zero,
+      minimumSize: Size.zero,
+      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
     );
   }
 }

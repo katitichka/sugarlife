@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sugarlife/core/router/root_navigator.dart';
 import 'package:sugarlife/core/theme/app_colors.dart';
+import 'package:sugarlife/core/utils/precache_game_map_assets.dart';
 import 'package:sugarlife/features/achievement/presentation/bloc/achievement_bloc.dart';
 import 'package:sugarlife/features/achievement/presentation/view/achievement_reward_dialog.dart';
 import 'package:sugarlife/features/daily_card/presentation/view/daily_card_screen.dart';
@@ -57,6 +58,7 @@ class _GamePageState extends State<GamePage> {
   final ScrollController _scrollController = ScrollController();
   bool _isAchievementDialogVisible = false;
   bool _isDailyCardDialogVisible = false;
+  late bool _areAssetsReady;
   int? _lastHandledAchievementId;
 
   final Map<int, bool> _pressedStates = {};
@@ -76,9 +78,17 @@ class _GamePageState extends State<GamePage> {
   void _scrollMapToStart() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted || !_scrollController.hasClients) return;
-      final max = _scrollController.position.maxScrollExtent;
-      _scrollController.jumpTo(max > 0 ? max : 0);
+      _scrollController.jumpTo(0);
     });
+  }
+
+  Future<void> _prepareAssets() async {
+    if (_areAssetsReady) return;
+    try {
+      await precacheGameMapAssets(context);
+    } finally {
+      if (mounted) setState(() => _areAssetsReady = true);
+    }
   }
 
   Future<void> _showAchievementDialog(AchievementState state) async {
@@ -149,9 +159,15 @@ class _GamePageState extends State<GamePage> {
   void initState() {
     super.initState();
     positions = const [];
+    _areAssetsReady = areGameMapAssetsPrecached;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
-      context.read<GameModuleListBloc>().add(GameModuleListEvent.receive());
+      _prepareAssets();
+      final gameBloc = context.read<GameModuleListBloc>();
+      if (gameBloc.state is! ReceiveSuccess &&
+          gameBloc.state is! ReceiveInProgress) {
+        gameBloc.add(const GameModuleListEvent.receive());
+      }
       context.read<AchievementBloc>().add(
         const AchievementEvent.checkPendingAchievement(),
       );
@@ -194,6 +210,9 @@ class _GamePageState extends State<GamePage> {
       child: BlocBuilder<GameModuleListBloc, GameModuleListState>(
         builder: (context, state) {
           if (state is ReceiveSuccess) {
+            if (!_areAssetsReady) {
+              return const Center(child: LottieProgressIndicator());
+            }
             return _buildGameContent(state.levels, state.progressMap);
           }
           if (state is ReceiveFailed) {
@@ -498,6 +517,7 @@ class _GamePageState extends State<GamePage> {
       children: [
         SingleChildScrollView(
           controller: _scrollController,
+          reverse: true,
           child: SizedBox(
             height: contentHeight,
             child: Stack(

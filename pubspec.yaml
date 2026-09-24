@@ -97,6 +97,7 @@ flutter:
     - assets/modules/theory/
     - assets/levels/
     - assets/common/
+    - assets/fonts/
     - assets/modules/theory_characters/
     
 
