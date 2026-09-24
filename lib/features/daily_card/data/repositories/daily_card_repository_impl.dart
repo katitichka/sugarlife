@@ -1,3 +1,4 @@
+import 'package:sugarlife/core/cache/app_cache_service.dart';
 import 'package:sugarlife/features/daily_card/data/mappers/daily_card_dto_mapper.dart';
 import 'package:sugarlife/features/daily_card/data/providers/daily_card_data_provider.dart';
 import 'package:sugarlife/features/daily_card/domain/entities/answered_daily_card_entity.dart';
@@ -6,12 +7,15 @@ import 'package:sugarlife/features/daily_card/domain/repositories/daily_card_rep
 
 class DailyCardRepositoryImpl implements DailyCardRepository {
   final DailyCardDataProvider _dataProvider;
+  final AppCacheService _cache;
   final DateTime Function() _now;
 
   DailyCardRepositoryImpl({
     required DailyCardDataProvider dataProvider,
+    required AppCacheService cache,
     DateTime Function()? now,
   }) : _dataProvider = dataProvider,
+       _cache = cache,
        _now = now ?? DateTime.now;
 
   String get _userId {
@@ -24,53 +28,100 @@ class DailyCardRepositoryImpl implements DailyCardRepository {
 
   @override
   Future<DailyCardEntity?> getTodayCard() async {
-    final createdAt = await _dataProvider.getUserProfileCreatedAt(_userId);
-    if (createdAt == null) return null;
+    final userId = _userId;
+    final today = _localDate(_now());
+    if (_cache.hasCachedDailyCard(userId: userId, date: today)) {
+      return _cache.getCachedDailyCard(userId: userId, date: today);
+    }
+
+    final createdAt = await _dataProvider.getUserProfileCreatedAt(userId);
+    if (createdAt == null) {
+      _cache.saveDailyCard(userId: userId, date: today, card: null);
+      return null;
+    }
 
     final createdDate = _localDate(createdAt);
-    final today = _localDate(_now());
     final dayNumber = today.difference(createdDate).inDays + 1;
-    if (dayNumber < 1) return null;
+    if (dayNumber < 1) {
+      _cache.saveDailyCard(userId: userId, date: today, card: null);
+      return null;
+    }
 
     final dto = await _dataProvider.getDailyCardByDayNumber(dayNumber);
-    return dto == null ? null : DailyCardDtoMapper.toEntity(dto: dto);
+    final card = dto == null ? null : DailyCardDtoMapper.toEntity(dto: dto);
+    _cache.saveDailyCard(userId: userId, date: today, card: card);
+    return card;
   }
 
   @override
   Future<void> saveUserAnswer(int cardId, bool isCorrect) async {
+    final userId = _userId;
+    final now = _now();
+    final today = _localDate(now);
     await _dataProvider.upsertUserAnswer(
-      userId: _userId,
+      userId: userId,
       cardId: cardId,
       isCorrect: isCorrect,
-      completedAt: _now().toUtc().toIso8601String(),
+      completedAt: now.toUtc().toIso8601String(),
     );
+
+    final card = _cache.getCachedDailyCard(userId: userId, date: today);
+    if (card != null && card.id == cardId) {
+      _cache.saveDailyCardAnswer(
+        userId: userId,
+        date: today,
+        answer: AnsweredDailyCardEntity(isCorrect: isCorrect, card: card),
+      );
+    }
   }
 
   @override
-  Future<bool> hasAnsweredToday() {
+  Future<bool> hasAnsweredToday() async {
+    final userId = _userId;
     final now = _now();
-    return _dataProvider.hasAnsweredInRange(
-      userId: _userId,
-      start: _localDate(now).toUtc(),
+    final today = _localDate(now);
+    if (_cache.hasCachedDailyCardAnswer(userId: userId, date: today)) {
+      return _cache.getCachedDailyCardAnswer(userId: userId, date: today) !=
+          null;
+    }
+
+    final hasAnswered = await _dataProvider.hasAnsweredInRange(
+      userId: userId,
+      start: today.toUtc(),
       end: _nextLocalDate(now).toUtc(),
     );
+    if (!hasAnswered) {
+      _cache.saveDailyCardAnswer(userId: userId, date: today, answer: null);
+    }
+    return hasAnswered;
   }
 
   @override
   Future<AnsweredDailyCardEntity?> getAnsweredCardForToday() async {
+    final userId = _userId;
     final now = _now();
+    final today = _localDate(now);
+    if (_cache.hasCachedDailyCardAnswer(userId: userId, date: today)) {
+      return _cache.getCachedDailyCardAnswer(userId: userId, date: today);
+    }
+
     final answered = await _dataProvider.getAnsweredCardInRange(
-      userId: _userId,
-      start: _localDate(now).toUtc(),
+      userId: userId,
+      start: today.toUtc(),
       end: _nextLocalDate(now).toUtc(),
     );
 
-    if (answered == null) return null;
+    if (answered == null) {
+      _cache.saveDailyCardAnswer(userId: userId, date: today, answer: null);
+      return null;
+    }
 
-    return AnsweredDailyCardEntity(
+    final answer = AnsweredDailyCardEntity(
       isCorrect: answered.isCorrect,
       card: DailyCardDtoMapper.toEntity(dto: answered.card),
     );
+    _cache.saveDailyCardAnswer(userId: userId, date: today, answer: answer);
+    return answer;
   }
 
   @override

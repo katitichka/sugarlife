@@ -44,8 +44,9 @@ Future<void> app(SupabaseClient supabase) async {
           ),
         ),
         RepositoryProvider<DailyCardRepository>(
-          create: (_) => DailyCardRepositoryImpl(
+          create: (context) => DailyCardRepositoryImpl(
             dataProvider: DailyCardDataProviderImpl(supabase),
+            cache: context.read<AppCacheService>(),
           ),
         ),
         RepositoryProvider<LevelProgressRepository>(

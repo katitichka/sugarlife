@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:sugarlife/core/cache/app_cache_service.dart';
 import 'package:sugarlife/features/daily_card/data/dtos/answered_daily_card_dto.dart';
 import 'package:sugarlife/features/daily_card/data/dtos/daily_card_dto.dart';
 import 'package:sugarlife/features/daily_card/data/providers/daily_card_data_provider.dart';
@@ -12,6 +13,7 @@ void main() {
       );
       final repository = DailyCardRepositoryImpl(
         dataProvider: provider,
+        cache: AppCacheService(),
         now: () => DateTime(2026, 9, 24, 8),
       );
 
@@ -26,6 +28,7 @@ void main() {
       final provider = _DailyCardDataProvider(createdAt: now);
       final repository = DailyCardRepositoryImpl(
         dataProvider: provider,
+        cache: AppCacheService(),
         now: () => now,
       );
 
@@ -41,9 +44,48 @@ void main() {
           createdAt: DateTime(2026),
           userId: null,
         ),
+        cache: AppCacheService(),
       );
 
       expect(repository.getAnswerHistory, throwsStateError);
+    });
+
+    test('повторно использует карточку и результат проверки за день', () async {
+      final now = DateTime(2026, 9, 24, 12);
+      final provider = _DailyCardDataProvider(createdAt: DateTime(2026, 9, 24));
+      final repository = DailyCardRepositoryImpl(
+        dataProvider: provider,
+        cache: AppCacheService(),
+        now: () => now,
+      );
+
+      expect(await repository.getAnsweredCardForToday(), isNull);
+      final firstCard = await repository.getTodayCard();
+      expect(await repository.getAnsweredCardForToday(), isNull);
+      final secondCard = await repository.getTodayCard();
+
+      expect(secondCard, firstCard);
+      expect(provider.answeredCardRequestCount, 1);
+      expect(provider.profileRequestCount, 1);
+      expect(provider.cardRequestCount, 1);
+    });
+
+    test('сохраняет ответ в кэше после успешной отправки', () async {
+      final now = DateTime(2026, 9, 24, 12);
+      final provider = _DailyCardDataProvider(createdAt: DateTime(2026, 9, 24));
+      final repository = DailyCardRepositoryImpl(
+        dataProvider: provider,
+        cache: AppCacheService(),
+        now: () => now,
+      );
+
+      final card = await repository.getTodayCard();
+      await repository.saveUserAnswer(card!.id, true);
+      final answer = await repository.getAnsweredCardForToday();
+
+      expect(answer?.card, card);
+      expect(answer?.isCorrect, isTrue);
+      expect(provider.answeredCardRequestCount, 0);
     });
   });
 }
@@ -58,15 +100,22 @@ class _DailyCardDataProvider implements DailyCardDataProvider {
   int? requestedDayNumber;
   DateTime? rangeStart;
   DateTime? rangeEnd;
+  int profileRequestCount = 0;
+  int cardRequestCount = 0;
+  int answeredCardRequestCount = 0;
 
   @override
   String? get currentUserId => userId;
 
   @override
-  Future<DateTime?> getUserProfileCreatedAt(String userId) async => createdAt;
+  Future<DateTime?> getUserProfileCreatedAt(String userId) async {
+    profileRequestCount++;
+    return createdAt;
+  }
 
   @override
   Future<DailyCardDto?> getDailyCardByDayNumber(int dayNumber) async {
+    cardRequestCount++;
     requestedDayNumber = dayNumber;
     return DailyCardDto(
       id: 1,
@@ -93,7 +142,10 @@ class _DailyCardDataProvider implements DailyCardDataProvider {
     required String userId,
     required DateTime start,
     required DateTime end,
-  }) async => null;
+  }) async {
+    answeredCardRequestCount++;
+    return null;
+  }
 
   @override
   Future<List<bool>> getAnswerHistory(String userId) async => const [];

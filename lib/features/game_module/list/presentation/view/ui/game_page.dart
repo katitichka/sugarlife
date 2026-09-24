@@ -56,6 +56,7 @@ class _GamePageState extends State<GamePage> {
   late List<Offset> positions;
   final ScrollController _scrollController = ScrollController();
   bool _isAchievementDialogVisible = false;
+  bool _isDailyCardDialogVisible = false;
   int? _lastHandledAchievementId;
 
   final Map<int, bool> _pressedStates = {};
@@ -114,6 +115,24 @@ class _GamePageState extends State<GamePage> {
       );
     } finally {
       _isAchievementDialogVisible = false;
+    }
+  }
+
+  Future<void> _showDailyCardDialog() async {
+    if (_isDailyCardDialogVisible) return;
+
+    setState(() => _isDailyCardDialogVisible = true);
+    try {
+      await showDialog<void>(
+        context: context,
+        barrierDismissible: false,
+        barrierColor: AppColors.modalBarrier,
+        builder: (_) => const DailyCardScreen(),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _isDailyCardDialogVisible = false);
+      }
     }
   }
 
@@ -520,38 +539,32 @@ class _GamePageState extends State<GamePage> {
             ),
           ),
         ),
-        Positioned(
-          top: 20,
-          right: 10,
-          child: IconButton(
-            icon: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: [
-                  BoxShadow(
-                    color: AppColors.white20,
-                    blurRadius: 5,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
+        if (!_isDailyCardDialogVisible)
+          Positioned(
+            top: 20,
+            right: 10,
+            child: IconButton(
+              icon: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.white20,
+                      blurRadius: 5,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: SvgPicture.asset(
+                  'assets/common/daily_icon.svg',
+                  width: 82,
+                  height: 45,
+                  fit: BoxFit.contain,
+                ),
               ),
-              child: SvgPicture.asset(
-                'assets/common/daily_icon.svg',
-                width: 82,
-                height: 45,
-                fit: BoxFit.contain,
-              ),
+              onPressed: _showDailyCardDialog,
             ),
-            onPressed: () {
-              showDialog(
-                context: context,
-                barrierDismissible: false,
-                barrierColor: AppColors.modalBarrier,
-                builder: (_) => const DailyCardScreen(),
-              );
-            },
           ),
-        ),
       ],
     );
   }
