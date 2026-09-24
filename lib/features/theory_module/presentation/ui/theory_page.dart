@@ -55,38 +55,35 @@ class _TheoryPageState extends State<TheoryPage> {
 
                 return LayoutBuilder(
                   builder: (context, constraints) {
-                    final availableHeight = constraints.maxHeight - 100;
-                    final totalHeight = modules.length * 130.0;
-                    final needScroll = totalHeight > availableHeight;
+                    const bottomContentPadding = 104.0;
+                    final contentHeight =
+                        modules.length * 116.0 + bottomContentPadding;
+                    final needScroll = contentHeight > constraints.maxHeight;
 
-                    return Column(
-                      children: [
-                        SizedBox(
-                          height: availableHeight,
-                          child: RawScrollbar(
-                            controller: _scrollController,
-                            thumbVisibility: needScroll,
-                            trackVisibility: needScroll,
-                            thickness: 4,
-                            radius: const Radius.circular(2),
-                            thumbColor: AppColors.white80,
-                            child: ListView.builder(
-                              controller: _scrollController,
-                              physics: needScroll
-                                  ? const AlwaysScrollableScrollPhysics()
-                                  : const NeverScrollableScrollPhysics(),
-                              itemCount: modules.length,
-                              itemBuilder: (context, index) {
-                                final module = modules[index];
-                                return TheoryListCard(
-                                  module: module,
-                                  moduleId: module.id,
-                                );
-                              },
-                            ),
-                          ),
+                    return RawScrollbar(
+                      controller: _scrollController,
+                      thumbVisibility: needScroll,
+                      trackVisibility: needScroll,
+                      thickness: 4,
+                      radius: const Radius.circular(2),
+                      thumbColor: AppColors.white80,
+                      child: ListView.builder(
+                        controller: _scrollController,
+                        padding: const EdgeInsets.only(
+                          bottom: bottomContentPadding,
                         ),
-                      ],
+                        physics: needScroll
+                            ? const AlwaysScrollableScrollPhysics()
+                            : const NeverScrollableScrollPhysics(),
+                        itemCount: modules.length,
+                        itemBuilder: (context, index) {
+                          final module = modules[index];
+                          return TheoryListCard(
+                            module: module,
+                            moduleId: module.id,
+                          );
+                        },
+                      ),
                     );
                   },
                 );
