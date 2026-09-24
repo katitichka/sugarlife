@@ -10,7 +10,7 @@ sealed class AuthEvent with _$AuthEvent {
     required String email,
     required String password,
   }) = _SignInRequested;
-  
+
   // Регистрация
   const factory AuthEvent.signUpRequested({
     required String email,
@@ -22,7 +22,6 @@ sealed class AuthEvent with _$AuthEvent {
   const factory AuthEvent.logoutPressed() = _LogoutPressed;
 
   // Обновление профиля
-  const factory AuthEvent.profileUpdate({
-    required ProfileEntity newProfile,
-  }) = _ProfileUpdate;
+  const factory AuthEvent.profileUpdate({required ProfileEntity newProfile}) =
+      _ProfileUpdate;
 }

@@ -1,22 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sugarlife/shared/ui/sweet_life_app.dart';
+import 'package:sugarlife/shared/ui/app_error_view.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const SweetLifeApp());
+  testWidgets('error view shows message and invokes retry', (tester) async {
+    var retryCount = 0;
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: AppErrorView(
+            message: 'Не удалось загрузить данны',
+            onRetry: () => retryCount++,
+          ),
+        ),
+      ),
+    );
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+    expect(find.text('Не удалось загрузить данны'), findsOneWidget);
+    expect(find.text('Повторить'), findsOneWidget);
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    await tester.tap(find.text('Повторить'));
+    expect(retryCount, 1);
   });
 }

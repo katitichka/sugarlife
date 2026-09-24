@@ -90,11 +90,7 @@ class _NavItem extends StatelessWidget {
       child: AnimatedScale(
         duration: const Duration(milliseconds: 200),
         scale: isActive ? 1.25 : 1.0,
-        child: SvgPicture.asset(
-          iconPath,
-          width: 28,
-          height: 28,
-        ),
+        child: SvgPicture.asset(iconPath, width: 28, height: 28),
       ),
     );
   }

@@ -70,12 +70,8 @@ class GameLevelContentPage extends StatelessWidget {
                 stars: stars,
                 onFinish: () {
                   if (correctAnswers == 0) {
-                    context.go(
-                      '/game/level/$levelId',
-                      extra: {
-                        'orderIndex': orderIndex,
-                        'theoryModuleId': theoryModuleId,
-                      },
+                    context.read<GameModuleLevelBloc>().add(
+                      GameModuleLevelEvent.receive(levelId: levelId),
                     );
                   } else {
                     _finishLevelWithAchievementCard(
@@ -176,9 +172,9 @@ Future<void> _finishLevelWithAchievementCard(
   final beforeToken = achievementBloc.state.pendingSyncToken;
   achievementBloc.add(const AchievementEvent.checkPendingAchievement());
   try {
-    await achievementBloc.stream.firstWhere(
-      (s) => s.pendingSyncToken != beforeToken,
-    );
+    await achievementBloc.stream
+        .firstWhere((s) => s.pendingSyncToken != beforeToken)
+        .timeout(const Duration(seconds: 10));
   } catch (_) {}
 
   if (!context.mounted) return;

@@ -9,7 +9,11 @@ class GameModuleLevelListRepositoryImpl
   final GameModuleLevelListDataProvider _dataProvider;
   final AppCacheService _cache;
 
-  GameModuleLevelListRepositoryImpl(this._dataProvider, this._cache);
+  GameModuleLevelListRepositoryImpl({
+    required GameModuleLevelListDataProvider dataProvider,
+    required AppCacheService cache,
+  }) : _dataProvider = dataProvider,
+       _cache = cache;
 
   @override
   Future<List<GameModuleLevelEntity>> getAllLevels() async {
@@ -29,7 +33,10 @@ class GameModuleLevelListRepositoryImpl
       levelIds,
     );
 
-    final levels = GameModuleLevelMapper.toEntityList(dtos, questionCountByLevel);
+    final levels = GameModuleLevelMapper.toEntityList(
+      dtos,
+      questionCountByLevel,
+    );
 
     _cache.saveLevels(levels);
     return levels;
@@ -37,10 +44,9 @@ class GameModuleLevelListRepositoryImpl
 
   @override
   Future<GameModuleLevelEntity> getLevelById({required int levelId}) async {
-    final cachedLevel = _cache.levels?.cast<GameModuleLevelEntity?>().firstWhere(
-      (level) => level?.id == levelId,
-      orElse: () => null,
-    );
+    final cachedLevel = _cache.levels
+        ?.cast<GameModuleLevelEntity?>()
+        .firstWhere((level) => level?.id == levelId, orElse: () => null);
     if (cachedLevel != null) {
       return cachedLevel;
     }
@@ -56,7 +62,9 @@ class GameModuleLevelListRepositoryImpl
     );
 
     final cachedLevels = List<GameModuleLevelEntity>.from(_cache.levels ?? []);
-    final existingIndex = cachedLevels.indexWhere((item) => item.id == level.id);
+    final existingIndex = cachedLevels.indexWhere(
+      (item) => item.id == level.id,
+    );
     if (existingIndex == -1) {
       cachedLevels.add(level);
     } else {

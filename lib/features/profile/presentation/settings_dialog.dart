@@ -20,146 +20,171 @@ class SettingsDialog extends StatelessWidget {
     required this.onAvatarChanged,
   });
 
-  void _showEditNameDialog(BuildContext context, ProfileEntity currentProfile) {
+  Future<void> _showEditNameDialog(
+    BuildContext context,
+    ProfileEntity currentProfile,
+  ) async {
     final controller = TextEditingController(text: currentProfile.username);
     final repository = context.read<ProfileRepository>();
+    final authBloc = context.read<AuthBloc>();
+    var isSaving = false;
+    var isClosing = false;
 
-    showDialog(
-      context: context,
-      builder: (context) => Dialog(
-        insetPadding: const EdgeInsets.symmetric(horizontal: 44),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Изменить имя',
-                style: GoogleFonts.rubik(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.blue,
-                ),
-              ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: controller,
-                decoration: InputDecoration(
-                  hintText: 'Введите новое имя',
-                  hintStyle: GoogleFonts.rubik(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w400,
+    try {
+      await showDialog<void>(
+        context: context,
+        barrierDismissible: false,
+        builder: (dialogContext) => Dialog(
+          insetPadding: const EdgeInsets.symmetric(horizontal: 44),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Изменить имя',
+                  style: GoogleFonts.rubik(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w600,
                     color: AppColors.blue,
                   ),
-                  contentPadding: const EdgeInsets.all(10),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(
-                      color: AppColors.blue,
-                      width: 2,
-                    ),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(
-                      color: AppColors.blue,
-                      width: 2,
-                    ),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(
-                      color: AppColors.blue,
-                      width: 2,
-                    ),
-                  ),
                 ),
-                style: GoogleFonts.rubik(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                  color: AppColors.blue,
-                ),
-              ),
-              const SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  TextButton(
-                    onPressed: () => Navigator.pop(context),
-                    style: TextButton.styleFrom(
-                      padding: EdgeInsets.zero,
-                      minimumSize: Size.zero,
-                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                const SizedBox(height: 12),
+                TextField(
+                  controller: controller,
+                  decoration: InputDecoration(
+                    hintText: 'Введите новое имя',
+                    hintStyle: GoogleFonts.rubik(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w400,
+                      color: AppColors.blue,
                     ),
-                    child: Text(
-                      'Отмена',
-                      style: GoogleFonts.rubik(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                        color: AppColors.grey,
+                    contentPadding: const EdgeInsets.all(10),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(
+                        color: AppColors.blue,
+                        width: 2,
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(
+                        color: AppColors.blue,
+                        width: 2,
+                      ),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(
+                        color: AppColors.blue,
+                        width: 2,
                       ),
                     ),
                   ),
-                  TextButton(
-                    onPressed: () async {
-                      final newUsername = controller.text.trim();
-                      if (newUsername.isNotEmpty &&
-                          newUsername != currentProfile.username) {
-                        try {
-                          await repository.updateUsername(newUsername);
-                          if (!context.mounted) return;
-                          final updatedProfile = currentProfile.copyWith(
-                            username: newUsername,
-                          );
-                          context.read<AuthBloc>().add(
-                            AuthEvent.profileUpdate(newProfile: updatedProfile),
-                          );
-                          if (context.mounted) {
-                            Navigator.pop(context);
+                  style: GoogleFonts.rubik(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.blue,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    TextButton(
+                      onPressed: () {
+                        if (isClosing || isSaving) return;
+                        isClosing = true;
+                        Navigator.pop(dialogContext);
+                      },
+                      style: TextButton.styleFrom(
+                        padding: EdgeInsets.zero,
+                        minimumSize: Size.zero,
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      ),
+                      child: Text(
+                        'Отмена',
+                        style: GoogleFonts.rubik(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: AppColors.grey,
+                        ),
+                      ),
+                    ),
+                    TextButton(
+                      onPressed: () async {
+                        if (isClosing || isSaving) return;
+                        final newUsername = controller.text.trim();
+                        if (newUsername.isNotEmpty &&
+                            newUsername != currentProfile.username) {
+                          isSaving = true;
+                          try {
+                            await repository.updateUsername(newUsername);
+                            if (!context.mounted) return;
+                            final updatedProfile = currentProfile.copyWith(
+                              username: newUsername,
+                            );
+                            authBloc.add(
+                              AuthEvent.profileUpdate(
+                                newProfile: updatedProfile,
+                              ),
+                            );
                             AppSnackBar.showSuccess(context, 'Имя изменено!');
+                            isClosing = true;
+                            if (dialogContext.mounted) {
+                              Navigator.pop(dialogContext);
+                            }
+                          } catch (_) {
+                            isSaving = false;
+                            if (!context.mounted) return;
+                            AppSnackBar.showError(
+                              context,
+                              'Не удалось сохранить изменения',
+                            );
                           }
-                        } catch (_) {
-                          if (!context.mounted) return;
+                        } else if (newUsername == currentProfile.username) {
+                          isClosing = true;
+                          Navigator.pop(dialogContext);
+                        } else {
                           AppSnackBar.showError(
                             context,
-                            'Не удалось сохранить изменения',
+                            'Имя не может быть пустым',
                           );
                         }
-                      } else if (newUsername == currentProfile.username) {
-                        Navigator.pop(context);
-                      } else {
-                        AppSnackBar.showError(
-                          context,
-                          'Имя не может быть пустым',
-                        );
-                      }
-                    },
-                    style: TextButton.styleFrom(
-                      padding: EdgeInsets.zero,
-                      minimumSize: Size.zero,
-                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    ),
-                    child: Text(
-                      'Изменить',
-                      style: GoogleFonts.rubik(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                        color: AppColors.blue,
+                      },
+                      style: TextButton.styleFrom(
+                        padding: EdgeInsets.zero,
+                        minimumSize: Size.zero,
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      ),
+                      child: Text(
+                        'Изменить',
+                        style: GoogleFonts.rubik(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: AppColors.blue,
+                        ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-            ],
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
-      ),
-    );
+      );
+    } finally {
+      controller.dispose();
+    }
   }
 
   void _showLogoutDialog(BuildContext context) {
+    final authBloc = context.read<AuthBloc>();
     showDialog(
       context: context,
       builder: (context) => Dialog(
@@ -210,9 +235,8 @@ class SettingsDialog extends StatelessWidget {
                   ),
                   TextButton(
                     onPressed: () {
-                      context.read<AuthBloc>().add(
-                        const AuthEvent.logoutPressed(),
-                      );
+                      Navigator.pop(context);
+                      authBloc.add(const AuthEvent.logoutPressed());
                     },
                     style: TextButton.styleFrom(
                       padding: EdgeInsets.zero,
@@ -241,6 +265,8 @@ class SettingsDialog extends StatelessWidget {
     BuildContext context,
     ProfileEntity currentProfile,
   ) async {
+    final repository = context.read<ProfileRepository>();
+    final authBloc = context.read<AuthBloc>();
     final result = await showDialog<AvatarEntity>(
       context: context,
       barrierDismissible: true,
@@ -265,16 +291,13 @@ class SettingsDialog extends StatelessWidget {
 
     if (result != null) {
       try {
-        final repository = context.read<ProfileRepository>();
         await repository.updateAvatar(result.id);
         if (!context.mounted) return false;
 
         final updatedProfile = currentProfile.copyWith(
           currentAvatarId: result.id,
         );
-        context.read<AuthBloc>().add(
-          AuthEvent.profileUpdate(newProfile: updatedProfile),
-        );
+        authBloc.add(AuthEvent.profileUpdate(newProfile: updatedProfile));
 
         if (context.mounted) {
           AppSnackBar.showSuccess(context, 'Аватар обновлён!');
@@ -292,8 +315,17 @@ class SettingsDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var routeTransitionStarted = false;
+    var avatarDialogOpen = false;
+
+    void closeSettings() {
+      if (routeTransitionStarted || avatarDialogOpen) return;
+      routeTransitionStarted = true;
+      Navigator.pop(context);
+    }
+
     return GestureDetector(
-      onTap: () => Navigator.pop(context),
+      onTap: closeSettings,
       child: Material(
         color: AppColors.transparent,
         child: Align(
@@ -320,8 +352,16 @@ class SettingsDialog extends StatelessWidget {
                       children: [
                         _buildDialogItem(
                           onTap: () {
-                            Navigator.pop(context);
-                            _showEditNameDialog(context, profile);
+                            if (routeTransitionStarted || avatarDialogOpen) {
+                              return;
+                            }
+                            routeTransitionStarted = true;
+                            final navigator = Navigator.of(context);
+                            final hostContext = navigator.context;
+                            navigator.pop();
+                            if (hostContext.mounted) {
+                              _showEditNameDialog(hostContext, profile);
+                            }
                           },
                           iconPath: 'assets/profile/edit_name.svg',
                           text: 'Изменить имя',
@@ -330,12 +370,19 @@ class SettingsDialog extends StatelessWidget {
                         const Divider(height: 1.5, color: AppColors.blue),
                         _buildDialogItem(
                           onTap: () async {
+                            if (routeTransitionStarted || avatarDialogOpen) {
+                              return;
+                            }
+                            avatarDialogOpen = true;
                             final result = await _showAvatarSelectionSheet(
                               context,
                               profile,
                             );
                             if (result == true && context.mounted) {
+                              routeTransitionStarted = true;
                               Navigator.pop(context);
+                            } else {
+                              avatarDialogOpen = false;
                             }
                           },
                           iconPath: 'assets/profile/edit_avatar.svg',
@@ -345,8 +392,16 @@ class SettingsDialog extends StatelessWidget {
                         const Divider(height: 1.5, color: AppColors.blue),
                         _buildDialogItem(
                           onTap: () {
-                            Navigator.pop(context);
-                            _showLogoutDialog(context);
+                            if (routeTransitionStarted || avatarDialogOpen) {
+                              return;
+                            }
+                            routeTransitionStarted = true;
+                            final navigator = Navigator.of(context);
+                            final hostContext = navigator.context;
+                            navigator.pop();
+                            if (hostContext.mounted) {
+                              _showLogoutDialog(hostContext);
+                            }
                           },
                           iconPath: 'assets/profile/logout.svg',
                           text: 'Выйти из профиля',

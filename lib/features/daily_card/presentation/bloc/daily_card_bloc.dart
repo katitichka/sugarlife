@@ -3,7 +3,6 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:sugarlife/core/enum/achievement_type.dart';
 import 'package:sugarlife/core/utils/retry.dart';
 import 'package:sugarlife/features/achievement/domain/repositories/achievement_repository.dart';
-import 'package:sugarlife/features/daily_card/domain/entities/answered_daily_card_entity.dart';
 import 'package:sugarlife/features/daily_card/domain/entities/daily_card_entity.dart';
 import 'package:sugarlife/features/daily_card/domain/repositories/daily_card_repository.dart';
 
@@ -15,8 +14,12 @@ class DailyCardBloc extends Bloc<DailyCardEvent, DailyCardState> {
   final DailyCardRepository _repository;
   final AchievementRepository _achievementRepository;
 
-  DailyCardBloc(this._repository, this._achievementRepository)
-    : super(const _Initial()) {
+  DailyCardBloc({
+    required DailyCardRepository repository,
+    required AchievementRepository achievementRepository,
+  }) : _repository = repository,
+       _achievementRepository = achievementRepository,
+       super(const _Initial()) {
     on<DailyCardEvent>(
       (event, emit) => switch (event) {
         final _LoadTodayCard _ => _onLoadTodayCard(emit),
@@ -38,36 +41,38 @@ class DailyCardBloc extends Bloc<DailyCardEvent, DailyCardState> {
     const timeout = Duration(seconds: 3);
 
     try {
-      final result = await withRetry<
-          ({AnsweredDailyCardEntity? answered, DailyCardEntity? card})>(() async {
-        final answeredCard = await _repository
-            .getAnsweredCardForToday()
-            .timeout(timeout);
-        if (answeredCard != null) {
-          return (answered: answeredCard, card: null);
-        }
-        final card = await _repository.getTodayCard().timeout(timeout);
-        return (answered: null, card: card);
-      }, delay: const Duration(seconds: 1));
-
-      final answeredCard = result.answered;
-      final card = result.card;
-      if (answeredCard != null) {
-        emit(
-          Answered(
-            isCorrect: answeredCard.isCorrect,
-            explanation: answeredCard.card.explanation,
-            isMyth: answeredCard.card.isMyth,
-          ),
-        );
-      } else if (card != null) {
-        emit(Loaded(card: card, hasAnsweredToday: false));
-      } else {
-        emit(const NoMoreCards());
-      }
+      final state = await withRetry(
+        () => _loadTodayCard(timeout: timeout),
+        delay: const Duration(seconds: 1),
+      );
+      emit(state);
     } catch (e) {
-      emit(const Error(message: 'Не удалось загрузить карточку. Проверьте подключение к интернету.'));
+      emit(
+        const Error(
+          message:
+              'Не удалось загрузить карточку. Проверьте подключение к интернету.',
+        ),
+      );
     }
+  }
+
+  Future<DailyCardState> _loadTodayCard({required Duration timeout}) async {
+    final answeredCard = await _repository.getAnsweredCardForToday().timeout(
+      timeout,
+    );
+
+    if (answeredCard != null) {
+      return Answered(
+        isCorrect: answeredCard.isCorrect,
+        explanation: answeredCard.card.explanation,
+        isMyth: answeredCard.card.isMyth,
+      );
+    }
+
+    final card = await _repository.getTodayCard().timeout(timeout);
+    if (card == null) return const NoMoreCards();
+
+    return Loaded(card: card, hasAnsweredToday: false);
   }
 
   Future<void> _onAnswerCard(
@@ -94,13 +99,20 @@ class DailyCardBloc extends Bloc<DailyCardEvent, DailyCardState> {
         // Достижение — не критичная часть флоу ответа, ошибку не показываем.
       }
 
-      emit(Answered(
-        isCorrect: isCorrect,
-        explanation: explanation,
-        isMyth: isMyth,
-      ));
+      emit(
+        Answered(
+          isCorrect: isCorrect,
+          explanation: explanation,
+          isMyth: isMyth,
+        ),
+      );
     } catch (e) {
-      emit(const Error(message: 'Не удалось сохранить ответ. Проверьте подключение к интернету.'));
+      emit(
+        const Error(
+          message:
+              'Не удалось сохранить ответ. Проверьте подключение к интернету.',
+        ),
+      );
     }
   }
 
@@ -119,8 +131,9 @@ class DailyCardBloc extends Bloc<DailyCardEvent, DailyCardState> {
     if (milestonesReached == 0) return;
 
     final userAchievements = await _achievementRepository.getUserAchievements();
-    final unlockedDailyCount =
-        userAchievements.where((a) => a.type == AchievementType.daily).length;
+    final unlockedDailyCount = userAchievements
+        .where((a) => a.type == AchievementType.daily)
+        .length;
 
     if (unlockedDailyCount >= milestonesReached) return;
 

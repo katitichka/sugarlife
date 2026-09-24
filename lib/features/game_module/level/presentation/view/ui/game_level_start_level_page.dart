@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -183,7 +183,12 @@ class _NewLevelContent extends StatelessWidget {
   final int theoryModuleId;
   final int questionsCount;
 
-  const _NewLevelContent({required this.levelId, required this.questionsCount, required this.orderIndex, required this.theoryModuleId});
+  const _NewLevelContent({
+    required this.levelId,
+    required this.questionsCount,
+    required this.orderIndex,
+    required this.theoryModuleId,
+  });
 
   @override
   Widget build(BuildContext context) {

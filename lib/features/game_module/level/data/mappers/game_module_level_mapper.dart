@@ -1,4 +1,4 @@
-﻿import 'package:sugarlife/features/game_module/level/data/dtos/game_module_level_dto.dart';
+import 'package:sugarlife/features/game_module/level/data/dtos/game_module_level_dto.dart';
 import 'package:sugarlife/features/game_module/level/domain/entities/game_module_level_entity.dart';
 
 abstract class GameModuleLevelMapper {
@@ -20,10 +20,8 @@ abstract class GameModuleLevelMapper {
   ) {
     return dtos
         .map(
-          (dto) => toEntity(
-            dto,
-            totalQuestions: questionCountByLevel[dto.id] ?? 0,
-          ),
+          (dto) =>
+              toEntity(dto, totalQuestions: questionCountByLevel[dto.id] ?? 0),
         )
         .toList();
   }

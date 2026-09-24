@@ -1,4 +1,3 @@
-import 'package:sugarlife/core/utils/retry.dart';
 import 'package:sugarlife/features/daily_card/data/mappers/daily_card_dto_mapper.dart';
 import 'package:sugarlife/features/daily_card/data/providers/daily_card_data_provider.dart';
 import 'package:sugarlife/features/daily_card/domain/entities/answered_daily_card_entity.dart';
@@ -7,80 +6,63 @@ import 'package:sugarlife/features/daily_card/domain/repositories/daily_card_rep
 
 class DailyCardRepositoryImpl implements DailyCardRepository {
   final DailyCardDataProvider _dataProvider;
-  final String _userId;
+  final DateTime Function() _now;
 
-  DailyCardRepositoryImpl(this._dataProvider, this._userId);
+  DailyCardRepositoryImpl({
+    required DailyCardDataProvider dataProvider,
+    DateTime Function()? now,
+  }) : _dataProvider = dataProvider,
+       _now = now ?? DateTime.now;
 
-Future<DailyCardEntity?> getTodayCard({int retries = 3}) {
-  return withRetry(
-    () async {
-      final createdAt = await _dataProvider.getUserProfileCreatedAt(_userId);
+  String get _userId {
+    final userId = _dataProvider.currentUserId;
+    if (userId == null) {
+      throw StateError('Нет авторизованного пользователя');
+    }
+    return userId;
+  }
 
-      if (createdAt == null) {
-        print('Пользователь не найден: $_userId');
-        return null;
-      }
+  @override
+  Future<DailyCardEntity?> getTodayCard() async {
+    final createdAt = await _dataProvider.getUserProfileCreatedAt(_userId);
+    if (createdAt == null) return null;
 
-      final today = DateTime.now();
-      final dayNumber = today.difference(createdAt).inDays + 1;
+    final createdDate = _localDate(createdAt);
+    final today = _localDate(_now());
+    final dayNumber = today.difference(createdDate).inDays + 1;
+    if (dayNumber < 1) return null;
 
-      final dto = await _dataProvider.getDailyCardByDayNumber(dayNumber);
+    final dto = await _dataProvider.getDailyCardByDayNumber(dayNumber);
+    return dto == null ? null : DailyCardDtoMapper.toEntity(dto: dto);
+  }
 
-      if (dto != null) {
-        return DailyCardDtoMapper.toEntity(dto: dto);
-      }
-
-      return null;
-    },
-    maxAttempts: retries,
-    delayBuilder: (attempt) => Duration(milliseconds: 300 * attempt),
-  );
-}
-
-@override
-Future<void> saveUserAnswer(int cardId, bool isCorrect) async {
-  try {
+  @override
+  Future<void> saveUserAnswer(int cardId, bool isCorrect) async {
     await _dataProvider.upsertUserAnswer(
       userId: _userId,
       cardId: cardId,
       isCorrect: isCorrect,
-      completedAt: DateTime.now().toIso8601String(),
+      completedAt: _now().toUtc().toIso8601String(),
     );
-
-  } catch (e, stackTrace) {
-    print('Ошибка сохранения ответа: $e');
-    rethrow;
   }
-}
 
-@override
-Future<bool> hasAnsweredToday() async {
-  try {
-    final now = DateTime.now();
-    final startOfDay = DateTime(now.year, now.month, now.day);
-    final endOfDay = startOfDay.add(const Duration(days: 1));
-
-    return await _dataProvider.hasAnsweredInRange(
+  @override
+  Future<bool> hasAnsweredToday() {
+    final now = _now();
+    return _dataProvider.hasAnsweredInRange(
       userId: _userId,
-      start: startOfDay,
-      end: endOfDay,
+      start: _localDate(now).toUtc(),
+      end: _nextLocalDate(now).toUtc(),
     );
-  } catch (e) {
-    print('Ошибка проверки: $e');
-    return false;
   }
-}
-@override
-Future<AnsweredDailyCardEntity?> getAnsweredCardForToday() async {
-  try {
-    final now = DateTime.now();
-    final startOfDay = DateTime(now.year, now.month, now.day);
-    final endOfDay = startOfDay.add(const Duration(days: 1));
 
+  @override
+  Future<AnsweredDailyCardEntity?> getAnsweredCardForToday() async {
+    final now = _now();
     final answered = await _dataProvider.getAnsweredCardInRange(
       userId: _userId,
-      start: startOfDay,
-      end: endOfDay,
+      start: _localDate(now).toUtc(),
+      end: _nextLocalDate(now).toUtc(),
     );
 
     if (answered == null) return null;
@@ -89,14 +71,20 @@ Future<AnsweredDailyCardEntity?> getAnsweredCardForToday() async {
       isCorrect: answered.isCorrect,
       card: DailyCardDtoMapper.toEntity(dto: answered.card),
     );
-  } catch (e) {
-    print('Ошибка сохранения: $e');
-    return null;
   }
-}
 
-@override
-Future<List<bool>> getAnswerHistory() {
-  return _dataProvider.getAnswerHistory(_userId);
-}
+  @override
+  Future<List<bool>> getAnswerHistory() {
+    return _dataProvider.getAnswerHistory(_userId);
+  }
+
+  DateTime _localDate(DateTime value) {
+    final local = value.toLocal();
+    return DateTime(local.year, local.month, local.day);
+  }
+
+  DateTime _nextLocalDate(DateTime value) {
+    final local = value.toLocal();
+    return DateTime(local.year, local.month, local.day + 1);
+  }
 }

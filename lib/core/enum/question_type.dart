@@ -8,9 +8,7 @@ enum QuestionType {
   const QuestionType(this.value);
 
   factory QuestionType.fromString(String value) {
-    return QuestionType.values.firstWhere(
-      (e) => e.value == value,
-    );
+    return parseLoose(value);
   }
 
   static QuestionType parseLoose(String? value) {

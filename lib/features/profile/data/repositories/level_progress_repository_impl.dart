@@ -6,14 +6,18 @@ import 'package:sugarlife/features/profile/domain/repositories/level_progress_re
 
 class LevelProgressRepositoryImpl implements LevelProgressRepository {
   final LevelProgressDataProvider _dataProvider;
-  LevelProgressRepositoryImpl(this._dataProvider);
+
+  LevelProgressRepositoryImpl({required LevelProgressDataProvider dataProvider})
+    : _dataProvider = dataProvider;
 
   LevelProgressEntity _mapEntity(LevelProgressDto dto) {
     return LevelProgressEntity(
       levelId: dto.levelId,
-      isCompleted: dto.stars != null,
+      isCompleted: (dto.stars ?? 0) > 0,
       stars: dto.stars,
-      lastPlayedAt: dto.completedAt != null ? DateTime.parse(dto.completedAt!) : null,
+      lastPlayedAt: dto.completedAt != null
+          ? DateTime.tryParse(dto.completedAt!)
+          : null,
       correctAnswers: dto.correctAnswers ?? 0,
     );
   }
@@ -39,7 +43,7 @@ class LevelProgressRepositoryImpl implements LevelProgressRepository {
       userId: userId,
       levelId: levelId,
     );
-    final completedAt = DateTime.now().toIso8601String();
+    final completedAt = DateTime.now().toUtc().toIso8601String();
     if (existing == null) {
       await _dataProvider.insertLevelProgress(
         SaveLevelProgressDto(
@@ -52,7 +56,9 @@ class LevelProgressRepositoryImpl implements LevelProgressRepository {
       );
     } else {
       final oldStars = existing.stars ?? 0;
-      if (stars > oldStars) {
+      final oldCorrectAnswers = existing.correctAnswers ?? 0;
+      if (stars > oldStars ||
+          (stars == oldStars && correctAnswers > oldCorrectAnswers)) {
         await _dataProvider.updateLevelProgress(
           SaveLevelProgressDto(
             userId: userId,
@@ -76,7 +82,7 @@ class LevelProgressRepositoryImpl implements LevelProgressRepository {
     if (existing == null) {
       return false;
     }
-    return existing.stars != null;
+    return (existing.stars ?? 0) > 0;
   }
 
   @override

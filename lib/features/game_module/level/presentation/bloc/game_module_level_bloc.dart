@@ -1,6 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:sugarlife/core/enum/achievement_type.dart';
+import 'package:sugarlife/core/services/app_logger.dart';
 import 'package:sugarlife/core/utils/retry.dart';
 import 'package:sugarlife/features/achievement/domain/entities/achievement_entity.dart';
 import 'package:sugarlife/features/achievement/domain/repositories/achievement_repository.dart';
@@ -18,6 +19,8 @@ part 'game_module_level_state.dart';
 
 class GameModuleLevelBloc
     extends Bloc<GameModuleLevelEvent, GameModuleLevelState> {
+  static const _tag = 'GameModuleLevelBloc';
+
   final GameModuleLevelRepository _gameModuleLevelRepository;
   final GameModuleLevelListRepository _gameModuleLevelListRepository;
   final LevelProgressRepository _levelProgressRepository;
@@ -64,38 +67,61 @@ class GameModuleLevelBloc
     );
   }
   Future<void> _receiveGameLevel({
-  required Emitter<GameModuleLevelState> emit,
-  required int levelId,
-}) async {
-  emit(const ReceiveInProgress(message: 'Получение вопросов'));
+    required Emitter<GameModuleLevelState> emit,
+    required int levelId,
+  }) async {
+    emit(const ReceiveInProgress(message: 'Получение вопросов'));
 
-  const timeout = Duration(seconds: 3);
+    const timeout = Duration(seconds: 3);
 
-  try {
-    final results = await withRetry(() => Future.wait([
-      _levelProgressRepository.getLevelProgress(levelId: levelId).timeout(timeout),
-      _gameModuleLevelRepository.getQuestionsForLevel(levelId: levelId).timeout(timeout),
-      _gameModuleLevelRepository.getCharacterImagesForLevel(levelId: levelId).timeout(timeout),
-    ]));
+    try {
+      final results = await withRetry(
+        () => Future.wait([
+          _levelProgressRepository
+              .getLevelProgress(levelId: levelId)
+              .timeout(timeout),
+          _gameModuleLevelRepository
+              .getQuestionsForLevel(levelId: levelId)
+              .timeout(timeout),
+          _gameModuleLevelRepository
+              .getCharacterImagesForLevel(levelId: levelId)
+              .timeout(timeout),
+        ]),
+      );
 
-    final progressResult = results[0] as LevelProgressEntity?;
-    final questionsResult = results[1] as List<GameModuleQuestionEntity>;
-    final characterImages = results[2] as Map<int, String>;
+      final progressResult = results[0] as LevelProgressEntity?;
+      final questionsResult = results[1] as List<GameModuleQuestionEntity>;
+      final characterImages = results[2] as Map<int, String>;
+      if (questionsResult.isEmpty) {
+        emit(const ReceiveFailed(message: 'В этом уровне пока нет вопросов.'));
+        return;
+      }
 
-    emit(
-      ReceiveSuccess(
-        questions: questionsResult,
-        currentIndex: -1,
-        progress: progressResult,
-        isAnswered: false,
-        answers: {},
-        characterImages: characterImages,
-      ),
-    );
-  } catch (e) {
-    emit(ReceiveFailed(message: 'Не удалось загрузить уровень. Проверьте подключение к интернету.'));
+      emit(
+        ReceiveSuccess(
+          questions: questionsResult,
+          currentIndex: -1,
+          progress: progressResult,
+          isAnswered: false,
+          answers: {},
+          characterImages: characterImages,
+        ),
+      );
+    } catch (error, stackTrace) {
+      AppLogger.error(
+        'Ошибка загрузки уровня $levelId',
+        error,
+        stackTrace,
+        _tag,
+      );
+      emit(
+        const ReceiveFailed(
+          message:
+              'Не удалось загрузить уровень. Проверьте подключение к интернету.',
+        ),
+      );
+    }
   }
-}
 
   Future<void> _answerMultipleChoice({
     required Emitter<GameModuleLevelState> emit,
@@ -103,6 +129,7 @@ class GameModuleLevelBloc
   }) async {
     if (state is! ReceiveSuccess) return;
     final successState = state as ReceiveSuccess;
+    if (!_canAnswer(successState)) return;
     final currentQuestion = successState.questions[successState.currentIndex];
     final isCorrect = currentQuestion.isAnswerCorrect(answer);
     final newAnswers = Map<int, bool>.from(successState.answers);
@@ -130,6 +157,7 @@ class GameModuleLevelBloc
   }) async {
     if (state is! ReceiveSuccess) return;
     final successState = state as ReceiveSuccess;
+    if (!_canAnswer(successState)) return;
     final currentQuestion = successState.questions[successState.currentIndex];
     final isCorrect = currentQuestion.isAnswerCorrect(answer);
     final answerAsString = answer ? 'true' : 'false';
@@ -158,6 +186,7 @@ class GameModuleLevelBloc
   }) async {
     if (state is! ReceiveSuccess) return;
     final successState = state as ReceiveSuccess;
+    if (!_canAnswer(successState)) return;
     final currentQuestion = successState.questions[successState.currentIndex];
     final isCorrect = currentQuestion.isAnswerCorrect(answer);
     final newAnswers = Map<int, bool>.from(successState.answers);
@@ -185,8 +214,19 @@ class GameModuleLevelBloc
   }) async {
     if (state is! ReceiveSuccess) return;
     final successState = state as ReceiveSuccess;
+    if (!_canAnswer(successState)) return;
     final currentQuestion = successState.questions[successState.currentIndex];
-    final isCorrect = currentQuestion.isAnswerCorrect(selectedIndices);
+    final validSelectedIndices =
+        selectedIndices
+            .where(
+              (index) => index >= 0 && index < currentQuestion.answers.length,
+            )
+            .toSet()
+            .toList()
+          ..sort();
+    final isCorrect =
+        validSelectedIndices.length == selectedIndices.toSet().length &&
+        currentQuestion.isAnswerCorrect(validSelectedIndices);
     final newAnswers = Map<int, bool>.from(successState.answers);
     newAnswers[successState.currentIndex] = isCorrect;
     emit(successState.copyWith(isAnswered: true, answers: newAnswers));
@@ -213,7 +253,7 @@ class GameModuleLevelBloc
       AnswerInProgress(
         isCorrect: isCorrect,
         explanation: currentQuestion.explanation,
-        selectedAnswer: selectedIndices
+        selectedAnswer: validSelectedIndices
             .map((i) => currentQuestion.answers[i])
             .toList()
             .join(', '),
@@ -286,8 +326,8 @@ class GameModuleLevelBloc
           stars: stars,
           correctAnswers: correctCount,
         );
-      } catch (e) {
-        print('Ошибка сохранения прогресса: $e');
+      } catch (error, stackTrace) {
+        AppLogger.error('Ошибка сохранения прогресса', error, stackTrace, _tag);
       }
 
       AchievementEntity? unlockedAchievement;
@@ -295,8 +335,13 @@ class GameModuleLevelBloc
         if (stars > 0) {
           unlockedAchievement = await _checkAndUnlockAchievement();
         }
-      } catch (e) {
-        print('Ошибка при проверке достижений: $e');
+      } catch (error, stackTrace) {
+        AppLogger.error(
+          'Ошибка при проверке достижений',
+          error,
+          stackTrace,
+          _tag,
+        );
       }
 
       _gameModuleListBloc.add(
@@ -347,7 +392,8 @@ class GameModuleLevelBloc
         return null;
       }
 
-      final userAchievements = await _achievementRepository.getUserAchievements();
+      final userAchievements = await _achievementRepository
+          .getUserAchievements();
       final unlockedModuleAchievementsCount = userAchievements
           .where((a) => a.type == AchievementType.module)
           .length;
@@ -359,8 +405,13 @@ class GameModuleLevelBloc
       return await _achievementRepository.unlockRandomAchievement(
         type: AchievementType.module,
       );
-    } catch (e) {
-      print('Ошибка проверки/выдачи достижения: $e');
+    } catch (error, stackTrace) {
+      AppLogger.error(
+        'Ошибка проверки/выдачи достижения',
+        error,
+        stackTrace,
+        _tag,
+      );
       return null;
     }
   }
@@ -379,6 +430,7 @@ class GameModuleLevelBloc
   }) async {
     if (state is! ReceiveSuccess) return;
     final currentState = state as ReceiveSuccess;
+    if (currentState.questions.isEmpty) return;
     emit(
       ReceiveSuccess(
         questions: currentState.questions,
@@ -389,5 +441,11 @@ class GameModuleLevelBloc
         characterImages: currentState.characterImages,
       ),
     );
+  }
+
+  bool _canAnswer(ReceiveSuccess state) {
+    return !state.isAnswered &&
+        state.currentIndex >= 0 &&
+        state.currentIndex < state.questions.length;
   }
 }

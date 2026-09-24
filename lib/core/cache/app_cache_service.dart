@@ -96,7 +96,7 @@ class AppCacheService {
     _achievements = List.unmodifiable(achievements);
   }
 
-  Future<void> clearAll()async  {
+  Future<void> clearAll() async {
     _levels = null;
     _questionsByLevel.clear();
     _theoryModules = null;
@@ -105,6 +105,6 @@ class AppCacheService {
     _achievements = null;
     _achievementsById.clear();
     final prefs = await SharedPreferences.getInstance();
-  await prefs.clear();
+    await prefs.clear();
   }
 }

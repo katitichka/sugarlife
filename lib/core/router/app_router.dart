@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sugarlife/core/router/root_navigator.dart';
@@ -39,7 +38,7 @@ final appRoute = GoRouter(
       path: '/choose-character',
       name: 'chooseCharacter',
       builder: (context, state) {
-        final currentAvatarId = state.extra as int;
+        final currentAvatarId = state.extra is int ? state.extra! as int : 1;
         return ChooseAvatarPage(currentAvatarId: currentAvatarId);
       },
     ),
@@ -68,9 +67,9 @@ final appRoute = GoRouter(
                   path: 'module/:moduleId',
                   name: 'theoryModule',
                   builder: (context, state) {
-                    final moduleId = int.parse(
-                      state.pathParameters['moduleId']!,
-                    );
+                    final moduleId =
+                        int.tryParse(state.pathParameters['moduleId'] ?? '') ??
+                        0;
                     return TheoryScreenPage(moduleId: moduleId);
                   },
                 ),
@@ -89,8 +88,12 @@ final appRoute = GoRouter(
                   path: 'level/:levelId',
                   name: 'gameLevel',
                   builder: (context, state) {
-                    final levelId = int.parse(state.pathParameters['levelId']!);
-                    final extra = state.extra as Map<String, int>?;
+                    final levelId =
+                        int.tryParse(state.pathParameters['levelId'] ?? '') ??
+                        0;
+                    final extra = state.extra is Map<String, int>
+                        ? state.extra! as Map<String, int>
+                        : null;
                     final orderIndex = extra?['orderIndex'] ?? 0;
                     final theoryModuleId = extra?['theoryModuleId'] ?? 0;
                     return GameModuleLevelProvider(
@@ -112,7 +115,7 @@ final appRoute = GoRouter(
               path: '/profile',
               name: 'profile',
               builder: (context, state) {
-                return ProfilePage();
+                return const ProfilePage();
               },
             ),
           ],

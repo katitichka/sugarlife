@@ -48,9 +48,7 @@ class _AnimatedLoadingDotsState extends State<AnimatedLoadingDots>
             final t = (_controller.value + i * 0.22) % 1.0;
             final opacity = 0.35 + 0.65 * ((t < 0.5 ? t * 2 : 2 - t * 2));
             return Padding(
-              padding: EdgeInsets.only(
-                right: i < 2 ? widget.spacing : 0,
-              ),
+              padding: EdgeInsets.only(right: i < 2 ? widget.spacing : 0),
               child: Opacity(
                 opacity: opacity,
                 child: DecoratedBox(
@@ -58,10 +56,7 @@ class _AnimatedLoadingDotsState extends State<AnimatedLoadingDots>
                     color: color,
                     shape: BoxShape.circle,
                   ),
-                  child: SizedBox(
-                    width: widget.size,
-                    height: widget.size,
-                  ),
+                  child: SizedBox(width: widget.size, height: widget.size),
                 ),
               ),
             );

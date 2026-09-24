@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sugarlife/core/theme/app_colors.dart';
@@ -49,7 +49,7 @@ class GameLevelResultPage extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Text(
-            'Уровень $orderIndex', 
+            'Уровень $orderIndex',
             style: GoogleFonts.rubik(
               fontSize: 32,
               fontWeight: FontWeight.w700,
@@ -58,7 +58,7 @@ class GameLevelResultPage extends StatelessWidget {
             textAlign: TextAlign.center,
           ),
           Text(
-            'модуль $theoryModuleId', 
+            'модуль $theoryModuleId',
             style: GoogleFonts.rubik(
               fontSize: 24,
               fontWeight: FontWeight.w700,

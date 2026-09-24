@@ -30,7 +30,9 @@ class _GameQuestionPageState extends State<GameQuestionPage> {
 
     int? currentQuestionId;
     GameModuleQuestionEntity? currentQuestion;
-    if (state is ReceiveSuccess) {
+    if (state is ReceiveSuccess &&
+        state.currentIndex >= 0 &&
+        state.currentIndex < state.questions.length) {
       currentQuestion = state.questions[state.currentIndex];
       currentQuestionId = currentQuestion.id;
     } else if (state is AnswerInProgress) {
@@ -57,9 +59,13 @@ class _GameQuestionPageState extends State<GameQuestionPage> {
     if (state is! ReceiveSuccess && state is! AnswerInProgress) {
       return const SizedBox.shrink();
     }
-    final currentQuestion = state is ReceiveSuccess
-        ? state.questions[state.currentIndex]
-        : (state is AnswerInProgress ? state.question : null);
+    final currentQuestion = switch (state) {
+      ReceiveSuccess s
+          when s.currentIndex >= 0 && s.currentIndex < s.questions.length =>
+        s.questions[s.currentIndex],
+      AnswerInProgress a => a.question,
+      _ => null,
+    };
     final isAnswered = state is ReceiveSuccess ? state.isAnswered : true;
     final isAnswerInProgress = state is AnswerInProgress;
     final selectionLocked =
@@ -258,7 +264,7 @@ class _GameQuestionPageState extends State<GameQuestionPage> {
               ),
             ),
             Text(
-              '${state.explanation}',
+              state.explanation,
               textAlign: TextAlign.center,
               style: const TextStyle(
                 color: AppColors.blue,
@@ -277,7 +283,7 @@ class _GameQuestionPageState extends State<GameQuestionPage> {
               ),
             ),
             Text(
-              '${state.correctAnswer}',
+              state.correctAnswer,
               textAlign: TextAlign.center,
               style: const TextStyle(
                 fontWeight: FontWeight.w500,
@@ -358,11 +364,9 @@ class _GameQuestionPageState extends State<GameQuestionPage> {
     return SizedBox(
       height: 70,
       child: ElevatedButton(
-        onPressed: () {
-          if (hasSelectedAnswer && !isAnswered) {
-            _handleAnswer(context, currentQuestionType, selectedAnswer);
-          }
-        },
+        onPressed: hasSelectedAnswer && !isAnswered
+            ? () => _handleAnswer(context, currentQuestionType, selectedAnswer)
+            : null,
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.blue,
           foregroundColor: AppColors.background,

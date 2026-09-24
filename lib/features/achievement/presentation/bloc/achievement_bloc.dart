@@ -1,5 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:sugarlife/core/services/app_logger.dart';
 import 'package:sugarlife/features/achievement/domain/entities/achievement_entity.dart';
 import 'package:sugarlife/features/achievement/domain/repositories/achievement_repository.dart';
 
@@ -8,6 +9,8 @@ part 'achievement_event.dart';
 part 'achievement_state.dart';
 
 class AchievementBloc extends Bloc<AchievementEvent, AchievementState> {
+  static const _tag = 'AchievementBloc';
+
   AchievementBloc({required AchievementRepository achievementRepository})
     : _achievementRepository = achievementRepository,
       super(const AchievementState()) {
@@ -37,8 +40,8 @@ class AchievementBloc extends Bloc<AchievementEvent, AchievementState> {
           .map((achievement) => unlockedById[achievement.id] ?? achievement)
           .toList();
       emit(state.copyWith(achievements: achievements));
-    } catch (e) {
-      print('Ошибка загрузки достижений: $e');
+    } catch (error, stackTrace) {
+      AppLogger.error('Ошибка загрузки достижений', error, stackTrace, _tag);
       emit(state.copyWith(achievements: const []));
     }
   }
@@ -52,8 +55,8 @@ class AchievementBloc extends Bloc<AchievementEvent, AchievementState> {
           pendingSyncToken: state.pendingSyncToken + 1,
         ),
       );
-    } catch (e) {
-      print('Ошибка получения достижения: $e');
+    } catch (error, stackTrace) {
+      AppLogger.error('Ошибка получения достижения', error, stackTrace, _tag);
       emit(
         state.copyWith(
           pendingAchievement: null,
@@ -71,8 +74,13 @@ class AchievementBloc extends Bloc<AchievementEvent, AchievementState> {
       await _achievementRepository.markAchievementCardShown(
         achievementId: achievementId,
       );
-    } catch (e) {
-      print('Ошибка показа достижения: $e');
+    } catch (error, stackTrace) {
+      AppLogger.error(
+        'Ошибка сохранения статуса достижения',
+        error,
+        stackTrace,
+        _tag,
+      );
     }
 
     emit(

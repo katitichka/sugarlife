@@ -13,8 +13,6 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
   final Color? titleColor;
   final Color? iconColor;
   final bool automaticallyImplyLeading;
-  
-  
 
   const MainAppBar({
     this.title,

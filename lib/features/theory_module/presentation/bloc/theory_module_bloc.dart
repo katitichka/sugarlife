@@ -7,8 +7,7 @@ part 'theory_module_state.dart';
 part 'theory_module_event.dart';
 part 'theory_module_bloc.freezed.dart';
 
-class TheoryModuleBloc
-    extends Bloc<TheoryModuleEvent, TheoryModuleState> {
+class TheoryModuleBloc extends Bloc<TheoryModuleEvent, TheoryModuleState> {
   final TheoryModuleRepository _theoryModuleRepository;
   TheoryModuleBloc({required TheoryModuleRepository theoryModuleRepository})
     : _theoryModuleRepository = theoryModuleRepository,
@@ -20,19 +19,13 @@ class TheoryModuleBloc
     Emitter<TheoryModuleState> emit,
   ) async {
     emit(
-      const TheoryModuleState.receiveInProgress(
-        message: 'Загрузка модулей',
-      ),
+      const TheoryModuleState.receiveInProgress(message: 'Загрузка модулей'),
     );
     try {
       final theoryModuleList = await _theoryModuleRepository.getAllModules();
-      emit(
-        TheoryModuleState.receiveSuccess(theoryModules: theoryModuleList),
-      );
+      emit(TheoryModuleState.receiveSuccess(theoryModules: theoryModuleList));
     } catch (e) {
-      emit(
-        TheoryModuleState.receiveFailed(message: 'Ошибка загрузки модулей'),
-      );
+      emit(TheoryModuleState.receiveFailed(message: 'Ошибка загрузки модулей'));
     }
   }
 }

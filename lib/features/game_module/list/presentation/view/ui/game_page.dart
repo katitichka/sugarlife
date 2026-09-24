@@ -191,10 +191,9 @@ class _GamePageState extends State<GamePage> {
   ) async {
     final achievementBloc = context.read<AchievementBloc>();
     final result = await context.push(
-      '/game/level/${levelId}',
+      '/game/level/$levelId',
       extra: {'orderIndex': orderIndex, 'theoryModuleId': theoryModuleId},
     );
-    ;
     if (!mounted) return;
     if (result == true) {
       achievementBloc.add(const AchievementEvent.checkPendingAchievement());
@@ -485,42 +484,33 @@ class _GamePageState extends State<GamePage> {
                     builder: (context, constraints) {
                       final w = constraints.maxWidth;
 
-                      return FutureBuilder(
-                        future: _getSvgSize(
-                          'assets/images/repeat_background.svg',
-                        ),
-                        builder: (context, snapshot) {
-                          final repeatHeight = snapshot.data ?? 1280.0;
-                          final bottomHeight = 1147.0;
+                      const repeatHeight = 1280.0;
+                      const bottomHeight = 1147.0;
+                      final availableHeight = contentHeight - bottomHeight;
+                      final repeatCount =
+                          (availableHeight / repeatHeight).ceil() + 2;
 
-                          final availableHeight = contentHeight - bottomHeight;
-                          final repeatCount =
-                              (availableHeight / repeatHeight).ceil() + 2;
-
-                          return Column(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              Expanded(
-                                child: ListView.builder(
-                                  physics: const NeverScrollableScrollPhysics(),
-                                  shrinkWrap: true,
-                                  itemCount: repeatCount,
-                                  itemBuilder: (context, index) =>
-                                      SvgPicture.asset(
-                                        'assets/images/repeat_background.svg',
-                                        width: w,
-                                        fit: BoxFit.fitWidth,
-                                      ),
-                                ),
-                              ),
-                              SvgPicture.asset(
-                                'assets/images/start_background.svg',
+                      return Column(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Expanded(
+                            child: ListView.builder(
+                              physics: const NeverScrollableScrollPhysics(),
+                              shrinkWrap: true,
+                              itemCount: repeatCount,
+                              itemBuilder: (context, index) => SvgPicture.asset(
+                                'assets/images/repeat_background.svg',
                                 width: w,
                                 fit: BoxFit.fitWidth,
                               ),
-                            ],
-                          );
-                        },
+                            ),
+                          ),
+                          SvgPicture.asset(
+                            'assets/images/start_background.svg',
+                            width: w,
+                            fit: BoxFit.fitWidth,
+                          ),
+                        ],
                       );
                     },
                   ),
@@ -564,9 +554,5 @@ class _GamePageState extends State<GamePage> {
         ),
       ],
     );
-  }
-
-  Future<double> _getSvgSize(String assetPath) async {
-    return 1280.0;
   }
 }

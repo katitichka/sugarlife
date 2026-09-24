@@ -1,14 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:sugarlife/core/theme/app_colors.dart';
 
 class AnimatedSettingsButton extends StatefulWidget {
-  final VoidCallback onPressed;
+  final Future<void> Function() onPressed;
 
-  const AnimatedSettingsButton({
-    super.key,
-    required this.onPressed,
-  });
+  const AnimatedSettingsButton({super.key, required this.onPressed});
 
   @override
   State<AnimatedSettingsButton> createState() => _AnimatedSettingsButtonState();
@@ -17,7 +13,7 @@ class AnimatedSettingsButton extends StatefulWidget {
 class _AnimatedSettingsButtonState extends State<AnimatedSettingsButton>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
-  bool _isOpen = false;
+  bool _isBusy = false;
 
   @override
   void initState() {
@@ -34,16 +30,18 @@ class _AnimatedSettingsButtonState extends State<AnimatedSettingsButton>
     super.dispose();
   }
 
-  void _handlePressed() {
-    setState(() {
-      _isOpen = !_isOpen;
-      if (_isOpen) {
-        _controller.forward();
-      } else {
-        _controller.reverse();
+  Future<void> _handlePressed() async {
+    if (_isBusy) return;
+    _isBusy = true;
+    await _controller.forward();
+    try {
+      await widget.onPressed();
+    } finally {
+      if (mounted) {
+        await _controller.reverse();
+        _isBusy = false;
       }
-    });
-    widget.onPressed();
+    }
   }
 
   @override
@@ -52,7 +50,7 @@ class _AnimatedSettingsButtonState extends State<AnimatedSettingsButton>
       animation: _controller,
       builder: (context, child) {
         return Transform.rotate(
-          angle: _controller.value * 3.14159 / 2, 
+          angle: _controller.value * 3.14159 / 2,
           child: child,
         );
       },
@@ -62,7 +60,6 @@ class _AnimatedSettingsButtonState extends State<AnimatedSettingsButton>
           'assets/profile/settings.svg',
           width: 40,
           height: 40,
-          
         ),
         onPressed: _handlePressed,
       ),

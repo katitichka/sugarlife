@@ -5,11 +5,15 @@ import 'package:sugarlife/features/game_module/level/domain/entities/game_module
 import 'package:sugarlife/features/game_module/level/domain/repositories/game_module_level_repository.dart';
 
 class GameModuleLevelRepositoryImpl implements GameModuleLevelRepository {
-  GameModuleLevelRepositoryImpl(this._dataProvider, this._cache);
-
   final GameModuleLevelDataProvider _dataProvider;
   final AppCacheService _cache;
   static const String _charactersBucket = 'characters';
+
+  GameModuleLevelRepositoryImpl({
+    required GameModuleLevelDataProvider dataProvider,
+    required AppCacheService cache,
+  }) : _dataProvider = dataProvider,
+       _cache = cache;
 
   String _publicSvgUrl(String raw) {
     final t = raw.trim();
@@ -52,7 +56,9 @@ class GameModuleLevelRepositoryImpl implements GameModuleLevelRepository {
   }
 
   @override
-  Future<Map<int, String>> getCharacterImagesForLevel({required int levelId}) async {
+  Future<Map<int, String>> getCharacterImagesForLevel({
+    required int levelId,
+  }) async {
     final questions = await getQuestionsForLevel(levelId: levelId);
 
     final characterIds = questions

@@ -23,9 +23,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _nameFocusNode = FocusNode();
   final _emailFocusNode = FocusNode();
   final _passwordFocusNode = FocusNode();
-  String? _nameError;
-  String? _emailError;
-  String? _passwordError;
   String? _authError;
   bool _isLoading = false;
 
@@ -115,7 +112,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
             TextFormField(
               controller: _nameController,
               focusNode: _nameFocusNode,
-              cursorColor: AppColors.background,
+              cursorColor: AppColors.blue,
+              textInputAction: TextInputAction.next,
               style: GoogleFonts.rubik(
                 color: AppColors.blue,
                 fontSize: 20,
@@ -173,7 +171,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
             TextFormField(
               controller: _emailController,
               focusNode: _emailFocusNode,
-              cursorColor: AppColors.background,
+              cursorColor: AppColors.blue,
+              keyboardType: TextInputType.emailAddress,
+              textInputAction: TextInputAction.next,
+              autocorrect: false,
               style: GoogleFonts.rubik(
                 color: AppColors.blue,
                 fontSize: 20,
@@ -231,7 +232,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
             TextFormField(
               focusNode: _passwordFocusNode,
               controller: _passwordController,
-              cursorColor: AppColors.background,
+              cursorColor: AppColors.blue,
+              textInputAction: TextInputAction.done,
+              autocorrect: false,
               obscureText: true,
               style: GoogleFonts.rubik(
                 color: AppColors.blue,
@@ -327,32 +330,26 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       _isLoading)
                   ? null
                   : () {
-                      setState(() {
-                        _nameError = _nameController.text.isEmpty
-                            ? 'Введите имя'
-                            : null;
-                        _emailError = _emailController.text.isEmpty
-                            ? 'Введите email'
-                            : null;
-                        _passwordError = _passwordController.text.isEmpty
-                            ? 'Введите пароль'
-                            : null;
-                        _authError = null;
-                      });
-
-                      if (_nameController.text.isEmpty ||
-                          _emailController.text.isEmpty ||
-                          _passwordController.text.isEmpty) {
+                      final username = _nameController.text.trim();
+                      final email = _emailController.text.trim();
+                      if (username.isEmpty || email.isEmpty) {
+                        setState(() {
+                          _authError = username.isEmpty
+                              ? 'Имя не может состоять только из пробелов'
+                              : 'Введите email';
+                        });
                         return;
                       }
-
-                      setState(() => _isLoading = true);
+                      setState(() {
+                        _authError = null;
+                        _isLoading = true;
+                      });
 
                       context.read<AuthBloc>().add(
                         AuthEvent.signUpRequested(
-                          email: _emailController.text,
+                          email: email,
                           password: _passwordController.text,
-                          username: _nameController.text,
+                          username: username,
                         ),
                       );
                     },

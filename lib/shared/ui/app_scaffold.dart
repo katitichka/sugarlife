@@ -7,7 +7,12 @@ class AppScaffold extends StatelessWidget {
   final StatefulNavigationShell navigationShell;
   final bool showBottomNav;
 
-  const AppScaffold({super.key, required this.navigationShell, required this.showBottomNav});
+  const AppScaffold({
+    super.key,
+    required this.navigationShell,
+    required this.showBottomNav,
+  });
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -17,10 +22,10 @@ class AppScaffold extends StatelessWidget {
           navigationShell,
           // Плавающее меню
           if (showBottomNav)
-          BottomIsland(
-            currentIndex: navigationShell.currentIndex,
-            onTap: (index) => navigationShell.goBranch(index),
-          ),
+            BottomIsland(
+              currentIndex: navigationShell.currentIndex,
+              onTap: (index) => navigationShell.goBranch(index),
+            ),
         ],
       ),
     );

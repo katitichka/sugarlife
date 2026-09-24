@@ -1,16 +1,23 @@
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sugarlife/core/cache/app_cache_service.dart';
 import 'package:sugarlife/core/enum/achievement_type.dart';
+import 'package:sugarlife/core/services/app_logger.dart';
 import 'package:sugarlife/features/achievement/data/dtos/achievement_dto.dart';
 import 'package:sugarlife/features/achievement/data/providers/achievement_data_provider.dart';
 import 'package:sugarlife/features/achievement/domain/entities/achievement_entity.dart';
 import 'package:sugarlife/features/achievement/domain/repositories/achievement_repository.dart';
 
 class AchievementRepositoryImpl implements AchievementRepository {
-  AchievementRepositoryImpl(this._dataProvider, this._cache);
+  static const _tag = 'AchievementRepositoryImpl';
 
   final AchievementDataProvider _dataProvider;
   final AppCacheService _cache;
+
+  AchievementRepositoryImpl({
+    required AchievementDataProvider dataProvider,
+    required AppCacheService cache,
+  }) : _dataProvider = dataProvider,
+       _cache = cache;
 
   static const String _shownAchievementsKey = 'shown_achievement_ids';
   static const String _pendingAchievementKey = 'pending_achievement_id';
@@ -45,7 +52,7 @@ class AchievementRepositoryImpl implements AchievementRepository {
   Future<Set<int>> _getShownAchievementIds() async {
     final prefs = await _prefs;
     final values = prefs.getStringList(_shownAchievementsKey) ?? const [];
-    return values.map(int.parse).toSet();
+    return values.map(int.tryParse).whereType<int>().toSet();
   }
 
   Future<void> _setShownAchievementIds(Set<int> ids) async {
@@ -146,13 +153,18 @@ class AchievementRepositoryImpl implements AchievementRepository {
         userId: userId,
         achievementId: achievement.id,
       );
-    } catch (e) {
+    } catch (error, stackTrace) {
       final hasRelation = await _dataProvider.hasUserAchievement(
         userId: userId,
         achievementId: achievement.id,
       );
       if (!hasRelation) {
-        print('Ошибка вставки: $e');
+        AppLogger.error(
+          'Не удалось выдать достижение',
+          error,
+          stackTrace,
+          _tag,
+        );
         return null;
       }
     }

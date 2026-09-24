@@ -21,8 +21,6 @@ class _LoginScreenState extends State<LoginScreen> {
   final _passwordController = TextEditingController();
   final _emailFocusNode = FocusNode();
   final _passwordFocusNode = FocusNode();
-  String? _emailError;
-  String? _passwordError;
   String? _authError;
   bool _isLoading = false;
 
@@ -59,7 +57,6 @@ class _LoginScreenState extends State<LoginScreen> {
           failure: (message) {
             setState(() {
               _authError = message;
-              _emailError = message;
               _isLoading = false;
             });
           },
@@ -110,7 +107,10 @@ class _LoginScreenState extends State<LoginScreen> {
             TextFormField(
               controller: _emailController,
               focusNode: _emailFocusNode,
-              cursorColor: AppColors.background,
+              cursorColor: AppColors.blue,
+              keyboardType: TextInputType.emailAddress,
+              textInputAction: TextInputAction.next,
+              autocorrect: false,
               selectionControls: MaterialTextSelectionControls(),
               style: GoogleFonts.rubik(
                 color: AppColors.blue,
@@ -168,7 +168,9 @@ class _LoginScreenState extends State<LoginScreen> {
             TextFormField(
               focusNode: _passwordFocusNode,
               controller: _passwordController,
-              cursorColor: AppColors.background,
+              cursorColor: AppColors.blue,
+              textInputAction: TextInputAction.done,
+              autocorrect: false,
               selectionControls: MaterialTextSelectionControls(),
               obscureText: true,
               style: GoogleFonts.rubik(
@@ -263,26 +265,19 @@ class _LoginScreenState extends State<LoginScreen> {
                       _isLoading)
                   ? null
                   : () {
-                      setState(() {
-                        _emailError = _emailController.text.isEmpty
-                            ? 'Введите email'
-                            : null;
-                        _passwordError = _passwordController.text.isEmpty
-                            ? 'Введите пароль'
-                            : null;
-                        _authError = null;
-                      });
-
-                      if (_emailController.text.isEmpty ||
-                          _passwordController.text.isEmpty) {
+                      final email = _emailController.text.trim();
+                      if (email.isEmpty) {
+                        setState(() => _authError = 'Введите email');
                         return;
                       }
-
-                      setState(() => _isLoading = true);
+                      setState(() {
+                        _authError = null;
+                        _isLoading = true;
+                      });
 
                       context.read<AuthBloc>().add(
                         AuthEvent.signInRequested(
-                          email: _emailController.text,
+                          email: email,
                           password: _passwordController.text,
                         ),
                       );

@@ -16,11 +16,7 @@ class LottieProgressIndicator extends StatelessWidget {
     return SizedBox(
       width: size,
       height: size,
-      child: Lottie.asset(
-        animationPath,
-        repeat: true,
-        fit: BoxFit.contain,
-      ),
+      child: Lottie.asset(animationPath, repeat: true, fit: BoxFit.contain),
     );
   }
 }

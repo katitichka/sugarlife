@@ -1,4 +1,4 @@
-﻿import 'package:bloc/bloc.dart';
+import 'package:bloc/bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:sugarlife/core/utils/retry.dart';
 import 'package:sugarlife/features/game_module/level/domain/entities/game_module_level_entity.dart';
@@ -41,9 +41,7 @@ class GameModuleListBloc
     });
   }
 
-  Future<void> _onReceive({
-    required Emitter<GameModuleListState> emit,
-  }) async {
+  Future<void> _onReceive({required Emitter<GameModuleListState> emit}) async {
     emit(
       const GameModuleListState.receiveInProgress(
         message: 'Загрузка игрового модуля...',
@@ -109,7 +107,6 @@ class GameModuleListBloc
           progressMap: allLevelsProgress,
         ),
       );
-    } catch (_) {
-    }
+    } catch (_) {}
   }
 }

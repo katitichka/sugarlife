@@ -8,13 +8,21 @@ class AppSnackBar {
 
   static void showError(BuildContext context, String message) {
     ScaffoldMessenger.of(context).showSnackBar(
-      _build(message: message, background: AppColors.backgroundRed, textColor: AppColors.error),
+      _build(
+        message: message,
+        background: AppColors.backgroundRed,
+        textColor: AppColors.error,
+      ),
     );
   }
 
   static void showSuccess(BuildContext context, String message) {
     ScaffoldMessenger.of(context).showSnackBar(
-      _build(message: message, background: AppColors.background, textColor: AppColors.blue),
+      _build(
+        message: message,
+        background: AppColors.background,
+        textColor: AppColors.blue,
+      ),
     );
   }
 

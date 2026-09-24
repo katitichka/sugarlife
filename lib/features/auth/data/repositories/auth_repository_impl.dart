@@ -1,14 +1,21 @@
 import 'package:sugarlife/core/cache/app_cache_service.dart';
+import 'package:sugarlife/core/services/app_logger.dart';
 import 'package:sugarlife/features/auth/data/providers/auth_data_provider.dart';
 import 'package:sugarlife/features/auth/domain/repositories/auth_repository.dart';
 import 'package:sugarlife/features/profile/data/DTOs/profile_dto.dart';
 import 'package:sugarlife/features/profile/domain/entities/profile_entity.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
+  static const _tag = 'AuthRepositoryImpl';
+
   final AuthDataProvider _dataProvider;
   final AppCacheService _cache;
 
-  AuthRepositoryImpl(this._dataProvider, this._cache);
+  AuthRepositoryImpl({
+    required AuthDataProvider dataProvider,
+    required AppCacheService cache,
+  }) : _dataProvider = dataProvider,
+       _cache = cache;
 
   @override
   Future<ProfileEntity> signIn({
@@ -32,8 +39,8 @@ class AuthRepositoryImpl implements AuthRepository {
       }
 
       return _mapToProfileEntity(userId, profileData);
-    } catch (e) {
-      print('Ошибка входа: $e');
+    } catch (error, stackTrace) {
+      AppLogger.error('Ошибка входа', error, stackTrace, _tag);
       rethrow;
     }
   }
@@ -49,9 +56,14 @@ class AuthRepositoryImpl implements AuthRepository {
       if (profileData == null) return null;
 
       return _mapToProfileEntity(userId, profileData);
-    } catch (e) {
-      print('Пользователь не найден: $e');
-      return null;
+    } catch (error, stackTrace) {
+      AppLogger.error(
+        'Не удалось получить текущего пользователя',
+        error,
+        stackTrace,
+        _tag,
+      );
+      rethrow;
     }
   }
 
@@ -59,14 +71,14 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<void> logout() async {
     try {
       await _dataProvider.signOut();
-    } catch (e) {
-      print('Ошибка выхода: $e');
+    } catch (error, stackTrace) {
+      AppLogger.error('Ошибка выхода', error, stackTrace, _tag);
       rethrow;
     }
     try {
       await _cache.clearAll();
-    } catch (e) {
-      print('Ошибка очистки кэша: $e');
+    } catch (error, stackTrace) {
+      AppLogger.error('Ошибка очистки кэша', error, stackTrace, _tag);
     }
   }
 
@@ -104,12 +116,11 @@ class AuthRepositoryImpl implements AuthRepository {
       }
 
       return _mapToProfileEntity(userId, profileData);
-    } catch (e) {
-      print('Ошибка регистрации: $e');
+    } catch (error, stackTrace) {
+      AppLogger.error('Ошибка регистрации', error, stackTrace, _tag);
       rethrow;
     }
   }
-
 }
 
 ProfileEntity _mapToProfileEntity(String userId, ProfileDto profileData) {

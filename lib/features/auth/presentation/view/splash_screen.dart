@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:sugarlife/core/theme/app_colors.dart';
 import 'package:sugarlife/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:sugarlife/shared/ui/animated_loading_dots.dart';
+import 'package:sugarlife/shared/ui/app_error_view.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -24,10 +25,6 @@ class _SplashScreenState extends State<SplashScreen> {
         context.go('/game');
       },
       unauthenticated: () {
-        _navigated = true;
-        context.go('/login');
-      },
-      failure: (_) {
         _navigated = true;
         context.go('/login');
       },
@@ -75,12 +72,24 @@ class _SplashScreenState extends State<SplashScreen> {
                 ),
               ),
             ),
-            const Positioned(
+            Positioned(
               left: 0,
               right: 0,
-              bottom: 120,
-              child: Center(
-                child: AnimatedLoadingDots(color: AppColors.white),
+              bottom: 80,
+              child: BlocBuilder<AuthBloc, AuthState>(
+                builder: (context, state) {
+                  return state.maybeWhen(
+                    failure: (message) => AppErrorView(
+                      message: message,
+                      onRetry: () => context.read<AuthBloc>().add(
+                        const AuthEvent.authCheckStarted(),
+                      ),
+                    ),
+                    orElse: () => const Center(
+                      child: AnimatedLoadingDots(color: AppColors.white),
+                    ),
+                  );
+                },
               ),
             ),
           ],

@@ -1,4 +1,4 @@
-﻿import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:sugarlife/core/enum/question_type.dart';
 
 part 'game_module_question_entity.freezed.dart';
@@ -25,6 +25,7 @@ sealed class GameModuleQuestionEntity with _$GameModuleQuestionEntity {
         final userSelectedAnswer = userAnswer as String;
         return userSelectedAnswer == correctAnswer;
       case QuestionType.trueFalse:
+        if (answers.length < 2) return false;
         final userBool = userAnswer as bool;
         final userAnswerText = userBool
             ? answers[0]
@@ -40,10 +41,10 @@ sealed class GameModuleQuestionEntity with _$GameModuleQuestionEntity {
 
         if (correctIndices == null || correctIndices.isEmpty) return false;
         if (userIndices.length != correctIndices.length) return false;
-        
+
         final sortedUser = List.of(userIndices)..sort();
         final sortedCorrect = List.of(correctIndices)..sort();
-        
+
         for (int i = 0; i < sortedUser.length; i++) {
           if (sortedUser[i] != sortedCorrect[i]) return false;
         }

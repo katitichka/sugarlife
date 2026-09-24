@@ -13,7 +13,5 @@ abstract class LevelProgressDataProvider {
 
   Future<void> updateLevelProgress(SaveLevelProgressDto progress);
 
-  Future<List<LevelProgressDto>> getAllLevelsProgress({
-    required String userId,
-  });
+  Future<List<LevelProgressDto>> getAllLevelsProgress({required String userId});
 }

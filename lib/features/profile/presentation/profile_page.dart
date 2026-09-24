@@ -23,16 +23,15 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  late final TextEditingController _usernameController;
   late final ProfileRepository _profileRepository;
 
-  int _avatarVersion = 0;
+  Future<String>? _avatarFuture;
+  int? _avatarIdForFuture;
   Timer? _retryTimer;
 
   @override
   void initState() {
     super.initState();
-    _usernameController = TextEditingController();
     _profileRepository = context.read<ProfileRepository>();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -46,15 +45,24 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   void dispose() {
-    _usernameController.dispose();
     _retryTimer?.cancel();
     super.dispose();
   }
 
   void _refreshAvatar() {
+    _retryTimer?.cancel();
     setState(() {
-      _avatarVersion++;
+      _avatarFuture = null;
+      _avatarIdForFuture = null;
     });
+  }
+
+  Future<String> _avatarFor(int avatarId) {
+    if (_avatarFuture == null || _avatarIdForFuture != avatarId) {
+      _avatarIdForFuture = avatarId;
+      _avatarFuture = _loadAvatarWithRetry(avatarId);
+    }
+    return _avatarFuture!;
   }
 
   Future<String> _loadAvatarWithRetry(int avatarId) async {
@@ -65,12 +73,16 @@ class _ProfilePageState extends State<ProfilePage> {
       }
       throw Exception('Empty URL');
     } catch (e) {
-      _retryTimer?.cancel();
-      _retryTimer = Timer(const Duration(seconds: 3), () {
-        if (mounted) {
-          setState(() {});
-        }
-      });
+      if (_avatarIdForFuture == avatarId) {
+        _retryTimer?.cancel();
+        _retryTimer = Timer(const Duration(seconds: 3), () {
+          if (mounted && _avatarIdForFuture == avatarId) {
+            setState(() {
+              _avatarFuture = null;
+            });
+          }
+        });
+      }
       rethrow;
     }
   }
@@ -94,15 +106,17 @@ class _ProfilePageState extends State<ProfilePage> {
               appBar: MainAppBar(
                 actions: [
                   AnimatedSettingsButton(
-                    onPressed: () => showDialog(
-                      context: context,
-                      barrierColor: AppColors.modalBarrier,
-                      barrierDismissible: true,
-                      builder: (_) => SettingsDialog(
-                        profile: profile,
-                        onAvatarChanged: _refreshAvatar,
-                      ),
-                    ),
+                    onPressed: () async {
+                      await showDialog<void>(
+                        context: context,
+                        barrierColor: AppColors.modalBarrier,
+                        barrierDismissible: true,
+                        builder: (_) => SettingsDialog(
+                          profile: profile,
+                          onAvatarChanged: _refreshAvatar,
+                        ),
+                      );
+                    },
                   ),
                 ],
               ),
@@ -114,12 +128,21 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                   child: Column(
                     children: [
-                      Text(
-                        profile.username,
-                        style: GoogleFonts.rubik(
-                          color: AppColors.background,
-                          fontSize: 30,
-                          fontWeight: FontWeight.w700,
+                      SizedBox(
+                        width: double.infinity,
+                        height: 36,
+                        child: Center(
+                          child: Text(
+                            profile.username,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.rubik(
+                              color: AppColors.background,
+                              fontSize: 30,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
                         ),
                       ),
                       const SizedBox(height: 40),
@@ -127,10 +150,8 @@ class _ProfilePageState extends State<ProfilePage> {
                         width: 190,
                         height: 190,
                         child: FutureBuilder<String>(
-                          key: ValueKey(
-                            'avatar_${profile.currentAvatarId}_$_avatarVersion',
-                          ),
-                          future: _loadAvatarWithRetry(profile.currentAvatarId),
+                          key: ValueKey(profile.currentAvatarId),
+                          future: _avatarFor(profile.currentAvatarId),
                           builder: (context, snapshot) {
                             if (snapshot.connectionState ==
                                 ConnectionState.waiting) {

@@ -8,7 +8,11 @@ class ProfileRepositoryImpl implements ProfileRepository {
   final ProfileDataProvider _dataProvider;
   final AppCacheService _cache;
 
-  ProfileRepositoryImpl(this._dataProvider, this._cache);
+  ProfileRepositoryImpl({
+    required ProfileDataProvider dataProvider,
+    required AppCacheService cache,
+  }) : _dataProvider = dataProvider,
+       _cache = cache;
 
   String _publicSvgUrl(String raw) {
     final t = raw.trim();
@@ -46,15 +50,22 @@ class ProfileRepositoryImpl implements ProfileRepository {
   @override
   Future<void> updateUsername(String newUsername) async {
     final userId = _dataProvider.currentUserId;
-    if (userId == null) return;
+    if (userId == null) {
+      throw StateError('Нет авторизованного пользователя');
+    }
 
-    await _dataProvider.updateUsername(userId: userId, newUsername: newUsername);
+    await _dataProvider.updateUsername(
+      userId: userId,
+      newUsername: newUsername,
+    );
   }
 
   @override
   Future<void> updateAvatar(int avatarId) async {
     final userId = _dataProvider.currentUserId;
-    if (userId == null) return;
+    if (userId == null) {
+      throw StateError('Нет авторизованного пользователя');
+    }
 
     await _dataProvider.updateAvatar(userId: userId, avatarId: avatarId);
   }

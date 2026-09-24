@@ -7,7 +7,10 @@ abstract class ProfileDataProvider {
 
   Future<AvatarDto> getAvatarById(int avatarId);
 
-  Future<void> updateUsername({required String userId, required String newUsername});
+  Future<void> updateUsername({
+    required String userId,
+    required String newUsername,
+  });
 
   Future<void> updateAvatar({required String userId, required int avatarId});
 

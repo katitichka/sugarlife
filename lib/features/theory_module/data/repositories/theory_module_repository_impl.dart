@@ -15,18 +15,17 @@ class TheoryModuleRepositoryImpl implements TheoryModuleRepository {
        _cache = cache;
 
   @override
-Future<List<TheoryModuleEntity>> getAllModules() async {
-  final cachedModules = _cache.theoryModules;
-  if (cachedModules != null) {
-    return cachedModules;
+  Future<List<TheoryModuleEntity>> getAllModules() async {
+    final cachedModules = _cache.theoryModules;
+    if (cachedModules != null) {
+      return cachedModules;
+    }
+
+    final dtos = await _dataProvider.getModules();
+    final modules = dtos
+        .map((dto) => TheoryModuleDtoMapper.toEntity(dto: dto))
+        .toList();
+    _cache.saveTheoryModules(modules);
+    return modules;
   }
-
-  final dtos = await _dataProvider.getModules();
-  final modules = dtos
-      .map((dto) => TheoryModuleDtoMapper.toEntity(dto: dto))
-      .toList();
-  _cache.saveTheoryModules(modules);
-  return modules;
-}
-
 }

@@ -26,6 +26,7 @@ class _ChooseAvatarPageState extends State<ChooseAvatarPage> {
   @override
   void initState() {
     super.initState();
+    _selectedId = widget.currentAvatarId;
     _loadAvatars();
   }
 
@@ -37,15 +38,20 @@ class _ChooseAvatarPageState extends State<ChooseAvatarPage> {
     try {
       final repository = context.read<ProfileRepository>();
       final avatars = await repository.getAllAvatars();
+      if (!mounted) return;
 
       setState(() {
         _avatars = avatars;
-        _selectedId = null;
+        if (!avatars.any((avatar) => avatar.id == _selectedId)) {
+          _selectedId = null;
+        }
         _isLoading = false;
       });
-    } catch (e) {
+    } catch (_) {
+      if (!mounted) return;
       setState(() {
-        _errorMessage = 'Не удалось загрузить аватары. Проверьте подключение к интернету.';
+        _errorMessage =
+            'Не удалось загрузить аватары. Проверьте подключение к интернету.';
         _isLoading = false;
       });
     }
@@ -97,8 +103,6 @@ class _ChooseAvatarPageState extends State<ChooseAvatarPage> {
         children: [
           Expanded(
             child: GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 3,
@@ -122,7 +126,7 @@ class _ChooseAvatarPageState extends State<ChooseAvatarPage> {
                     ),
                     child: ClipOval(
                       child: Opacity(
-                        opacity: _selectedId == null ? 1.0 : (isSelected ? 1.0 : 0.5),
+                        opacity: isSelected ? 1.0 : 0.5,
                         child: SvgPicture.network(
                           key: ValueKey(avatar.id),
                           avatar.imageUrl,
@@ -132,7 +136,10 @@ class _ChooseAvatarPageState extends State<ChooseAvatarPage> {
                           placeholderBuilder: (_) =>
                               const Center(child: LottieProgressIndicator()),
                           errorBuilder: (_, __, ___) => const Center(
-                            child: Icon(Icons.error_outline, color: AppColors.error),
+                            child: Icon(
+                              Icons.error_outline,
+                              color: AppColors.error,
+                            ),
                           ),
                         ),
                       ),
@@ -165,7 +172,10 @@ class _ChooseAvatarPageState extends State<ChooseAvatarPage> {
                   fontSize: 28,
                   fontWeight: FontWeight.w700,
                 ),
-                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 10),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 32,
+                  vertical: 10,
+                ),
               ),
               child: const Text('Готово'),
             ),

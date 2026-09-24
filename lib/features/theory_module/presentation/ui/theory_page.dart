@@ -18,12 +18,6 @@ class _TheoryPageState extends State<TheoryPage> {
   final ScrollController _scrollController = ScrollController();
 
   @override
-  void initState() {
-    super.initState();
-    context.read<TheoryModuleBloc>().add(const TheoryModuleEvent.receive());
-  }
-
-  @override
   void dispose() {
     _scrollController.dispose();
     super.dispose();
