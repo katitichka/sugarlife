@@ -28,8 +28,10 @@ class _LoginScreenState extends State<LoginScreen> {
   void initState() {
     super.initState();
     _isLoading = false;
-    _emailController.addListener(_updateButtonState);
-    _passwordController.addListener(_updateButtonState);
+    _emailController.addListener(_updateFormState);
+    _passwordController.addListener(_updateFormState);
+    _emailFocusNode.addListener(_updateFormState);
+    _passwordFocusNode.addListener(_updateFormState);
   }
 
   @override
@@ -41,7 +43,7 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  void _updateButtonState() {
+  void _updateFormState() {
     setState(() {});
   }
 
@@ -159,7 +161,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   fontSize: 12,
                 ),
                 filled: true,
-                fillColor: _emailController.text.isNotEmpty
+                fillColor:
+                    _emailFocusNode.hasFocus || _emailController.text.isNotEmpty
                     ? AppColors.background
                     : AppColors.blue,
               ),
@@ -220,7 +223,9 @@ class _LoginScreenState extends State<LoginScreen> {
                   fontSize: 12,
                 ),
                 filled: true,
-                fillColor: _passwordController.text.isNotEmpty
+                fillColor:
+                    _passwordFocusNode.hasFocus ||
+                        _passwordController.text.isNotEmpty
                     ? AppColors.background
                     : AppColors.blue,
               ),

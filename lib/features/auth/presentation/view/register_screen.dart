@@ -30,9 +30,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
   void initState() {
     super.initState();
     _isLoading = false;
-    _nameController.addListener(_updateButtonState);
-    _emailController.addListener(_updateButtonState);
-    _passwordController.addListener(_updateButtonState);
+    _nameController.addListener(_updateFormState);
+    _emailController.addListener(_updateFormState);
+    _passwordController.addListener(_updateFormState);
+    _nameFocusNode.addListener(_updateFormState);
+    _emailFocusNode.addListener(_updateFormState);
+    _passwordFocusNode.addListener(_updateFormState);
   }
 
   @override
@@ -46,7 +49,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     super.dispose();
   }
 
-  void _updateButtonState() {
+  void _updateFormState() {
     setState(() {});
   }
 
@@ -162,7 +165,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   fontSize: 12,
                 ),
                 filled: true,
-                fillColor: _nameController.text.isNotEmpty
+                fillColor:
+                    _nameFocusNode.hasFocus || _nameController.text.isNotEmpty
                     ? AppColors.background
                     : AppColors.blue,
               ),
@@ -223,7 +227,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   fontSize: 12,
                 ),
                 filled: true,
-                fillColor: _emailController.text.isNotEmpty
+                fillColor:
+                    _emailFocusNode.hasFocus || _emailController.text.isNotEmpty
                     ? AppColors.background
                     : AppColors.blue,
               ),
@@ -284,7 +289,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   fontSize: 12,
                 ),
                 filled: true,
-                fillColor: _passwordController.text.isNotEmpty
+                fillColor:
+                    _passwordFocusNode.hasFocus ||
+                        _passwordController.text.isNotEmpty
                     ? AppColors.background
                     : AppColors.blue,
               ),
