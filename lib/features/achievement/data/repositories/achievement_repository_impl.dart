@@ -64,10 +64,21 @@ class AchievementRepositoryImpl implements AchievementRepository {
   }
 
   Future<AchievementEntity?> _getAchievementById(int id) async {
-    final cached = _cache.achievementsById[id];
+    var cached = _cache.achievementsById[id];
     if (cached != null) {
       return cached;
     }
+
+    final userId = _dataProvider.currentUserId;
+    if (userId != null) {
+      await _cache.getUserAchievements(userId);
+      cached = _cache.achievementsById[id];
+      if (cached != null) return cached;
+    }
+
+    await _cache.getAllAchievements();
+    cached = _cache.achievementsById[id];
+    if (cached != null) return cached;
 
     final dto = await _dataProvider.getAchievementById(id);
     if (dto == null) {
@@ -75,31 +86,39 @@ class AchievementRepositoryImpl implements AchievementRepository {
     }
 
     final achievement = _mapAchievement(dto, isUnlocked: true);
-    _cache.saveAchievement(achievement);
+    if (userId != null) {
+      await _cache.saveUserAchievement(
+        userId: userId,
+        achievement: achievement,
+      );
+    }
     return achievement;
   }
 
   @override
   Future<List<AchievementEntity>> getAllAchievements() async {
-    final achievements = await _dataProvider.getAllAchievements();
-    return achievements.map(_mapAchievement).toList();
+    final cached = await _cache.getAllAchievements();
+    if (cached != null) return cached;
+
+    final response = await _dataProvider.getAllAchievements();
+    final achievements = response.map(_mapAchievement).toList();
+    await _cache.saveAllAchievements(achievements);
+    return achievements;
   }
 
   @override
   Future<List<AchievementEntity>> getUserAchievements() async {
-    final cached = _cache.achievements;
-    if (cached != null) {
-      return cached;
-    }
-
     final userId = _dataProvider.currentUserId;
     if (userId == null) {
       return const [];
     }
 
+    final cached = await _cache.getUserAchievements(userId);
+    if (cached != null) return cached;
+
     final achievementIds = await _dataProvider.getUserAchievementIds(userId);
     if (achievementIds.isEmpty) {
-      _cache.saveAchievements(const []);
+      await _cache.saveUserAchievements(userId: userId, achievements: const []);
       return const [];
     }
 
@@ -110,7 +129,10 @@ class AchievementRepositoryImpl implements AchievementRepository {
     final achievements = achievementsResponse
         .map((dto) => _mapAchievement(dto, isUnlocked: true))
         .toList();
-    _cache.saveAchievements(achievements);
+    await _cache.saveUserAchievements(
+      userId: userId,
+      achievements: achievements,
+    );
     return achievements;
   }
 
@@ -123,11 +145,7 @@ class AchievementRepositoryImpl implements AchievementRepository {
       return null;
     }
 
-    final allAchievementsResponse = await _dataProvider.getAllAchievements();
-
-    final allAchievements = allAchievementsResponse
-        .map(_mapAchievement)
-        .toList();
+    final allAchievements = await getAllAchievements();
 
     if (allAchievements.isEmpty) {
       return null;
@@ -172,13 +190,7 @@ class AchievementRepositoryImpl implements AchievementRepository {
     final prefs = await _prefs;
     await prefs.setInt(_pendingAchievementKey, achievement.id);
 
-    final cached = List<AchievementEntity>.from(
-      _cache.achievements ?? const [],
-    );
-    cached.removeWhere((item) => item.id == achievement.id);
-    cached.add(achievement);
-    cached.sort((a, b) => a.id.compareTo(b.id));
-    _cache.saveAchievements(cached);
+    await _cache.saveUserAchievement(userId: userId, achievement: achievement);
 
     return achievement;
   }

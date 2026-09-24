@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sugarlife/core/enum/achievement_type.dart';
 import 'package:sugarlife/features/avatars/domain/entities/avatar_entity.dart';
 import 'package:sugarlife/features/achievement/domain/entities/achievement_entity.dart';
 import 'package:sugarlife/features/daily_card/domain/entities/answered_daily_card_entity.dart';
@@ -8,19 +11,23 @@ import 'package:sugarlife/features/game_module/level/domain/entities/game_module
 import 'package:sugarlife/features/theory_module/domain/entities/theory_module_entity.dart';
 
 class AppCacheService {
+  static const _allAchievementsKey = 'cached_all_achievements';
+  static const _userAchievementsKey = 'cached_user_achievements';
+
   List<GameModuleLevelEntity>? _levels;
   final Map<int, List<GameModuleQuestionEntity>> _questionsByLevel = {};
   List<TheoryModuleEntity>? _theoryModules;
   final Map<int, TheoryModuleEntity> _theoryModuleById = {};
   List<AvatarEntity>? _avatars;
-  List<AchievementEntity>? _achievements;
+  List<AchievementEntity>? _allAchievements;
+  List<AchievementEntity>? _userAchievements;
+  String? _achievementUserId;
   final Map<int, AchievementEntity> _achievementsById = {};
   _DailyCardCache? _dailyCardCache;
 
   List<GameModuleLevelEntity>? get levels => _levels;
   List<TheoryModuleEntity>? get theoryModules => _theoryModules;
   List<AvatarEntity>? get avatars => _avatars;
-  List<AchievementEntity>? get achievements => _achievements;
   Map<int, AchievementEntity> get achievementsById =>
       Map.unmodifiable(_achievementsById);
 
@@ -112,22 +119,76 @@ class AppCacheService {
     _avatars = List.unmodifiable(avatars);
   }
 
-  void saveAchievements(List<AchievementEntity> achievements) {
-    _achievements = List.unmodifiable(achievements);
-    _achievementsById
-      ..clear()
-      ..addEntries(achievements.map((item) => MapEntry(item.id, item)));
+  Future<List<AchievementEntity>?> getAllAchievements() async {
+    if (_allAchievements != null) return _allAchievements;
+
+    final prefs = await SharedPreferences.getInstance();
+    final cached = _decodeAchievements(prefs.getString(_allAchievementsKey));
+    if (cached == null) return null;
+
+    _allAchievements = List.unmodifiable(cached);
+    _indexAchievements(cached);
+    return _allAchievements;
   }
 
-  void saveAchievement(AchievementEntity achievement) {
-    _achievementsById[achievement.id] = achievement;
+  Future<void> saveAllAchievements(List<AchievementEntity> achievements) async {
+    _allAchievements = List.unmodifiable(achievements);
+    _indexAchievements(achievements, overwrite: false);
 
-    if (_achievements == null) {
-      _achievements = List.unmodifiable([achievement]);
-      return;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(
+      _allAchievementsKey,
+      jsonEncode(achievements.map(_achievementToJson).toList()),
+    );
+  }
+
+  Future<List<AchievementEntity>?> getUserAchievements(String userId) async {
+    if (_achievementUserId == userId && _userAchievements != null) {
+      return _userAchievements;
     }
 
-    final achievements = List<AchievementEntity>.from(_achievements!);
+    final prefs = await SharedPreferences.getInstance();
+    final raw = prefs.getString(_userAchievementsKey);
+    if (raw == null) return null;
+
+    try {
+      final payload = jsonDecode(raw) as Map<String, dynamic>;
+      if (payload['userId'] != userId) return null;
+      final cached = _decodeAchievementList(payload['items']);
+      _achievementUserId = userId;
+      _userAchievements = List.unmodifiable(cached);
+      _indexAchievements(cached);
+      return _userAchievements;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  Future<void> saveUserAchievements({
+    required String userId,
+    required List<AchievementEntity> achievements,
+  }) async {
+    _achievementUserId = userId;
+    _userAchievements = List.unmodifiable(achievements);
+    _indexAchievements(achievements);
+
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(
+      _userAchievementsKey,
+      jsonEncode({
+        'userId': userId,
+        'items': achievements.map(_achievementToJson).toList(),
+      }),
+    );
+  }
+
+  Future<void> saveUserAchievement({
+    required String userId,
+    required AchievementEntity achievement,
+  }) async {
+    final cached = await getUserAchievements(userId) ?? const [];
+    final achievements = List<AchievementEntity>.from(cached);
+
     final index = achievements.indexWhere((item) => item.id == achievement.id);
     if (index == -1) {
       achievements.add(achievement);
@@ -135,7 +196,58 @@ class AppCacheService {
       achievements[index] = achievement;
     }
     achievements.sort((a, b) => a.id.compareTo(b.id));
-    _achievements = List.unmodifiable(achievements);
+    await saveUserAchievements(userId: userId, achievements: achievements);
+  }
+
+  void _indexAchievements(
+    List<AchievementEntity> achievements, {
+    bool overwrite = true,
+  }) {
+    for (final achievement in achievements) {
+      if (overwrite) {
+        _achievementsById[achievement.id] = achievement;
+      } else {
+        _achievementsById.putIfAbsent(achievement.id, () => achievement);
+      }
+    }
+  }
+
+  List<AchievementEntity>? _decodeAchievements(String? raw) {
+    if (raw == null) return null;
+    try {
+      return _decodeAchievementList(jsonDecode(raw));
+    } catch (_) {
+      return null;
+    }
+  }
+
+  List<AchievementEntity> _decodeAchievementList(Object? value) {
+    final items = value as List<dynamic>;
+    return items
+        .map((item) => _achievementFromJson(item as Map<String, dynamic>))
+        .toList();
+  }
+
+  Map<String, dynamic> _achievementToJson(AchievementEntity achievement) {
+    return {
+      'id': achievement.id,
+      'name': achievement.name,
+      'description': achievement.description,
+      'imageUrl': achievement.imageUrl,
+      'type': achievement.type.value,
+      'isUnlocked': achievement.isUnlocked,
+    };
+  }
+
+  AchievementEntity _achievementFromJson(Map<String, dynamic> json) {
+    return AchievementEntity(
+      id: (json['id'] as num).toInt(),
+      name: json['name'] as String,
+      description: json['description'] as String,
+      imageUrl: json['imageUrl'] as String,
+      type: AchievementType.fromString(json['type'] as String),
+      isUnlocked: json['isUnlocked'] as bool? ?? false,
+    );
   }
 
   void saveDailyCard({
@@ -184,7 +296,9 @@ class AppCacheService {
     _theoryModules = null;
     _theoryModuleById.clear();
     _avatars = null;
-    _achievements = null;
+    _allAchievements = null;
+    _userAchievements = null;
+    _achievementUserId = null;
     _achievementsById.clear();
     _dailyCardCache = null;
     final prefs = await SharedPreferences.getInstance();

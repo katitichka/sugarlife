@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_cached_svg/flutter_cached_svg.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:sugarlife/core/theme/app_colors.dart';
 import 'package:sugarlife/features/achievement/presentation/bloc/achievement_bloc.dart';
@@ -223,12 +224,13 @@ class _AchievementIcon extends StatelessWidget {
             height: 100,
             child: ClipRRect(
               borderRadius: BorderRadius.circular(14),
-              child: SvgPicture.network(
+              child: FlutterCachedSvg(
                 url,
                 width: 100,
                 height: 100,
                 fit: BoxFit.contain,
-                placeholderBuilder: (_) => _placeholder(),
+                placeholder: _placeholder(),
+                errorWidget: _placeholder(),
               ),
             ),
           )

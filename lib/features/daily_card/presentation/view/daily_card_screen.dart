@@ -5,7 +5,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:lottie/lottie.dart';
 import 'package:sugarlife/core/theme/app_colors.dart';
 import 'package:sugarlife/features/achievement/domain/repositories/achievement_repository.dart';
-import 'package:sugarlife/features/achievement/presentation/bloc/achievement_bloc.dart';
 import 'package:sugarlife/features/daily_card/domain/entities/daily_card_entity.dart';
 import 'package:sugarlife/features/daily_card/domain/repositories/daily_card_repository.dart';
 import 'package:sugarlife/features/daily_card/presentation/bloc/daily_card_bloc.dart';
@@ -22,57 +21,51 @@ class DailyCardScreen extends StatelessWidget {
         repository: context.read<DailyCardRepository>(),
         achievementRepository: context.read<AchievementRepository>(),
       )..add(const DailyCardEvent.loadTodayCard()),
-      child: BlocListener<DailyCardBloc, DailyCardState>(
-        listener: (context, state) {
-          if (state is Answered) {
-            context.read<AchievementBloc>().add(
-              const AchievementEvent.checkPendingAchievement(),
-            );
-          }
-        },
-        child: Builder(
-          builder: (dialogContext) {
-            return Stack(
-              clipBehavior: Clip.none,
-              children: [
-                const Dialog(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(32)),
-                  ),
-                  child: _DialogContent(),
+      child: Builder(
+        builder: (dialogContext) {
+          return Stack(
+            clipBehavior: Clip.none,
+            children: [
+              const Dialog(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(32)),
                 ),
-                Positioned(
-                  top: 12,
-                  right: 18,
-                  child: GestureDetector(
-                    onTap: () {
-                      dialogContext.read<DailyCardBloc>().add(
-                        const DailyCardEvent.close(),
-                      );
-                      if (dialogContext.mounted) {
-                        Navigator.pop(dialogContext);
-                      }
-                    },
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: AppColors.blue,
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Padding(
-                        padding: EdgeInsets.zero,
-                        child: Icon(
-                          Icons.cancel,
-                          color: AppColors.background,
-                          size: 45,
-                        ),
+                child: _DialogContent(),
+              ),
+              Positioned(
+                top: 12,
+                right: 18,
+                child: GestureDetector(
+                  onTap: () {
+                    final bloc = dialogContext.read<DailyCardBloc>();
+                    final shouldCheckAchievement = switch (bloc.state) {
+                      Answered(:final isCorrect) => isCorrect,
+                      _ => false,
+                    };
+                    bloc.add(const DailyCardEvent.close());
+                    if (dialogContext.mounted) {
+                      Navigator.pop(dialogContext, shouldCheckAchievement);
+                    }
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: AppColors.blue,
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Padding(
+                      padding: EdgeInsets.zero,
+                      child: Icon(
+                        Icons.cancel,
+                        color: AppColors.background,
+                        size: 45,
                       ),
                     ),
                   ),
                 ),
-              ],
-            );
-          },
-        ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }

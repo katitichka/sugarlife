@@ -122,17 +122,26 @@ class _GamePageState extends State<GamePage> {
     if (_isDailyCardDialogVisible) return;
 
     setState(() => _isDailyCardDialogVisible = true);
+    var shouldCheckAchievement = false;
     try {
-      await showDialog<void>(
-        context: context,
-        barrierDismissible: false,
-        barrierColor: AppColors.modalBarrier,
-        builder: (_) => const DailyCardScreen(),
-      );
+      shouldCheckAchievement =
+          await showDialog<bool>(
+            context: context,
+            barrierDismissible: false,
+            barrierColor: AppColors.modalBarrier,
+            builder: (_) => const DailyCardScreen(),
+          ) ??
+          false;
     } finally {
       if (mounted) {
         setState(() => _isDailyCardDialogVisible = false);
       }
+    }
+
+    if (mounted && shouldCheckAchievement) {
+      context.read<AchievementBloc>().add(
+        const AchievementEvent.checkPendingAchievement(),
+      );
     }
   }
 

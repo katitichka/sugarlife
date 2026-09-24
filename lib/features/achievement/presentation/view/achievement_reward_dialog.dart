@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_cached_svg/flutter_cached_svg.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sugarlife/core/theme/app_colors.dart';
@@ -110,6 +111,10 @@ class _AchievementRewardDialogState extends State<AchievementRewardDialog> {
 }
 
 class _CardFace extends StatelessWidget {
+  static const _cardWidth = 250.0;
+  static const _cardHeight = 330.0;
+  static const _imageSize = 140.0;
+
   const _CardFace({
     required this.imagePath,
     required this.title,
@@ -126,7 +131,8 @@ class _CardFace extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 250,
+      width: _cardWidth,
+      height: _cardHeight,
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: AppColors.primaryTint,
@@ -134,30 +140,44 @@ class _CardFace extends StatelessWidget {
         border: Border.all(color: AppColors.blue),
       ),
       child: Column(
-        mainAxisSize: MainAxisSize.min,
         children: [
-          _buildImage(),
+          SizedBox.square(
+            dimension: _imageSize,
+            child: Center(child: _buildImage()),
+          ),
           const SizedBox(height: 16),
-          Text(
-            title,
-            textAlign: TextAlign.center,
-            style: GoogleFonts.rubik(
-              fontSize: 20,
-              fontWeight: FontWeight.w700,
-              color: AppColors.blue,
+          SizedBox(
+            height: 48,
+            child: Center(
+              child: Text(
+                title,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
+                style: GoogleFonts.rubik(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.blue,
+                ),
+              ),
             ),
           ),
           const SizedBox(height: 4),
-          Text(
-            subtitle,
-            textAlign: TextAlign.center,
-            style: GoogleFonts.rubik(
-              fontSize: 14,
-              fontWeight: FontWeight.w400,
-              color: AppColors.blue,
+          Expanded(
+            child: Center(
+              child: Text(
+                subtitle,
+                maxLines: 4,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
+                style: GoogleFonts.rubik(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w400,
+                  color: AppColors.blue,
+                ),
+              ),
             ),
           ),
-          const SizedBox(height: 16),
         ],
       ),
     );
@@ -166,20 +186,47 @@ class _CardFace extends StatelessWidget {
   Widget _buildImage() {
     if (!isNetworkImage) {
       if (imagePath.endsWith('.svg')) {
-        return SvgPicture.asset(imagePath, width: 140, fit: BoxFit.contain);
+        return SvgPicture.asset(
+          imagePath,
+          width: _imageSize,
+          height: _imageSize,
+          fit: BoxFit.contain,
+        );
       }
-      return Image.asset(imagePath, width: 140, fit: BoxFit.contain);
+      return Image.asset(
+        imagePath,
+        width: _imageSize,
+        height: _imageSize,
+        fit: BoxFit.contain,
+      );
     }
 
     if (isSvg) {
-      return SvgPicture.network(
+      return FlutterCachedSvg(
         imagePath,
-        width: 140,
-        placeholderBuilder: (context) =>
-            const SizedBox(width: 140, child: LottieProgressIndicator()),
+        width: _imageSize,
+        height: _imageSize,
+        fit: BoxFit.contain,
+        placeholder: const SizedBox.square(
+          dimension: _imageSize,
+          child: LottieProgressIndicator(),
+        ),
+        errorWidget: const SizedBox.square(
+          dimension: _imageSize,
+          child: Icon(Icons.emoji_events_outlined, color: AppColors.blue),
+        ),
       );
     } else {
-      return Image.network(imagePath, width: 140, fit: BoxFit.contain);
+      return Image.network(
+        imagePath,
+        width: _imageSize,
+        height: _imageSize,
+        fit: BoxFit.contain,
+        loadingBuilder: (context, child, loadingProgress) {
+          if (loadingProgress == null) return child;
+          return const LottieProgressIndicator();
+        },
+      );
     }
   }
 }
