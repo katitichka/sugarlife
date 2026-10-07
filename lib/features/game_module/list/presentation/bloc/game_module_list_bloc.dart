@@ -83,6 +83,15 @@ class GameModuleListBloc
     final current = state;
     if (current is! ReceiveSuccess) return;
     final updatedMap = Map<int, LevelProgressEntity>.from(current.progressMap);
+    final previous = updatedMap[levelId];
+    final previousStars = previous?.stars ?? 0;
+    final keepsPreviousResult =
+        previous != null &&
+        (previousStars > stars ||
+            (previousStars == stars &&
+                previous.correctAnswers >= correctAnswers));
+    if (keepsPreviousResult) return;
+
     updatedMap[levelId] = LevelProgressEntity(
       levelId: levelId,
       isCompleted: stars > 0,

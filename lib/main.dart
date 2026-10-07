@@ -9,9 +9,12 @@ Future<void> main() async {
 
   await dotenv.load(fileName: ".env");
 
-  final supabaseUrl = dotenv.env['SUPABASE_URL'];
-  final supabaseAnonKey = dotenv.env['SUPABASE_ANON_KEY'];
-  if (supabaseUrl == null || supabaseAnonKey == null) {
+  final supabaseUrl = dotenv.env['SUPABASE_URL']?.trim();
+  final supabaseAnonKey = dotenv.env['SUPABASE_ANON_KEY']?.trim();
+  if (supabaseUrl == null ||
+      supabaseUrl.isEmpty ||
+      supabaseAnonKey == null ||
+      supabaseAnonKey.isEmpty) {
     throw StateError(
       'SUPABASE_URL и SUPABASE_ANON_KEY должны быть заданы в .env',
     );

@@ -82,6 +82,13 @@ class DailyCardBloc extends Bloc<DailyCardEvent, DailyCardState> {
     String explanation,
     bool isMyth,
   ) async {
+    final currentState = state;
+    if (currentState is! Loaded ||
+        currentState.hasAnsweredToday ||
+        currentState.card.id != cardId) {
+      return;
+    }
+
     emit(const Loading());
 
     const timeout = Duration(seconds: 3);

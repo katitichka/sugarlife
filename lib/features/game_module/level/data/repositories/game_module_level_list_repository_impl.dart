@@ -25,7 +25,8 @@ class GameModuleLevelListRepositoryImpl
     final dtos = await _dataProvider.getLevels();
 
     if (dtos.isEmpty) {
-      return [];
+      _cache.saveLevels(const []);
+      return const [];
     }
 
     final levelIds = dtos.map((dto) => dto.id).toList();

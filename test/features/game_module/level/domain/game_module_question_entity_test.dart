@@ -24,6 +24,32 @@ void main() {
       expect(question.isAnswerCorrect(<int>[2, 0]), isTrue);
       expect(question.isAnswerCorrect(<int>[0, 1]), isFalse);
     });
+
+    test('returns false for an answer of an unexpected runtime type', () {
+      final choice = _question(
+        type: QuestionType.multipleChoice,
+        answers: const ['A', 'B'],
+        correctAnswer: 'A',
+      );
+      final multiple = _question(
+        type: QuestionType.multipleSelect,
+        answers: const ['A', 'B'],
+        correctIndices: const [0],
+      );
+
+      expect(choice.isAnswerCorrect(true), isFalse);
+      expect(multiple.isAnswerCorrect('0'), isFalse);
+    });
+
+    test('rejects duplicate selections', () {
+      final question = _question(
+        type: QuestionType.multipleSelect,
+        answers: const ['A', 'B'],
+        correctIndices: const [0, 1],
+      );
+
+      expect(question.isAnswerCorrect(<int>[0, 0]), isFalse);
+    });
   });
 }
 

@@ -13,6 +13,8 @@ import 'package:sugarlife/features/theory_module/domain/entities/theory_module_e
 class AppCacheService {
   static const _allAchievementsKey = 'cached_all_achievements';
   static const _userAchievementsKey = 'cached_user_achievements';
+  static const _shownAchievementsKey = 'shown_achievement_ids';
+  static const _pendingAchievementKey = 'pending_achievement_id';
 
   List<GameModuleLevelEntity>? _levels;
   final Map<int, List<GameModuleQuestionEntity>> _questionsByLevel = {};
@@ -91,6 +93,7 @@ class AppCacheService {
 
   void saveTheoryModules(List<TheoryModuleEntity> modules) {
     _theoryModules = List.unmodifiable(modules);
+    _theoryModuleById.clear();
     for (final module in modules) {
       _theoryModuleById[module.id] = module;
     }
@@ -127,13 +130,13 @@ class AppCacheService {
     if (cached == null) return null;
 
     _allAchievements = List.unmodifiable(cached);
-    _indexAchievements(cached);
+    _rebuildAchievementIndex();
     return _allAchievements;
   }
 
   Future<void> saveAllAchievements(List<AchievementEntity> achievements) async {
     _allAchievements = List.unmodifiable(achievements);
-    _indexAchievements(achievements, overwrite: false);
+    _rebuildAchievementIndex();
 
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(
@@ -147,6 +150,12 @@ class AppCacheService {
       return _userAchievements;
     }
 
+    if (_achievementUserId != null && _achievementUserId != userId) {
+      _achievementUserId = null;
+      _userAchievements = null;
+      _rebuildAchievementIndex();
+    }
+
     final prefs = await SharedPreferences.getInstance();
     final raw = prefs.getString(_userAchievementsKey);
     if (raw == null) return null;
@@ -157,7 +166,7 @@ class AppCacheService {
       final cached = _decodeAchievementList(payload['items']);
       _achievementUserId = userId;
       _userAchievements = List.unmodifiable(cached);
-      _indexAchievements(cached);
+      _rebuildAchievementIndex();
       return _userAchievements;
     } catch (_) {
       return null;
@@ -170,7 +179,7 @@ class AppCacheService {
   }) async {
     _achievementUserId = userId;
     _userAchievements = List.unmodifiable(achievements);
-    _indexAchievements(achievements);
+    _rebuildAchievementIndex();
 
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(
@@ -199,16 +208,14 @@ class AppCacheService {
     await saveUserAchievements(userId: userId, achievements: achievements);
   }
 
-  void _indexAchievements(
-    List<AchievementEntity> achievements, {
-    bool overwrite = true,
-  }) {
-    for (final achievement in achievements) {
-      if (overwrite) {
-        _achievementsById[achievement.id] = achievement;
-      } else {
-        _achievementsById.putIfAbsent(achievement.id, () => achievement);
-      }
+  void _rebuildAchievementIndex() {
+    _achievementsById.clear();
+    for (final achievement in _allAchievements ?? const <AchievementEntity>[]) {
+      _achievementsById[achievement.id] = achievement;
+    }
+    for (final achievement
+        in _userAchievements ?? const <AchievementEntity>[]) {
+      _achievementsById[achievement.id] = achievement;
     }
   }
 
@@ -302,7 +309,12 @@ class AppCacheService {
     _achievementsById.clear();
     _dailyCardCache = null;
     final prefs = await SharedPreferences.getInstance();
-    await prefs.clear();
+    await Future.wait([
+      prefs.remove(_allAchievementsKey),
+      prefs.remove(_userAchievementsKey),
+      prefs.remove(_shownAchievementsKey),
+      prefs.remove(_pendingAchievementKey),
+    ]);
   }
 }
 

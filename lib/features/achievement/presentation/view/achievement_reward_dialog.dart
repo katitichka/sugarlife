@@ -47,7 +47,7 @@ class _AchievementRewardDialogState extends State<AchievementRewardDialog> {
                     color: AppColors.blue,
                   ),
                 ),
-                const SizedBox(height: 15),
+                const SizedBox(height: 32),
                 GestureDetector(
                   onTap: () {
                     if (_isOpened) {
@@ -81,14 +81,14 @@ class _AchievementRewardDialogState extends State<AchievementRewardDialog> {
                             : const _CardFace(
                                 imagePath:
                                     'assets/achievements/closed_card.svg',
-                                title: 'Нажми, чтобы открыть',
+                                title: 'Нажмите, чтобы открыть',
                                 subtitle: 'Твоя новая награда уже здесь',
                               ),
                       );
                     },
                   ),
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 8),
               ],
             ),
           ),
@@ -112,7 +112,7 @@ class _AchievementRewardDialogState extends State<AchievementRewardDialog> {
 
 class _CardFace extends StatelessWidget {
   static const _cardWidth = 250.0;
-  static const _cardHeight = 330.0;
+  static const _cardHeight = 340.0;
   static const _imageSize = 140.0;
 
   const _CardFace({
@@ -147,15 +147,15 @@ class _CardFace extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           SizedBox(
-            height: 48,
+            height: 60,
             child: Center(
               child: Text(
                 title,
                 maxLines: 2,
-                overflow: TextOverflow.ellipsis,
                 textAlign: TextAlign.center,
                 style: GoogleFonts.rubik(
-                  fontSize: 20,
+                  fontSize: 19,
+                  height: 1.15,
                   fontWeight: FontWeight.w700,
                   color: AppColors.blue,
                 ),

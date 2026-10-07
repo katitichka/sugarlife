@@ -26,6 +26,7 @@ class GameModuleLevelBloc
   final LevelProgressRepository _levelProgressRepository;
   final GameModuleListBloc _gameModuleListBloc;
   final AchievementRepository _achievementRepository;
+  bool _isCompletingLevel = false;
   GameModuleLevelBloc({
     required GameModuleLevelRepository gameModuleLevelRepository,
     required GameModuleLevelListRepository gameModuleLevelListRepository,
@@ -271,29 +272,13 @@ class GameModuleLevelBloc
   Future<void> _nextQuestions({
     required Emitter<GameModuleLevelState> emit,
   }) async {
-    int currentIndex;
-    List<GameModuleQuestionEntity> questions;
-    LevelProgressEntity? progress;
-    Map<int, bool> answers;
-    Map<int, String> characterImages;
-
-    if (state is ReceiveSuccess) {
-      final successState = state as ReceiveSuccess;
-      currentIndex = successState.currentIndex;
-      questions = successState.questions;
-      progress = successState.progress;
-      answers = successState.answers;
-      characterImages = successState.characterImages;
-    } else if (state is AnswerInProgress) {
-      final answerState = state as AnswerInProgress;
-      currentIndex = answerState.currentIndex;
-      questions = answerState.questions;
-      progress = answerState.progress;
-      answers = answerState.answers;
-      characterImages = answerState.characterImages;
-    } else {
-      return;
-    }
+    if (state is! AnswerInProgress || _isCompletingLevel) return;
+    final answerState = state as AnswerInProgress;
+    final currentIndex = answerState.currentIndex;
+    final questions = answerState.questions;
+    final progress = answerState.progress;
+    final answers = answerState.answers;
+    final characterImages = answerState.characterImages;
 
     final nextIndex = currentIndex + 1;
     if (nextIndex < questions.length) {
@@ -308,6 +293,7 @@ class GameModuleLevelBloc
         ),
       );
     } else {
+      _isCompletingLevel = true;
       final correctCount = answers.values.where((correct) => correct).length;
       int stars;
       if (correctCount >= 3) {
@@ -362,6 +348,7 @@ class GameModuleLevelBloc
           unlockedAchievement: unlockedAchievement,
         ),
       );
+      _isCompletingLevel = false;
     }
   }
 
@@ -430,7 +417,9 @@ class GameModuleLevelBloc
   }) async {
     if (state is! ReceiveSuccess) return;
     final currentState = state as ReceiveSuccess;
-    if (currentState.questions.isEmpty) return;
+    if (currentState.questions.isEmpty || currentState.currentIndex != -1) {
+      return;
+    }
     emit(
       ReceiveSuccess(
         questions: currentState.questions,

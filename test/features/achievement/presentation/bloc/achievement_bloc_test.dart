@@ -6,7 +6,7 @@ import 'package:sugarlife/features/achievement/presentation/bloc/achievement_blo
 
 void main() {
   test(
-    'loadAchievements keeps all achievements and marks unlocked ones',
+    'loadAchievements puts unlocked achievements before locked ones',
     () async {
       final allAchievements = [
         _achievement(1),
@@ -25,10 +25,11 @@ void main() {
         bloc.stream,
         emits(
           isA<AchievementState>().having(
-            (state) =>
-                state.achievements.map((item) => item.isUnlocked).toList(),
-            'unlock states',
-            [false, true, false],
+            (state) => state.achievements
+                .map((item) => (item.id, item.isUnlocked))
+                .toList(),
+            'achievement order and unlock states',
+            [(2, true), (1, false), (3, false)],
           ),
         ),
       );

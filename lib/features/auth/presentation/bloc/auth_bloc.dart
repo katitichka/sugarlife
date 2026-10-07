@@ -100,6 +100,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   }
 
   Future<void> _logoutPressed({required Emitter<AuthState> emit}) async {
+    final previousState = state;
     try {
       emit(const AuthState.loading());
       await _authRepository.logout().timeout(_serverTimeout);
@@ -109,6 +110,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         const AuthState.failure(
           message: 'Не удалось выйти из аккаунта.\nПопробуйте ещё раз',
         ),
+      );
+      previousState.maybeWhen(
+        authenticated: (profile) =>
+            emit(AuthState.authenticated(profile: profile)),
+        orElse: () {},
       );
     }
   }

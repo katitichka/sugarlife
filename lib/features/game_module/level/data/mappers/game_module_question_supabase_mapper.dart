@@ -36,7 +36,7 @@ abstract final class GameModuleQuestionSupabaseMapper {
   static List<int>? _parseMultipleSelectIndices(dynamic raw) {
     if (raw == null) return null;
     if (raw is List) {
-      final out = <int>[];
+      final out = <int>{};
       for (final e in raw) {
         if (e is int) {
           out.add(e);
@@ -47,7 +47,7 @@ abstract final class GameModuleQuestionSupabaseMapper {
           if (i != null) out.add(i);
         }
       }
-      return out.isEmpty ? null : out;
+      return out.isEmpty ? null : (out.toList()..sort());
     }
     if (raw is String) {
       final s = raw.trim();
@@ -62,11 +62,14 @@ abstract final class GameModuleQuestionSupabaseMapper {
           return null;
         }
       }
-      final fromCsv = s
-          .split(',')
-          .map((e) => int.tryParse(e.trim()))
-          .whereType<int>()
-          .toList();
+      final fromCsv =
+          s
+              .split(',')
+              .map((e) => int.tryParse(e.trim()))
+              .whereType<int>()
+              .toSet()
+              .toList()
+            ..sort();
       return fromCsv.isEmpty ? null : fromCsv;
     }
     final single = int.tryParse(raw.toString());
@@ -90,12 +93,15 @@ abstract final class GameModuleQuestionSupabaseMapper {
 
     switch (type) {
       case QuestionType.multipleSelect:
-        if (raw is List) {
-          return raw.map((e) => (e as num).toInt()).join(',');
-        }
-        return raw.toString();
+        return _parseMultipleSelectIndices(raw)?.join(',');
       case QuestionType.trueFalse:
         final s = raw.toString().trim();
+        final normalized = s.toLowerCase();
+        if (raw is bool || normalized == 'true' || normalized == 'false') {
+          final isTrue = raw is bool ? raw : normalized == 'true';
+          final index = isTrue ? 0 : 1;
+          return index < answers.length ? answers[index] : normalized;
+        }
         if (s == '0' || s == '1') {
           final i = int.tryParse(s);
           if (i != null && i >= 0 && i < answers.length) {

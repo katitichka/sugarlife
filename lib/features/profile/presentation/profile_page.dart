@@ -12,6 +12,7 @@ import 'package:sugarlife/features/profile/domain/repositories/profile_repositor
 import 'package:sugarlife/features/profile/presentation/achievements_sections.dart';
 import 'package:sugarlife/features/profile/presentation/settings_dialog.dart';
 import 'package:sugarlife/shared/ui/animated_settings_button.dart';
+import 'package:sugarlife/shared/ui/app_snack_bar.dart';
 import 'package:sugarlife/shared/ui/lottie_progress_indicator.dart';
 import 'package:sugarlife/shared/ui/main_app_bar.dart';
 
@@ -95,6 +96,7 @@ class _ProfilePageState extends State<ProfilePage> {
           unauthenticated: () {
             context.go('/login');
           },
+          failure: (message) => AppSnackBar.showError(context, message),
           orElse: () {},
         );
       },

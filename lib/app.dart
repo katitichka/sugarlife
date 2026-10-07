@@ -32,7 +32,7 @@ import 'package:sugarlife/features/theory_module/presentation/bloc/theory_module
 import 'package:sugarlife/shared/ui/sweet_life_app.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-Future<void> app(SupabaseClient supabase) async {
+void app(SupabaseClient supabase) {
   runApp(
     MultiRepositoryProvider(
       providers: [

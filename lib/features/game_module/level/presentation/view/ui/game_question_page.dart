@@ -6,7 +6,6 @@ import 'package:sugarlife/core/enum/question_type.dart';
 import 'package:sugarlife/core/theme/app_colors.dart';
 import 'package:sugarlife/features/game_module/level/domain/entities/game_module_question_entity.dart';
 import 'package:sugarlife/features/game_module/level/presentation/bloc/game_module_level_bloc.dart';
-import 'package:sugarlife/shared/ui/lottie_progress_indicator.dart';
 import 'package:sugarlife/shared/ui/main_app_bar.dart';
 
 class GameQuestionPage extends StatefulWidget {
@@ -183,7 +182,7 @@ class _GameQuestionPageState extends State<GameQuestionPage> {
           SizedBox(
             width: 100,
             height: 100,
-            child: imageUrl != null
+            child: imageUrl != null && imageUrl.isNotEmpty
                 ? SvgPicture.network(
                     key: ValueKey(question.characterId),
                     imageUrl,
@@ -198,7 +197,13 @@ class _GameQuestionPageState extends State<GameQuestionPage> {
                       ),
                     ),
                   )
-                : const Center(child: LottieProgressIndicator()),
+                : const Center(
+                    child: Icon(
+                      Icons.person_outline,
+                      color: AppColors.blue,
+                      size: 56,
+                    ),
+                  ),
           ),
 
           const SizedBox(width: 12),
@@ -408,6 +413,7 @@ Widget _buildAnswer(
       );
     case QuestionType.fillBlank:
       return FillBlankWidget(
+        key: ValueKey(question.id),
         question: question,
         selectionLocked: selectionLocked,
         onAnswerSelected: onStringAnswerSelected,
@@ -548,6 +554,19 @@ class TrueFalseWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (question.answers.length < 2) {
+      return const Center(
+        child: Padding(
+          padding: EdgeInsets.all(16),
+          child: Text(
+            'Для этого вопроса не заданы варианты ответа',
+            textAlign: TextAlign.center,
+            style: TextStyle(color: AppColors.danger, fontSize: 16),
+          ),
+        ),
+      );
+    }
+
     return Padding(
       padding: const EdgeInsets.all(16),
       child: Row(

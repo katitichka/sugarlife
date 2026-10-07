@@ -52,7 +52,7 @@ class GameModuleLevelRepositoryImpl implements GameModuleLevelRepository {
     final character = await _dataProvider.getCharacterById(characterId);
     if (character == null) return null;
 
-    return _dataProvider.resolveCharacterImageUrl(character.imageUrl);
+    return _publicSvgUrl(character.imageUrl);
   }
 
   @override

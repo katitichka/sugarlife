@@ -18,6 +18,10 @@ import 'package:sugarlife/shared/ui/app_scaffold.dart';
 final appRoute = GoRouter(
   navigatorKey: rootNavigatorKey,
   initialLocation: '/splash',
+  redirect: (context, state) => authRedirect(
+    authState: context.read<AuthBloc>().state,
+    location: state.matchedLocation,
+  ),
   routes: [
     GoRoute(
       path: '/splash',
@@ -121,24 +125,26 @@ final appRoute = GoRouter(
           ],
         ),
       ],
-      redirect: (context, state) {
-        final authState = context.read<AuthBloc>().state;
-        final isLoggedIn = authState.maybeWhen(
-          authenticated: (_) => true,
-          orElse: () => false,
-        );
-        final location = state.matchedLocation;
-        if (isLoggedIn && (location == '/login' || location == '/register')) {
-          return '/game';
-        }
-        if (!isLoggedIn &&
-            (location == '/game' ||
-                location == '/theory' ||
-                location == '/profile')) {
-          return '/login';
-        }
-        return null;
-      },
     ),
   ],
 );
+
+String? authRedirect({required AuthState authState, required String location}) {
+  final isLoggedIn = authState.maybeWhen(
+    authenticated: (_) => true,
+    orElse: () => false,
+  );
+  final isAuthRoute = location == '/login' || location == '/register';
+  final isProtectedRoute =
+      location == '/game' ||
+      location.startsWith('/game/') ||
+      location == '/theory' ||
+      location.startsWith('/theory/') ||
+      location == '/profile' ||
+      location.startsWith('/profile/') ||
+      location == '/choose-character';
+
+  if (isLoggedIn && isAuthRoute) return '/game';
+  if (!isLoggedIn && isProtectedRoute) return '/login';
+  return null;
+}

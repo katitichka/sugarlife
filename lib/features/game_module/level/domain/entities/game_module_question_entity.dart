@@ -22,24 +22,32 @@ sealed class GameModuleQuestionEntity with _$GameModuleQuestionEntity {
   bool isAnswerCorrect(dynamic userAnswer) {
     switch (questionType) {
       case QuestionType.multipleChoice:
-        final userSelectedAnswer = userAnswer as String;
+        if (userAnswer is! String) return false;
+        final userSelectedAnswer = userAnswer;
         return userSelectedAnswer == correctAnswer;
       case QuestionType.trueFalse:
-        if (answers.length < 2) return false;
-        final userBool = userAnswer as bool;
+        if (answers.length < 2 || userAnswer is! bool) return false;
+        final userBool = userAnswer;
         final userAnswerText = userBool
             ? answers[0]
             : answers[1]; // answers[0] - "Правда", answers[1] - "Ложь"
-        return userAnswerText == correctAnswer;
+        return userAnswerText.trim().toLowerCase() ==
+            correctAnswer?.trim().toLowerCase();
       case QuestionType.fillBlank:
-        final userText = userAnswer as String;
+        if (userAnswer is! String) return false;
+        final userText = userAnswer;
         return userText.trim().toLowerCase() ==
             correctAnswer?.trim().toLowerCase();
       case QuestionType.multipleSelect:
-        final userIndices = userAnswer as List<int>;
+        if (userAnswer is! List<int>) return false;
+        final userIndices = userAnswer;
         final correctIndices = _resolvedMultipleSelectIndices();
 
         if (correctIndices == null || correctIndices.isEmpty) return false;
+        if (userIndices.toSet().length != userIndices.length ||
+            correctIndices.toSet().length != correctIndices.length) {
+          return false;
+        }
         if (userIndices.length != correctIndices.length) return false;
 
         final sortedUser = List.of(userIndices)..sort();

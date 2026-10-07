@@ -36,9 +36,22 @@ class AchievementBloc extends Bloc<AchievementEvent, AchievementState> {
       final unlockedById = {
         for (final achievement in results[1]) achievement.id: achievement,
       };
-      final achievements = allAchievements
-          .map((achievement) => unlockedById[achievement.id] ?? achievement)
-          .toList();
+      final unlockedAchievements = <AchievementEntity>[];
+      final lockedAchievements = <AchievementEntity>[];
+
+      for (final achievement in allAchievements) {
+        final unlockedAchievement = unlockedById[achievement.id];
+        if (unlockedAchievement != null) {
+          unlockedAchievements.add(unlockedAchievement);
+        } else {
+          lockedAchievements.add(achievement);
+        }
+      }
+
+      final achievements = [
+        ...unlockedAchievements,
+        ...lockedAchievements,
+      ];
       emit(state.copyWith(achievements: achievements));
     } catch (error, stackTrace) {
       AppLogger.error('Ошибка загрузки достижений', error, stackTrace, _tag);

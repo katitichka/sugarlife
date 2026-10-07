@@ -38,12 +38,30 @@ void main() {
 
   test('не отдаёт достижения другого пользователя', () async {
     final cache = AppCacheService();
+    final catalogAchievement = _achievement(1);
+    await cache.saveAllAchievements([catalogAchievement]);
     await cache.saveUserAchievements(
       userId: 'first-user',
-      achievements: [_achievement(1).copyWith(isUnlocked: true)],
+      achievements: [catalogAchievement.copyWith(isUnlocked: true)],
     );
 
     expect(await cache.getUserAchievements('second-user'), isNull);
+    expect(cache.achievementsById[1]?.isUnlocked, isFalse);
+  });
+
+  test('при очистке не удаляет настройки, которыми кэш не владеет', () async {
+    SharedPreferences.setMockInitialValues({
+      'unrelated_setting': 'keep-me',
+      'cached_all_achievements': '[]',
+      'shown_achievement_ids': <String>['1'],
+    });
+
+    await AppCacheService().clearAll();
+
+    final prefs = await SharedPreferences.getInstance();
+    expect(prefs.getString('unrelated_setting'), 'keep-me');
+    expect(prefs.containsKey('cached_all_achievements'), isFalse);
+    expect(prefs.containsKey('shown_achievement_ids'), isFalse);
   });
 }
 
