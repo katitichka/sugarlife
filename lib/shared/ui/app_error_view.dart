@@ -11,48 +11,57 @@ class AppErrorView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 32),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Icon(Icons.wifi_off_rounded, color: AppColors.error, size: 48),
-          const SizedBox(height: 16),
-          Text(
-            message,
-            textAlign: TextAlign.center,
-            style: GoogleFonts.rubik(
-              color: AppColors.error,
-              fontSize: 18,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          if (onRetry != null) ...[
-            const SizedBox(height: 24),
-            ElevatedButton(
-              onPressed: onRetry,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.blue,
-                foregroundColor: AppColors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30),
-                ),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 32,
-                  vertical: 12,
-                ),
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 520),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(
+                Icons.wifi_off_rounded,
+                color: AppColors.error,
+                size: 48,
               ),
-              child: Text(
-                'Повторить',
+              const SizedBox(height: 16),
+              Text(
+                message,
+                textAlign: TextAlign.center,
                 style: GoogleFonts.rubik(
+                  color: AppColors.error,
                   fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.white,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
-            ),
-          ],
-        ],
+              if (onRetry != null) ...[
+                const SizedBox(height: 24),
+                ElevatedButton(
+                  onPressed: onRetry,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.blue,
+                    foregroundColor: AppColors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 32,
+                      vertical: 12,
+                    ),
+                  ),
+                  child: Text(
+                    'Повторить',
+                    style: GoogleFonts.rubik(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.white,
+                    ),
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
       ),
     );
   }

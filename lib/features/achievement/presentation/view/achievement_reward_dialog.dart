@@ -23,104 +23,129 @@ class _AchievementRewardDialogState extends State<AchievementRewardDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final screenSize = MediaQuery.sizeOf(context);
+
     return Dialog(
-      insetPadding: const EdgeInsets.symmetric(horizontal: 24),
+      insetPadding: const EdgeInsets.all(16),
       backgroundColor: AppColors.transparent,
-      child: Stack(
-        children: [
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.fromLTRB(24, 32, 24, 24),
-            decoration: BoxDecoration(
-              color: AppColors.background,
-              borderRadius: BorderRadius.circular(28),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                SizedBox(height: 30),
-                Text(
-                  'Новое достижение!',
-                  style: GoogleFonts.rubik(
-                    fontSize: 24,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.blue,
-                  ),
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          maxWidth: 420,
+          maxHeight: screenSize.height - 32,
+        ),
+        child: Stack(
+          children: [
+            SingleChildScrollView(
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.fromLTRB(24, 52, 24, 24),
+                decoration: BoxDecoration(
+                  color: AppColors.background,
+                  borderRadius: BorderRadius.circular(28),
                 ),
-                const SizedBox(height: 32),
-                GestureDetector(
-                  onTap: () {
-                    if (_isOpened) {
-                      return;
-                    }
-                    setState(() {
-                      _isOpened = true;
-                    });
-                  },
-                  child: TweenAnimationBuilder<double>(
-                    duration: const Duration(milliseconds: 700),
-                    tween: Tween<double>(begin: 0, end: _isOpened ? 1 : 0),
-                    builder: (context, value, child) {
-                      final angle = value * math.pi;
-                      final isFront = value >= 0.5;
-                      return Transform(
-                        alignment: Alignment.center,
-                        transform: Matrix4.identity()
-                          ..setEntry(3, 2, 0.001)
-                          ..rotateY(angle),
-                        child: isFront
-                            ? Transform(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(
+                        'Новое достижение!',
+                        style: GoogleFonts.rubik(
+                          fontSize: 24,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.blue,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    LayoutBuilder(
+                      builder: (context, constraints) {
+                        final cardWidth = math.min(
+                          _CardFace.maxCardWidth,
+                          constraints.maxWidth,
+                        );
+                        return GestureDetector(
+                          onTap: () {
+                            if (_isOpened) return;
+                            setState(() => _isOpened = true);
+                          },
+                          child: TweenAnimationBuilder<double>(
+                            duration: const Duration(milliseconds: 700),
+                            tween: Tween<double>(
+                              begin: 0,
+                              end: _isOpened ? 1 : 0,
+                            ),
+                            builder: (context, value, child) {
+                              final angle = value * math.pi;
+                              final isFront = value >= 0.5;
+                              final face = isFront
+                                  ? _CardFace(
+                                      width: cardWidth,
+                                      imagePath: widget.achievement.imageUrl,
+                                      title: widget.achievement.name,
+                                      subtitle: widget.achievement.description,
+                                    )
+                                  : _CardFace(
+                                      width: cardWidth,
+                                      imagePath:
+                                          'assets/achievements/closed_card.svg',
+                                      title: 'Нажмите, чтобы открыть',
+                                      subtitle: 'Твоя новая награда уже здесь',
+                                    );
+                              return Transform(
                                 alignment: Alignment.center,
-                                transform: Matrix4.identity()..rotateY(math.pi),
-                                child: _CardFace(
-                                  imagePath: widget.achievement.imageUrl,
-                                  title: widget.achievement.name,
-                                  subtitle: widget.achievement.description,
-                                ),
-                              )
-                            : const _CardFace(
-                                imagePath:
-                                    'assets/achievements/closed_card.svg',
-                                title: 'Нажмите, чтобы открыть',
-                                subtitle: 'Твоя новая награда уже здесь',
-                              ),
-                      );
-                    },
-                  ),
+                                transform: Matrix4.identity()
+                                  ..setEntry(3, 2, 0.001)
+                                  ..rotateY(angle),
+                                child: isFront
+                                    ? Transform(
+                                        alignment: Alignment.center,
+                                        transform: Matrix4.identity()
+                                          ..rotateY(math.pi),
+                                        child: face,
+                                      )
+                                    : face,
+                              );
+                            },
+                          ),
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 8),
+                  ],
                 ),
-                const SizedBox(height: 8),
-              ],
-            ),
-          ),
-          Positioned(
-            top: 8,
-            right: 8,
-            child: IconButton(
-              onPressed: () => Navigator.of(context).pop(),
-              icon: const Icon(
-                Icons.cancel_outlined,
-                color: AppColors.blue,
-                size: 40,
               ),
             ),
-          ),
-        ],
+            Positioned(
+              top: 8,
+              right: 8,
+              child: IconButton(
+                onPressed: () => Navigator.of(context).pop(),
+                icon: const Icon(
+                  Icons.cancel_outlined,
+                  color: AppColors.blue,
+                  size: 40,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 }
 
 class _CardFace extends StatelessWidget {
-  static const _cardWidth = 250.0;
-  static const _cardHeight = 340.0;
-  static const _imageSize = 140.0;
+  static const maxCardWidth = 250.0;
 
   const _CardFace({
+    required this.width,
     required this.imagePath,
     required this.title,
     required this.subtitle,
   });
 
+  final double width;
   final String imagePath;
   final String title;
   final String subtitle;
@@ -130,10 +155,14 @@ class _CardFace extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scale = width / maxCardWidth;
+    final cardHeight = 340 * scale;
+    final imageSize = 140 * scale;
+
     return Container(
-      width: _cardWidth,
-      height: _cardHeight,
-      padding: const EdgeInsets.all(12),
+      width: width,
+      height: cardHeight,
+      padding: EdgeInsets.all(12 * scale),
       decoration: BoxDecoration(
         color: AppColors.primaryTint,
         borderRadius: BorderRadius.circular(24),
@@ -142,19 +171,19 @@ class _CardFace extends StatelessWidget {
       child: Column(
         children: [
           SizedBox.square(
-            dimension: _imageSize,
-            child: Center(child: _buildImage()),
+            dimension: imageSize,
+            child: Center(child: _buildImage(imageSize)),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 16 * scale),
           SizedBox(
-            height: 60,
+            height: 60 * scale,
             child: Center(
               child: Text(
                 title,
                 maxLines: 2,
                 textAlign: TextAlign.center,
                 style: GoogleFonts.rubik(
-                  fontSize: 19,
+                  fontSize: math.max(14, 19 * scale),
                   height: 1.15,
                   fontWeight: FontWeight.w700,
                   color: AppColors.blue,
@@ -162,7 +191,7 @@ class _CardFace extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(height: 4),
+          SizedBox(height: 4 * scale),
           Expanded(
             child: Center(
               child: Text(
@@ -171,7 +200,7 @@ class _CardFace extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
                 textAlign: TextAlign.center,
                 style: GoogleFonts.rubik(
-                  fontSize: 14,
+                  fontSize: math.max(11, 14 * scale),
                   fontWeight: FontWeight.w400,
                   color: AppColors.blue,
                 ),
@@ -183,20 +212,20 @@ class _CardFace extends StatelessWidget {
     );
   }
 
-  Widget _buildImage() {
+  Widget _buildImage(double imageSize) {
     if (!isNetworkImage) {
       if (imagePath.endsWith('.svg')) {
         return SvgPicture.asset(
           imagePath,
-          width: _imageSize,
-          height: _imageSize,
+          width: imageSize,
+          height: imageSize,
           fit: BoxFit.contain,
         );
       }
       return Image.asset(
         imagePath,
-        width: _imageSize,
-        height: _imageSize,
+        width: imageSize,
+        height: imageSize,
         fit: BoxFit.contain,
       );
     }
@@ -204,23 +233,23 @@ class _CardFace extends StatelessWidget {
     if (isSvg) {
       return FlutterCachedSvg(
         imagePath,
-        width: _imageSize,
-        height: _imageSize,
+        width: imageSize,
+        height: imageSize,
         fit: BoxFit.contain,
-        placeholder: const SizedBox.square(
-          dimension: _imageSize,
-          child: LottieProgressIndicator(),
+        placeholder: SizedBox.square(
+          dimension: imageSize,
+          child: const LottieProgressIndicator(),
         ),
-        errorWidget: const SizedBox.square(
-          dimension: _imageSize,
-          child: Icon(Icons.emoji_events_outlined, color: AppColors.blue),
+        errorWidget: SizedBox.square(
+          dimension: imageSize,
+          child: const Icon(Icons.emoji_events_outlined, color: AppColors.blue),
         ),
       );
     } else {
       return Image.network(
         imagePath,
-        width: _imageSize,
-        height: _imageSize,
+        width: imageSize,
+        height: imageSize,
         fit: BoxFit.contain,
         loadingBuilder: (context, child, loadingProgress) {
           if (loadingProgress == null) return child;

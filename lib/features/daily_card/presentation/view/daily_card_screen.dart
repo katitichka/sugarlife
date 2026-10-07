@@ -23,47 +23,57 @@ class DailyCardScreen extends StatelessWidget {
       )..add(const DailyCardEvent.loadTodayCard()),
       child: Builder(
         builder: (dialogContext) {
-          return Stack(
-            clipBehavior: Clip.none,
-            children: [
-              const Dialog(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(32)),
-                ),
-                child: _DialogContent(),
+          final screenSize = MediaQuery.sizeOf(dialogContext);
+          return Dialog(
+            insetPadding: const EdgeInsets.all(16),
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(32)),
+            ),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                maxWidth: 520,
+                maxHeight: screenSize.height - 32,
               ),
-              Positioned(
-                top: 12,
-                right: 18,
-                child: GestureDetector(
-                  onTap: () {
-                    final bloc = dialogContext.read<DailyCardBloc>();
-                    final shouldCheckAchievement = switch (bloc.state) {
-                      Answered(:final isCorrect) => isCorrect,
-                      _ => false,
-                    };
-                    bloc.add(const DailyCardEvent.close());
-                    if (dialogContext.mounted) {
-                      Navigator.pop(dialogContext, shouldCheckAchievement);
-                    }
-                  },
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: AppColors.blue,
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Padding(
-                      padding: EdgeInsets.zero,
-                      child: Icon(
-                        Icons.cancel,
-                        color: AppColors.background,
-                        size: 45,
+              child: SizedBox(
+                width: double.infinity,
+                child: Stack(
+                  children: [
+                    const SingleChildScrollView(child: _DialogContent()),
+                    Positioned(
+                      top: 10,
+                      right: 12,
+                      child: GestureDetector(
+                        onTap: () {
+                          final bloc = dialogContext.read<DailyCardBloc>();
+                          final shouldCheckAchievement = switch (bloc.state) {
+                            Answered(:final isCorrect) => isCorrect,
+                            _ => false,
+                          };
+                          bloc.add(const DailyCardEvent.close());
+                          if (dialogContext.mounted) {
+                            Navigator.pop(
+                              dialogContext,
+                              shouldCheckAchievement,
+                            );
+                          }
+                        },
+                        child: const DecoratedBox(
+                          decoration: BoxDecoration(
+                            color: AppColors.blue,
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            Icons.cancel,
+                            color: AppColors.background,
+                            size: 42,
+                          ),
+                        ),
                       ),
                     ),
-                  ),
+                  ],
                 ),
               ),
-            ],
+            ),
           );
         },
       ),
@@ -79,7 +89,7 @@ class _DialogContent extends StatelessWidget {
     return BlocBuilder<DailyCardBloc, DailyCardState>(
       builder: (context, state) {
         return Container(
-          padding: const EdgeInsets.all(24),
+          padding: const EdgeInsets.fromLTRB(24, 56, 24, 24),
           decoration: BoxDecoration(
             color: AppColors.background,
             border: Border.all(color: AppColors.blue, width: 4),
@@ -89,7 +99,7 @@ class _DialogContent extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               switch (state) {
-                Loading() => const LottieProgressIndicator(),
+                Loading() => const _LoadingContent(),
                 Loaded(:final card, :final hasAnsweredToday) => _LoadedContent(
                   card: card,
                   hasAnsweredToday: hasAnsweredToday,
@@ -121,6 +131,54 @@ class _DialogContent extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+}
+
+class _LoadingContent extends StatelessWidget {
+  const _LoadingContent();
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      key: const Key('daily-card-loading'),
+      width: double.infinity,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          SizedBox(
+            width: 190,
+            height: 95,
+            child: SvgPicture.asset(
+              'assets/common/daily_icon.svg',
+              fit: BoxFit.contain,
+            ),
+          ),
+          const SizedBox(height: 20),
+          Text(
+            'Ежедневная карточка',
+            textAlign: TextAlign.center,
+            style: GoogleFonts.rubik(
+              fontSize: 22,
+              fontWeight: FontWeight.w700,
+              color: AppColors.blue,
+            ),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            'Загружаем новый факт…',
+            textAlign: TextAlign.center,
+            style: GoogleFonts.rubik(
+              fontSize: 17,
+              fontWeight: FontWeight.w500,
+              color: AppColors.darkBlue,
+            ),
+          ),
+          const SizedBox(height: 16),
+          const LottieProgressIndicator(size: 72),
+          const SizedBox(height: 8),
+        ],
+      ),
     );
   }
 }

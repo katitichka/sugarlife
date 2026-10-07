@@ -55,88 +55,104 @@ class TheoryScreenPage extends StatelessWidget {
               }
               return SingleChildScrollView(
                 padding: const EdgeInsets.only(bottom: 16, left: 16, right: 16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Container(
-                      decoration: BoxDecoration(
-                        boxShadow: [
-                          BoxShadow(
-                            color: mixWithBlack(module.color, 0.1),
-                            offset: const Offset(3, 3),
-                            blurRadius: 0,
-                            spreadRadius: 0,
-                          ),
-                        ],
-                        borderRadius: BorderRadius.circular(24),
-                      ),
-                      child: Card(
-                        elevation: 0,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(24),
-                          side: BorderSide.none,
-                        ),
-                        color: module.color,
-                        child: SizedBox(
-                          height: 50,
-                          width: 200,
-                          child: Stack(
-                            children: [
-                              Positioned(
-                                left: 16,
-                                right: 80,
-                                top: 0,
-                                bottom: 0,
-                                child: Center(
-                                  child: Text(
-                                    module.title,
-                                    style: GoogleFonts.rubik(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.w700,
-                                      color: AppColors.blue,
-                                    ),
+                child: Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 900),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        LayoutBuilder(
+                          builder: (context, constraints) {
+                            final headerWidth = (constraints.maxWidth * 0.42)
+                                .clamp(200.0, 300.0);
+                            final headerHeight = headerWidth * 0.25;
+                            final characterWidth = headerWidth * 0.4;
+
+                            return Container(
+                              decoration: BoxDecoration(
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: mixWithBlack(module.color, 0.1),
+                                    offset: const Offset(3, 3),
+                                  ),
+                                ],
+                                borderRadius: BorderRadius.circular(24),
+                              ),
+                              child: Card(
+                                elevation: 0,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(24),
+                                  side: BorderSide.none,
+                                ),
+                                color: module.color,
+                                child: SizedBox(
+                                  height: headerHeight,
+                                  width: headerWidth,
+                                  child: Stack(
+                                    children: [
+                                      Positioned(
+                                        left: 16,
+                                        right: characterWidth,
+                                        top: 0,
+                                        bottom: 0,
+                                        child: Center(
+                                          child: Text(
+                                            module.title,
+                                            maxLines: 2,
+                                            overflow: TextOverflow.ellipsis,
+                                            textAlign: TextAlign.center,
+                                            style: GoogleFonts.rubik(
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.w700,
+                                              color: AppColors.blue,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      Positioned(
+                                        right: 0,
+                                        bottom: -5,
+                                        child: ClipRRect(
+                                          borderRadius: const BorderRadius.only(
+                                            bottomRight: Radius.circular(24),
+                                          ),
+                                          child: SizedBox(
+                                            width: characterWidth,
+                                            height: headerHeight,
+                                            child: SvgPicture.asset(
+                                              'assets/modules/theory_characters/character_module$moduleId.svg',
+                                              fit: BoxFit.contain,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ),
-                              Positioned(
-                                right: 0,
-                                bottom: -5,
-                                child: ClipRRect(
-                                  borderRadius: const BorderRadius.only(
-                                    bottomRight: Radius.circular(24),
-                                  ),
-                                  child: SizedBox(
-                                    width: 80,
-                                    height: 50,
-                                    child: SvgPicture.asset(
-                                      'assets/modules/theory_characters/character_module$moduleId.svg',
-                                      fit: BoxFit.contain,
-                                    ),
+                            );
+                          },
+                        ),
+                        const SizedBox(height: 4),
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 20),
+                          child: Image.asset(
+                            'assets/modules/theory/module$moduleId.png',
+                            width: double.infinity,
+                            fit: BoxFit.contain,
+                            errorBuilder: (context, error, stackTrace) =>
+                                Container(
+                                  height: 200,
+                                  color: AppColors.lighterGrey,
+                                  child: const Center(
+                                    child: Text('Изображение не найдено'),
                                   ),
                                 ),
-                              ),
-                            ],
                           ),
                         ),
-                      ),
+                      ],
                     ),
-                    const SizedBox(height: 4),
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 20),
-                      child: Image.asset(
-                        'assets/modules/theory/module$moduleId.png',
-                        width: double.infinity,
-                        fit: BoxFit.contain,
-                        errorBuilder: (context, error, stackTrace) => Container(
-                          height: 200,
-                          color: AppColors.lighterGrey,
-                          child: const Center(
-                            child: Text('Изображение не найдено'),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
               );
             default:

@@ -9,6 +9,7 @@ class AppSnackBar {
   static void showError(BuildContext context, String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       _build(
+        context: context,
         message: message,
         background: AppColors.backgroundRed,
         textColor: AppColors.error,
@@ -19,6 +20,7 @@ class AppSnackBar {
   static void showSuccess(BuildContext context, String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       _build(
+        context: context,
         message: message,
         background: AppColors.background,
         textColor: AppColors.blue,
@@ -27,10 +29,14 @@ class AppSnackBar {
   }
 
   static SnackBar _build({
+    required BuildContext context,
     required String message,
     required Color background,
     required Color textColor,
   }) {
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    final useFixedWidth = screenWidth >= 600;
+
     return SnackBar(
       content: Text(
         message,
@@ -43,7 +49,8 @@ class AppSnackBar {
       ),
       backgroundColor: background,
       behavior: SnackBarBehavior.floating,
-      margin: const EdgeInsets.all(16),
+      width: useFixedWidth ? 520 : null,
+      margin: useFixedWidth ? null : const EdgeInsets.all(16),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
     );
   }

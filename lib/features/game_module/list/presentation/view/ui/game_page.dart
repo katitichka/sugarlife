@@ -1,4 +1,6 @@
-﻿import 'package:flutter/material.dart';
+﻿import 'dart:math' as math;
+
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
@@ -361,9 +363,11 @@ class _GamePageState extends State<GamePage> {
       return const SizedBox.shrink();
     }
 
-    final screenHeight = MediaQuery.of(context).size.height;
-    final screenWidth = MediaQuery.of(context).size.width;
-    final centerX = screenWidth / 2 - 28;
+    final screenSize = MediaQuery.sizeOf(context);
+    final screenHeight = screenSize.height;
+    final mapWidth = math.min(screenSize.width, 560.0);
+    final mapSideInset = math.max(0.0, (screenSize.width - mapWidth) / 2);
+    final centerX = mapWidth / 2 - 28;
     const calculator = LevelPositionCalculator();
 
     positions = List.generate(
@@ -518,60 +522,64 @@ class _GamePageState extends State<GamePage> {
         SingleChildScrollView(
           controller: _scrollController,
           reverse: true,
-          child: SizedBox(
-            height: contentHeight,
-            child: Stack(
-              clipBehavior: Clip.none,
-              children: [
-                Positioned(
-                  left: 0,
-                  right: 0,
-                  top: -30,
-                  bottom: 0,
-                  child: LayoutBuilder(
-                    builder: (context, constraints) {
-                      final w = constraints.maxWidth;
+          child: Center(
+            child: SizedBox(
+              width: mapWidth,
+              height: contentHeight,
+              child: Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  Positioned(
+                    left: 0,
+                    right: 0,
+                    top: -30,
+                    bottom: 0,
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        final w = constraints.maxWidth;
 
-                      const repeatHeight = 1280.0;
-                      const bottomHeight = 1147.0;
-                      final availableHeight = contentHeight - bottomHeight;
-                      final repeatCount =
-                          (availableHeight / repeatHeight).ceil() + 2;
+                        const repeatHeight = 1280.0;
+                        const bottomHeight = 1147.0;
+                        final availableHeight = contentHeight - bottomHeight;
+                        final repeatCount =
+                            (availableHeight / repeatHeight).ceil() + 2;
 
-                      return Column(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          Expanded(
-                            child: ListView.builder(
-                              physics: const NeverScrollableScrollPhysics(),
-                              shrinkWrap: true,
-                              itemCount: repeatCount,
-                              itemBuilder: (context, index) => SvgPicture.asset(
-                                'assets/images/repeat_background.svg',
-                                width: w,
-                                fit: BoxFit.fitWidth,
+                        return Column(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Expanded(
+                              child: ListView.builder(
+                                physics: const NeverScrollableScrollPhysics(),
+                                shrinkWrap: true,
+                                itemCount: repeatCount,
+                                itemBuilder: (context, index) =>
+                                    SvgPicture.asset(
+                                      'assets/images/repeat_background.svg',
+                                      width: w,
+                                      fit: BoxFit.fitWidth,
+                                    ),
                               ),
                             ),
-                          ),
-                          SvgPicture.asset(
-                            'assets/images/start_background.svg',
-                            width: w,
-                            fit: BoxFit.fitWidth,
-                          ),
-                        ],
-                      );
-                    },
+                            SvgPicture.asset(
+                              'assets/images/start_background.svg',
+                              width: w,
+                              fit: BoxFit.fitWidth,
+                            ),
+                          ],
+                        );
+                      },
+                    ),
                   ),
-                ),
-                ...children,
-              ],
+                  ...children,
+                ],
+              ),
             ),
           ),
         ),
         if (!_isDailyCardDialogVisible)
           Positioned(
             top: 20,
-            right: 10,
+            right: mapSideInset + 10,
             child: IconButton(
               icon: Container(
                 decoration: BoxDecoration(

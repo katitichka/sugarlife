@@ -122,105 +122,124 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                 ],
               ),
-              body: SingleChildScrollView(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 24,
-                  ),
-                  child: Column(
-                    children: [
-                      SizedBox(
-                        width: double.infinity,
-                        height: 36,
-                        child: Center(
-                          child: Text(
-                            profile.username,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            textAlign: TextAlign.center,
-                            style: GoogleFonts.rubik(
-                              color: AppColors.background,
-                              fontSize: 30,
-                              fontWeight: FontWeight.w700,
-                            ),
+              body: LayoutBuilder(
+                builder: (context, constraints) {
+                  final wide = constraints.maxWidth >= 600;
+                  final avatarSize = wide
+                      ? 240.0
+                      : (constraints.maxWidth * 0.55).clamp(140.0, 190.0);
+
+                  return SingleChildScrollView(
+                    padding: const EdgeInsets.only(bottom: 120),
+                    child: Center(
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 760),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 24,
                           ),
-                        ),
-                      ),
-                      const SizedBox(height: 40),
-                      SizedBox(
-                        width: 190,
-                        height: 190,
-                        child: FutureBuilder<String>(
-                          key: ValueKey(profile.currentAvatarId),
-                          future: _avatarFor(profile.currentAvatarId),
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState ==
-                                ConnectionState.waiting) {
-                              return const Center(
-                                child: LottieProgressIndicator(),
-                              );
-                            }
-                            if (snapshot.hasError ||
-                                !snapshot.hasData ||
-                                snapshot.data!.isEmpty) {
-                              return const Center(
-                                child: Icon(
-                                  Icons.error_outline,
-                                  color: AppColors.error,
-                                  size: 48,
-                                ),
-                              );
-                            }
-                            final url = snapshot.data!;
-                            return Container(
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: AppColors.blue,
-                                  width: 3,
-                                ),
-                                color: AppColors.avatarPlaceholderBackground,
-                              ),
-                              child: ClipOval(
-                                child: SvgPicture.network(
-                                  url,
-                                  width: 190,
-                                  height: 190,
-                                  fit: BoxFit.contain,
-                                  placeholderBuilder: (context) => const Center(
-                                    child: LottieProgressIndicator(),
+                          child: Column(
+                            children: [
+                              SizedBox(
+                                width: double.infinity,
+                                height: 36,
+                                child: Center(
+                                  child: Text(
+                                    profile.username,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    textAlign: TextAlign.center,
+                                    style: GoogleFonts.rubik(
+                                      color: AppColors.background,
+                                      fontSize: wide ? 36 : 30,
+                                      fontWeight: FontWeight.w700,
+                                    ),
                                   ),
-                                  errorBuilder: (context, error, stackTrace) =>
-                                      const Center(
+                                ),
+                              ),
+                              SizedBox(height: wide ? 48 : 40),
+                              SizedBox.square(
+                                dimension: avatarSize,
+                                child: FutureBuilder<String>(
+                                  key: ValueKey(profile.currentAvatarId),
+                                  future: _avatarFor(profile.currentAvatarId),
+                                  builder: (context, snapshot) {
+                                    if (snapshot.connectionState ==
+                                        ConnectionState.waiting) {
+                                      return const Center(
+                                        child: LottieProgressIndicator(),
+                                      );
+                                    }
+                                    if (snapshot.hasError ||
+                                        !snapshot.hasData ||
+                                        snapshot.data!.isEmpty) {
+                                      return const Center(
                                         child: Icon(
                                           Icons.error_outline,
-                                          color: AppColors.background,
+                                          color: AppColors.error,
                                           size: 48,
                                         ),
+                                      );
+                                    }
+                                    final url = snapshot.data!;
+                                    return Container(
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        border: Border.all(
+                                          color: AppColors.blue,
+                                          width: 3,
+                                        ),
+                                        color: AppColors
+                                            .avatarPlaceholderBackground,
                                       ),
+                                      child: ClipOval(
+                                        child: SvgPicture.network(
+                                          url,
+                                          width: avatarSize,
+                                          height: avatarSize,
+                                          fit: BoxFit.contain,
+                                          placeholderBuilder: (context) =>
+                                              const Center(
+                                                child:
+                                                    LottieProgressIndicator(),
+                                              ),
+                                          errorBuilder:
+                                              (context, error, stackTrace) =>
+                                                  const Center(
+                                                    child: Icon(
+                                                      Icons.error_outline,
+                                                      color:
+                                                          AppColors.background,
+                                                      size: 48,
+                                                    ),
+                                                  ),
+                                        ),
+                                      ),
+                                    );
+                                  },
                                 ),
                               ),
-                            );
-                          },
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      const Center(
-                        child: Text(
-                          'Достижения',
-                          style: TextStyle(
-                            color: AppColors.background,
-                            fontSize: 30,
-                            fontWeight: FontWeight.w500,
+                              const SizedBox(height: 20),
+                              Center(
+                                child: Text(
+                                  'Достижения',
+                                  style: TextStyle(
+                                    color: AppColors.background,
+                                    fontSize: wide ? 34 : 30,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 10),
+                              const AchievementsSection(),
+                            ],
                           ),
                         ),
                       ),
-                      const SizedBox(height: 10),
-                      const AchievementsSection(),
-                    ],
-                  ),
-                ),
+                    ),
+                  );
+                },
               ),
             ),
             orElse: () => const SizedBox.shrink(),

@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -39,103 +41,108 @@ class _AchievementsSectionState extends State<AchievementsSection> {
           if (_currentPage < 0) _currentPage = 0;
         }
 
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 5),
-          child: SizedBox(
-            height: 100,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                // Левая стрелка
-                if (_totalPages > 1)
-                  IconButton(
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(),
-                    icon: const Icon(
-                      Icons.arrow_circle_left_outlined,
-                      color: AppColors.background,
-                      size: 40,
-                    ),
-                    onPressed: _currentPage > 0
-                        ? () {
-                            _pageController.previousPage(
-                              duration: const Duration(milliseconds: 300),
-                              curve: Curves.easeOut,
-                            );
-                          }
-                        : null,
-                  )
-                else
-                  const SizedBox(width: 35),
-
-                // Список достижений
-                Expanded(
-                  child: SizedBox(
-                    height: 100,
-                    child: PageView.builder(
-                      controller: _pageController,
-                      onPageChanged: (page) {
-                        setState(() {
-                          _currentPage = page;
-                        });
-                      },
-                      itemCount: _totalPages,
-                      itemBuilder: (context, pageIndex) {
-                        final startIndex = pageIndex * 2;
-                        final endIndex = startIndex + 2;
-                        final pageAchievements =
-                            achievements.length > startIndex
-                            ? achievements.sublist(
-                                startIndex,
-                                endIndex > achievements.length
-                                    ? achievements.length
-                                    : endIndex,
-                              )
-                            : [];
-
-                        final List<AchievementEntity?> displayItems =
-                            List.generate(2, (index) {
-                              if (index < pageAchievements.length) {
-                                return pageAchievements[index];
+        return Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 420),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 5),
+              child: SizedBox(
+                height: 100,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    // Левая стрелка
+                    if (_totalPages > 1)
+                      IconButton(
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
+                        icon: const Icon(
+                          Icons.arrow_circle_left_outlined,
+                          color: AppColors.background,
+                          size: 40,
+                        ),
+                        onPressed: _currentPage > 0
+                            ? () {
+                                _pageController.previousPage(
+                                  duration: const Duration(milliseconds: 300),
+                                  curve: Curves.easeOut,
+                                );
                               }
-                              return null;
+                            : null,
+                      )
+                    else
+                      const SizedBox(width: 35),
+
+                    // Список достижений
+                    Expanded(
+                      child: SizedBox(
+                        height: 100,
+                        child: PageView.builder(
+                          controller: _pageController,
+                          onPageChanged: (page) {
+                            setState(() {
+                              _currentPage = page;
                             });
+                          },
+                          itemCount: _totalPages,
+                          itemBuilder: (context, pageIndex) {
+                            final startIndex = pageIndex * 2;
+                            final endIndex = startIndex + 2;
+                            final pageAchievements =
+                                achievements.length > startIndex
+                                ? achievements.sublist(
+                                    startIndex,
+                                    endIndex > achievements.length
+                                        ? achievements.length
+                                        : endIndex,
+                                  )
+                                : [];
 
-                        return _AchievementPage(
-                          key: ValueKey(
-                            displayItems
-                                .map((achievement) => achievement?.id ?? 0)
-                                .join('-'),
-                          ),
-                          achievements: displayItems,
-                        );
-                      },
-                    ),
-                  ),
-                ),
+                            final List<AchievementEntity?> displayItems =
+                                List.generate(2, (index) {
+                                  if (index < pageAchievements.length) {
+                                    return pageAchievements[index];
+                                  }
+                                  return null;
+                                });
 
-                // Правая стрелка
-                if (_totalPages > 1)
-                  IconButton(
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(),
-                    icon: const Icon(
-                      Icons.arrow_circle_right_outlined,
-                      color: AppColors.background,
-                      size: 35,
-                    ),
-                    onPressed: _currentPage < _totalPages - 1
-                        ? () {
-                            _pageController.nextPage(
-                              duration: const Duration(milliseconds: 300),
-                              curve: Curves.easeOut,
+                            return _AchievementPage(
+                              key: ValueKey(
+                                displayItems
+                                    .map((achievement) => achievement?.id ?? 0)
+                                    .join('-'),
+                              ),
+                              achievements: displayItems,
                             );
-                          }
-                        : null,
-                  )
-                else
-                  const SizedBox(width: 35),
-              ],
+                          },
+                        ),
+                      ),
+                    ),
+
+                    // Правая стрелка
+                    if (_totalPages > 1)
+                      IconButton(
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
+                        icon: const Icon(
+                          Icons.arrow_circle_right_outlined,
+                          color: AppColors.background,
+                          size: 35,
+                        ),
+                        onPressed: _currentPage < _totalPages - 1
+                            ? () {
+                                _pageController.nextPage(
+                                  duration: const Duration(milliseconds: 300),
+                                  curve: Curves.easeOut,
+                                );
+                              }
+                            : null,
+                      )
+                    else
+                      const SizedBox(width: 35),
+                  ],
+                ),
+              ),
             ),
           ),
         );
@@ -162,30 +169,43 @@ class _AchievementPageState extends State<_AchievementPage>
   Widget build(BuildContext context) {
     super.build(context);
 
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: widget.achievements.map((achievement) {
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 4),
-          child: SizedBox(
-            width: 100,
-            height: 100,
-            child: achievement?.isUnlocked == true
-                ? _AchievementIcon(
-                    key: ValueKey(achievement!.id),
-                    url: achievement.imageUrl,
-                  )
-                : const _AchievementPlaceholderCard(),
-          ),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final itemPadding = math.min(4.0, constraints.maxWidth / 8);
+        final availableItemWidth = math.max(
+          0.0,
+          (constraints.maxWidth - itemPadding * 4) / 2,
         );
-      }).toList(),
+        final itemSize = math.min(100.0, availableItemWidth);
+
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: widget.achievements.map((achievement) {
+            return Padding(
+              padding: EdgeInsets.symmetric(horizontal: itemPadding),
+              child: SizedBox.square(
+                dimension: itemSize,
+                child: achievement?.isUnlocked == true
+                    ? _AchievementIcon(
+                        key: ValueKey(achievement!.id),
+                        url: achievement.imageUrl,
+                        size: itemSize,
+                      )
+                    : _AchievementPlaceholderCard(size: itemSize),
+              ),
+            );
+          }).toList(),
+        );
+      },
     );
   }
 }
 
 class _AchievementPlaceholderCard extends StatelessWidget {
-  const _AchievementPlaceholderCard();
+  const _AchievementPlaceholderCard({required this.size});
+
+  final double size;
 
   @override
   Widget build(BuildContext context) {
@@ -193,15 +213,14 @@ class _AchievementPlaceholderCard extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.end,
       mainAxisSize: MainAxisSize.min,
       children: [
-        SizedBox(
-          width: 100,
-          height: 100,
+        SizedBox.square(
+          dimension: size,
           child: ClipRRect(
             borderRadius: BorderRadius.circular(14),
             child: SvgPicture.asset(
               'assets/achievements/plug.svg',
-              width: 100,
-              height: 100,
+              width: size,
+              height: size,
               fit: BoxFit.contain,
               alignment: Alignment.bottomCenter,
             ),
@@ -213,21 +232,21 @@ class _AchievementPlaceholderCard extends StatelessWidget {
 }
 
 class _AchievementIcon extends StatelessWidget {
-  const _AchievementIcon({required this.url, super.key});
+  const _AchievementIcon({required this.url, required this.size, super.key});
 
   final String url;
+  final double size;
 
-  static Widget _placeholder() => Column(
+  static Widget _placeholder(double size) => Column(
     mainAxisAlignment: MainAxisAlignment.end,
     mainAxisSize: MainAxisSize.min,
     children: [
-      SizedBox(
-        width: 100,
-        height: 100,
+      SizedBox.square(
+        dimension: size,
         child: SvgPicture.asset(
           'assets/achievements/plug.svg',
-          width: 100,
-          height: 100,
+          width: size,
+          height: size,
           fit: BoxFit.contain,
           alignment: Alignment.bottomCenter,
         ),
@@ -242,34 +261,32 @@ class _AchievementIcon extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         if (url.toLowerCase().endsWith('.svg'))
-          SizedBox(
-            width: 100,
-            height: 100,
+          SizedBox.square(
+            dimension: size,
             child: ClipRRect(
               borderRadius: BorderRadius.circular(14),
               child: FlutterCachedSvg(
                 url,
-                width: 100,
-                height: 100,
+                width: size,
+                height: size,
                 fit: BoxFit.contain,
-                placeholder: _placeholder(),
-                errorWidget: _placeholder(),
+                placeholder: _placeholder(size),
+                errorWidget: _placeholder(size),
               ),
             ),
           )
         else
-          SizedBox(
-            width: 100,
-            height: 100,
+          SizedBox.square(
+            dimension: size,
             child: ClipRRect(
               borderRadius: BorderRadius.circular(14),
               child: CachedNetworkImage(
                 imageUrl: url,
-                width: 100,
-                height: 100,
+                width: size,
+                height: size,
                 fit: BoxFit.contain,
-                placeholder: (_, __) => _placeholder(),
-                errorWidget: (_, __, ___) => _placeholder(),
+                placeholder: (_, __) => _placeholder(size),
+                errorWidget: (_, __, ___) => _placeholder(size),
               ),
             ),
           ),

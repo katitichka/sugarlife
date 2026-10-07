@@ -115,55 +115,67 @@ class _GameQuestionPageState extends State<GameQuestionPage> {
           },
         ),
       ),
-      body: Stack(
-        children: [
-          if (currentQuestion != null)
-            Column(
-              children: [
-                SizedBox(height: 40),
-                _buildQuestionHeader(currentQuestion, characterImages),
-                SizedBox(height: 30),
-                Expanded(
-                  child: _buildAnswer(
-                    currentQuestion,
-                    selectionLocked: selectionLocked,
-                    onStringAnswerSelected: (answer) {
-                      if (selectionLocked) return;
-                      setState(() => _selectedStringAnswer = answer);
-                    },
-                    onBoolAnswerSelected: (answer) {
-                      if (selectionLocked) return;
-                      setState(() => _selectedBoolAnswer = answer);
-                    },
-                    onMultipleSelectSelected: (indices) {
-                      if (selectionLocked) return;
-                      setState(() => _selectedMultipleSelectAnswer = indices);
-                    },
-                    selectedStringAnswer: _selectedStringAnswer,
-                    selectedBoolAnswer: _selectedBoolAnswer,
-                    selectedMultipleSelectAnswer: _selectedMultipleSelectAnswer,
-                  ),
-                ),
-
-                _buildButton(
-                  context,
-                  isAnswerInProgress,
-                  hasSelectedAnswer,
-                  currentQuestion.questionType,
-                  selectedAnswer,
-                  isAnswered,
-                ),
-                SizedBox(height: 40),
-              ],
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          final compactHeight = constraints.maxHeight < 650;
+          return Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 760),
+              child: Stack(
+                children: [
+                  if (currentQuestion != null)
+                    Column(
+                      children: [
+                        SizedBox(height: compactHeight ? 20 : 40),
+                        _buildQuestionHeader(currentQuestion, characterImages),
+                        SizedBox(height: compactHeight ? 14 : 30),
+                        Expanded(
+                          child: _buildAnswer(
+                            currentQuestion,
+                            selectionLocked: selectionLocked,
+                            onStringAnswerSelected: (answer) {
+                              if (selectionLocked) return;
+                              setState(() => _selectedStringAnswer = answer);
+                            },
+                            onBoolAnswerSelected: (answer) {
+                              if (selectionLocked) return;
+                              setState(() => _selectedBoolAnswer = answer);
+                            },
+                            onMultipleSelectSelected: (indices) {
+                              if (selectionLocked) return;
+                              setState(
+                                () => _selectedMultipleSelectAnswer = indices,
+                              );
+                            },
+                            selectedStringAnswer: _selectedStringAnswer,
+                            selectedBoolAnswer: _selectedBoolAnswer,
+                            selectedMultipleSelectAnswer:
+                                _selectedMultipleSelectAnswer,
+                          ),
+                        ),
+                        _buildButton(
+                          context,
+                          isAnswerInProgress,
+                          hasSelectedAnswer,
+                          currentQuestion.questionType,
+                          selectedAnswer,
+                          isAnswered,
+                        ),
+                        SizedBox(height: compactHeight ? 20 : 40),
+                      ],
+                    ),
+                  if (isAnswerInProgress)
+                    Positioned(
+                      bottom: 0,
+                      left: 0,
+                      right: 0,
+                      child: _buildExplantationOverlay(context, state),
+                    ),
+                ],
+              ),
             ),
-          if (isAnswerInProgress)
-            Positioned(
-              bottom: 0,
-              left: 0,
-              right: 0,
-              child: _buildExplantationOverlay(context, state),
-            ),
-        ],
+          );
+        },
       ),
     );
   }
@@ -176,48 +188,50 @@ class _GameQuestionPageState extends State<GameQuestionPage> {
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: 100,
-            height: 100,
-            child: imageUrl != null && imageUrl.isNotEmpty
-                ? SvgPicture.network(
-                    key: ValueKey(question.characterId),
-                    imageUrl,
-                    width: 100,
-                    height: 100,
-                    fit: BoxFit.contain,
-                    errorBuilder: (_, __, ___) => const SizedBox(
-                      width: 100,
-                      height: 100,
-                      child: Center(
-                        child: Icon(Icons.error, color: AppColors.danger),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final compact = constraints.maxWidth < 360;
+          final imageSize = (constraints.maxWidth * 0.18).clamp(72.0, 120.0);
+          return Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox.square(
+                dimension: imageSize,
+                child: imageUrl != null && imageUrl.isNotEmpty
+                    ? SvgPicture.network(
+                        key: ValueKey(question.characterId),
+                        imageUrl,
+                        width: imageSize,
+                        height: imageSize,
+                        fit: BoxFit.contain,
+                        errorBuilder: (_, __, ___) => const Center(
+                          child: Icon(Icons.error, color: AppColors.danger),
+                        ),
+                      )
+                    : Center(
+                        child: Icon(
+                          Icons.person_outline,
+                          color: AppColors.blue,
+                          size: imageSize * 0.56,
+                        ),
                       ),
-                    ),
-                  )
-                : const Center(
-                    child: Icon(
-                      Icons.person_outline,
-                      color: AppColors.blue,
-                      size: 56,
-                    ),
-                  ),
-          ),
-
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              question.question,
-              style: const TextStyle(
-                fontSize: 17,
-                fontWeight: FontWeight.w500,
-                color: AppColors.blue,
               ),
-            ),
-          ),
-        ],
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  question.question,
+                  maxLines: compact ? 6 : 7,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: compact ? 16 : 17,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.blue,
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
@@ -226,106 +240,119 @@ class _GameQuestionPageState extends State<GameQuestionPage> {
     BuildContext context,
     AnswerInProgress state,
   ) {
-    return Container(
-      decoration: BoxDecoration(
-        color: state.isCorrect
-            ? AppColors.backgroundGreen
-            : AppColors.backgroundRed,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-        border: Border(
-          top: BorderSide(
-            color: state.isCorrect ? AppColors.green : AppColors.red,
-            width: 6,
-          ),
-        ),
+    return ConstrainedBox(
+      constraints: BoxConstraints(
+        maxHeight: MediaQuery.sizeOf(context).height * 0.82,
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              state.isCorrect ? Icons.check_circle : Icons.cancel,
-              color: state.isCorrect ? AppColors.green : AppColors.red,
-              size: 48,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              state.isCorrect ? 'ПРАВИЛЬНО!' : 'НЕПРАВИЛЬНО',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w800,
+      child: SingleChildScrollView(
+        child: Container(
+          decoration: BoxDecoration(
+            color: state.isCorrect
+                ? AppColors.backgroundGreen
+                : AppColors.backgroundRed,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+            border: Border(
+              top: BorderSide(
                 color: state.isCorrect ? AppColors.green : AppColors.red,
+                width: 6,
               ),
             ),
-            const SizedBox(height: 16),
-            Text(
-              'Объяснение:',
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                color: AppColors.blue,
-                fontSize: 17,
-                fontWeight: FontWeight.w700,
+          ),
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                state.isCorrect ? Icons.check_circle : Icons.cancel,
+                color: state.isCorrect ? AppColors.green : AppColors.red,
+                size: 48,
               ),
-            ),
-            Text(
-              state.explanation,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                color: AppColors.blue,
-                fontSize: 17,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Правильный ответ:',
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontWeight: FontWeight.w700,
-                fontSize: 17,
-                color: AppColors.blue,
-              ),
-            ),
-            Text(
-              state.correctAnswer,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontWeight: FontWeight.w500,
-                fontSize: 17,
-                color: AppColors.blue,
-              ),
-            ),
-            const SizedBox(height: 24),
-            SizedBox(
-              height: 70,
-              child: ElevatedButton(
-                onPressed: () {
-                  context.read<GameModuleLevelBloc>().add(
-                    GameModuleLevelEvent.nextQuestion(),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.blue,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(70),
-                  ),
+              const SizedBox(height: 8),
+              Text(
+                state.isCorrect ? 'ПРАВИЛЬНО!' : 'НЕПРАВИЛЬНО',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w800,
+                  color: state.isCorrect ? AppColors.green : AppColors.red,
                 ),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
-                  child: const Text(
-                    'ДАЛЕЕ',
-                    style: TextStyle(
-                      fontSize: 32,
-                      color: AppColors.background,
-                      fontWeight: FontWeight.w600,
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Объяснение:',
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  color: AppColors.blue,
+                  fontSize: 17,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              Text(
+                state.explanation,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  color: AppColors.blue,
+                  fontSize: 17,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Правильный ответ:',
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontWeight: FontWeight.w700,
+                  fontSize: 17,
+                  color: AppColors.blue,
+                ),
+              ),
+              Text(
+                state.correctAnswer,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontWeight: FontWeight.w500,
+                  fontSize: 17,
+                  color: AppColors.blue,
+                ),
+              ),
+              const SizedBox(height: 24),
+              Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(
+                    minWidth: 220,
+                    maxWidth: 360,
+                  ),
+                  child: SizedBox(
+                    height: 70,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        context.read<GameModuleLevelBloc>().add(
+                          GameModuleLevelEvent.nextQuestion(),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.blue,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(70),
+                        ),
+                      ),
+                      child: const FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text(
+                          'ДАЛЕЕ',
+                          style: TextStyle(
+                            fontSize: 32,
+                            color: AppColors.background,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
-            const SizedBox(height: 20),
-          ],
+              const SizedBox(height: 20),
+            ],
+          ),
         ),
       ),
     );
@@ -366,26 +393,30 @@ class _GameQuestionPageState extends State<GameQuestionPage> {
       return const SizedBox.shrink();
     }
 
-    return SizedBox(
-      height: 70,
-      child: ElevatedButton(
-        onPressed: hasSelectedAnswer && !isAnswered
-            ? () => _handleAnswer(context, currentQuestionType, selectedAnswer)
-            : null,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.blue,
-          foregroundColor: AppColors.background,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(70),
+    return ConstrainedBox(
+      constraints: const BoxConstraints(minWidth: 220, maxWidth: 360),
+      child: SizedBox(
+        height: 70,
+        child: ElevatedButton(
+          onPressed: hasSelectedAnswer && !isAnswered
+              ? () =>
+                    _handleAnswer(context, currentQuestionType, selectedAnswer)
+              : null,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: AppColors.blue,
+            foregroundColor: AppColors.background,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(70),
+            ),
+            disabledBackgroundColor: AppColors.grey,
+            disabledForegroundColor: AppColors.background,
           ),
-          disabledBackgroundColor: AppColors.grey,
-          disabledForegroundColor: AppColors.background,
-        ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10),
-          child: Text(
-            isAnswerInProgress ? 'ДАЛЕЕ' : 'ГОТОВО',
-            style: const TextStyle(fontSize: 32, fontWeight: FontWeight.w700),
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              isAnswerInProgress ? 'ДАЛЕЕ' : 'ГОТОВО',
+              style: const TextStyle(fontSize: 32, fontWeight: FontWeight.w700),
+            ),
           ),
         ),
       ),
@@ -474,8 +505,6 @@ class MultipleChoiceWidget extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.all(16),
       child: GridView.count(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
         crossAxisCount: 2,
         mainAxisSpacing: 12,
         crossAxisSpacing: 12,

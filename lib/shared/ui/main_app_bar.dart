@@ -43,6 +43,9 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
                 if (title != null)
                   Text(
                     title!,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.center,
                     style: GoogleFonts.rubik(
                       fontSize: titleFontSize ?? 24,
                       fontWeight: titleFontWeight ?? FontWeight.w700,
@@ -52,6 +55,9 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
                 if (subtitle != null)
                   Text(
                     subtitle!,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.center,
                     style: GoogleFonts.rubik(
                       fontSize: 18,
                       fontWeight: FontWeight.w500,
