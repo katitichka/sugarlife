@@ -101,18 +101,7 @@ class AuthRepositoryImpl implements AuthRepository {
       final profileData = await _dataProvider.getUserProfile(userId);
 
       if (profileData == null) {
-        await _dataProvider.insertUserProfile(
-          userId: userId,
-          username: username,
-          currentAvatarId: 1,
-        );
-
-        final newProfileData = await _dataProvider.getUserProfile(userId);
-        if (newProfileData == null) {
-          throw Exception('Не удалось создать профиль пользователя');
-        }
-
-        return _mapToProfileEntity(userId, newProfileData);
+        throw Exception('Не удалось создать профиль пользователя');
       }
 
       return _mapToProfileEntity(userId, profileData);

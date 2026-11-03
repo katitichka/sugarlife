@@ -4,7 +4,7 @@ import 'package:sugarlife/core/enum/question_type.dart';
 import 'package:sugarlife/features/game_module/level/data/dtos/game_module_question_dto.dart';
 import 'package:sugarlife/features/game_module/level/domain/entities/game_module_question_entity.dart';
 
-abstract final class GameModuleQuestionSupabaseMapper {
+abstract final class GameModuleQuestionMapper {
   static GameModuleQuestionEntity toEntity(GameModuleQuestionDto dto) {
     final type = QuestionType.parseLoose(dto.questionType);
     final answers = _parseAnswers(dto.answers);

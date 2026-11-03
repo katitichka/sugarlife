@@ -1,62 +1,50 @@
+import 'package:sugarlife/core/api/api_client.dart';
 import 'package:sugarlife/features/profile/data/DTOs/level_progress_dto.dart';
 import 'package:sugarlife/features/profile/data/DTOs/save_level_progress_dto.dart';
 import 'package:sugarlife/features/profile/data/providers/level_progress_data_provider.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 class LevelProgressDataProviderImpl implements LevelProgressDataProvider {
-  LevelProgressDataProviderImpl(this._supabase);
-
-  final SupabaseClient _supabase;
+  LevelProgressDataProviderImpl(this._api);
+  final ApiClient _api;
 
   @override
-  String get currentUserId {
-    final userId = _supabase.auth.currentUser?.id;
-    if (userId == null) {
-      throw StateError('Нет авторизованного пользователя');
-    }
-    return userId;
-  }
+  String get currentUserId =>
+      _api.currentUserId ??
+      (throw StateError('Нет авторизованного пользователя'));
 
   @override
   Future<LevelProgressDto?> getLevelProgress({
     required String userId,
     required int levelId,
   }) async {
-    final response = await _supabase
-        .from('user_progress')
-        .select()
-        .eq('user_id', userId)
-        .eq('level_id', levelId)
-        .maybeSingle();
-    return response == null ? null : LevelProgressDto.fromJson(response);
+    try {
+      return LevelProgressDto.fromJson(
+        await _api.get('/me/progress/$levelId') as Map<String, dynamic>,
+      );
+    } on ApiException catch (error) {
+      if (error.statusCode == 404) return null;
+      rethrow;
+    }
+  }
+
+  Future<void> _save(SaveLevelProgressDto progress) async {
+    await _api.put('/me/progress/${progress.levelId}', {
+      'stars': progress.stars,
+      'correct_answers': progress.correctAnswers,
+    });
   }
 
   @override
-  Future<void> insertLevelProgress(SaveLevelProgressDto progress) async {
-    await _supabase.from('user_progress').insert(progress.toJson());
-  }
-
+  Future<void> insertLevelProgress(SaveLevelProgressDto progress) =>
+      _save(progress);
   @override
-  Future<void> updateLevelProgress(SaveLevelProgressDto progress) async {
-    await _supabase
-        .from('user_progress')
-        .update({
-          'stars': progress.stars,
-          'correct_answers': progress.correctAnswers,
-          'completed_at': progress.completedAt,
-        })
-        .eq('user_id', progress.userId)
-        .eq('level_id', progress.levelId);
-  }
+  Future<void> updateLevelProgress(SaveLevelProgressDto progress) =>
+      _save(progress);
 
   @override
   Future<List<LevelProgressDto>> getAllLevelsProgress({
     required String userId,
-  }) async {
-    final response = await _supabase
-        .from('user_progress')
-        .select()
-        .eq('user_id', userId);
-    return response.map((row) => LevelProgressDto.fromJson(row)).toList();
-  }
+  }) async => (await _api.get('/me/progress') as List)
+      .map((row) => LevelProgressDto.fromJson(row as Map<String, Object?>))
+      .toList();
 }

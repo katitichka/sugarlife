@@ -17,10 +17,4 @@ abstract class AuthDataProvider {
   Future<void> signOut();
 
   Future<ProfileDto?> getUserProfile(String userId);
-
-  Future<void> insertUserProfile({
-    required String userId,
-    required String username,
-    required int currentAvatarId,
-  });
 }

@@ -1,14 +1,14 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sugarlife/features/game_module/level/data/dtos/game_module_question_dto.dart';
-import 'package:sugarlife/features/game_module/level/data/mappers/game_module_question_supabase_mapper.dart';
+import 'package:sugarlife/features/game_module/level/data/mappers/game_module_question_mapper.dart';
 
 void main() {
-  group('GameModuleQuestionSupabaseMapper', () {
+  group('GameModuleQuestionMapper', () {
     test('maps boolean true/false answers to their displayed labels', () {
-      final trueQuestion = GameModuleQuestionSupabaseMapper.toEntity(
+      final trueQuestion = GameModuleQuestionMapper.toEntity(
         _dto(type: 'true_false', correctAnswer: true),
       );
-      final falseQuestion = GameModuleQuestionSupabaseMapper.toEntity(
+      final falseQuestion = GameModuleQuestionMapper.toEntity(
         _dto(type: 'true_false', correctAnswer: 'false'),
       );
 
@@ -19,7 +19,7 @@ void main() {
     });
 
     test('accepts numeric strings and removes duplicate select indices', () {
-      final question = GameModuleQuestionSupabaseMapper.toEntity(
+      final question = GameModuleQuestionMapper.toEntity(
         _dto(type: 'multiple_select', correctAnswer: <Object?>['2', 0, '2']),
       );
 

@@ -1,5 +1,5 @@
 import 'package:sugarlife/core/cache/app_cache_service.dart';
-import 'package:sugarlife/features/game_module/level/data/mappers/game_module_question_supabase_mapper.dart';
+import 'package:sugarlife/features/game_module/level/data/mappers/game_module_question_mapper.dart';
 import 'package:sugarlife/features/game_module/level/data/providers/game_module_level_data_provider.dart';
 import 'package:sugarlife/features/game_module/level/domain/entities/game_module_question_entity.dart';
 import 'package:sugarlife/features/game_module/level/domain/repositories/game_module_level_repository.dart';
@@ -39,9 +39,7 @@ class GameModuleLevelRepositoryImpl implements GameModuleLevelRepository {
     }
 
     final dtos = await _dataProvider.getQuestionsForLevel(levelId: levelId);
-    final questions = dtos
-        .map(GameModuleQuestionSupabaseMapper.toEntity)
-        .toList();
+    final questions = dtos.map(GameModuleQuestionMapper.toEntity).toList();
 
     _cache.saveQuestionsForLevel(levelId, questions);
     return questions;

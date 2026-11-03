@@ -82,10 +82,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   }) async {
     try {
       emit(const AuthState.loading());
-      if (password.length < 6) {
+      if (password.length < 8) {
         emit(
           const AuthState.failure(
-            message: 'Пароль должен быть не менее 6 символов',
+            message: 'Пароль должен быть не менее 8 символов',
           ),
         );
         return;
@@ -130,7 +130,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       return 'Неверный email или пароль';
     }
     if (s.contains('user already registered') ||
-        s.contains('already registered')) {
+        s.contains('already registered') ||
+        s.contains('email already exists')) {
       return 'Аккаунт с таким email уже существует';
     }
     if (s.contains('network') ||

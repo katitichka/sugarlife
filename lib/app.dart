@@ -30,45 +30,45 @@ import 'package:sugarlife/features/theory_module/data/repositories/theory_module
 import 'package:sugarlife/features/theory_module/domain/repositories/theory_module_repository.dart';
 import 'package:sugarlife/features/theory_module/presentation/bloc/theory_module_bloc.dart';
 import 'package:sugarlife/shared/ui/sweet_life_app.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:sugarlife/core/api/api_client.dart';
 
-void app(SupabaseClient supabase) {
+void app(ApiClient api) {
   runApp(
     MultiRepositoryProvider(
       providers: [
         RepositoryProvider<AppCacheService>(create: (_) => AppCacheService()),
         RepositoryProvider<AchievementRepository>(
           create: (context) => AchievementRepositoryImpl(
-            dataProvider: AchievementDataProviderImpl(supabase),
+            dataProvider: AchievementDataProviderImpl(api),
             cache: context.read<AppCacheService>(),
           ),
         ),
         RepositoryProvider<DailyCardRepository>(
           create: (context) => DailyCardRepositoryImpl(
-            dataProvider: DailyCardDataProviderImpl(supabase),
+            dataProvider: DailyCardDataProviderImpl(api),
             cache: context.read<AppCacheService>(),
           ),
         ),
         RepositoryProvider<LevelProgressRepository>(
           create: (_) => LevelProgressRepositoryImpl(
-            dataProvider: LevelProgressDataProviderImpl(supabase),
+            dataProvider: LevelProgressDataProviderImpl(api),
           ),
         ),
         RepositoryProvider<GameModuleLevelListRepository>(
           create: (context) => GameModuleLevelListRepositoryImpl(
-            dataProvider: GameModuleLevelListDataProviderImpl(supabase),
+            dataProvider: GameModuleLevelListDataProviderImpl(api),
             cache: context.read<AppCacheService>(),
           ),
         ),
         RepositoryProvider<GameModuleLevelRepository>(
           create: (context) => GameModuleLevelRepositoryImpl(
-            dataProvider: GameModuleLevelDataProviderImpl(supabase),
+            dataProvider: GameModuleLevelDataProviderImpl(api),
             cache: context.read<AppCacheService>(),
           ),
         ),
         RepositoryProvider<AuthRepository>(
           create: (context) => AuthRepositoryImpl(
-            dataProvider: AuthDataProviderImpl(supabase),
+            dataProvider: AuthDataProviderImpl(api),
             cache: context.read<AppCacheService>(),
           ),
         ),
@@ -80,7 +80,7 @@ void app(SupabaseClient supabase) {
         ),
         RepositoryProvider<ProfileRepository>(
           create: (context) => ProfileRepositoryImpl(
-            dataProvider: ProfileDataProviderImpl(supabase),
+            dataProvider: ProfileDataProviderImpl(api),
             cache: context.read<AppCacheService>(),
           ),
         ),

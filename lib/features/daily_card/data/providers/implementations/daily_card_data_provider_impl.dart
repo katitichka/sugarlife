@@ -1,35 +1,32 @@
+import 'package:sugarlife/core/api/api_client.dart';
 import 'package:sugarlife/features/daily_card/data/dtos/answered_daily_card_dto.dart';
 import 'package:sugarlife/features/daily_card/data/dtos/daily_card_dto.dart';
 import 'package:sugarlife/features/daily_card/data/providers/daily_card_data_provider.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 class DailyCardDataProviderImpl implements DailyCardDataProvider {
-  DailyCardDataProviderImpl(this._supabase);
-
-  final SupabaseClient _supabase;
+  DailyCardDataProviderImpl(this._api);
+  final ApiClient _api;
 
   @override
-  String? get currentUserId => _supabase.auth.currentUser?.id;
+  String? get currentUserId => _api.currentUserId;
 
   @override
   Future<DateTime?> getUserProfileCreatedAt(String userId) async {
-    final response = await _supabase
-        .from('user_profile')
-        .select('created_at')
-        .eq('id', userId)
-        .maybeSingle();
-    if (response == null) return null;
-    return DateTime.parse(response['created_at']);
+    final profile = await _api.get('/me') as Map<String, dynamic>;
+    final createdAt = profile['created_at'] as String?;
+    return createdAt == null ? null : DateTime.parse(createdAt);
   }
 
   @override
   Future<DailyCardDto?> getDailyCardByDayNumber(int dayNumber) async {
-    final response = await _supabase
-        .from('daily_cards')
-        .select()
-        .eq('day_number', dayNumber)
-        .maybeSingle();
-    return response == null ? null : DailyCardDto.fromJson(response);
+    try {
+      return DailyCardDto.fromJson(
+        await _api.get('/daily-cards/$dayNumber') as Map<String, dynamic>,
+      );
+    } on ApiException catch (error) {
+      if (error.statusCode == 404) return null;
+      rethrow;
+    }
   }
 
   @override
@@ -39,28 +36,29 @@ class DailyCardDataProviderImpl implements DailyCardDataProvider {
     required bool isCorrect,
     required String completedAt,
   }) async {
-    await _supabase.from('user_daily_cards').upsert({
-      'user_id': userId,
-      'card_id': cardId,
-      'is_correct': isCorrect,
-      'completed_at': completedAt,
-    }, onConflict: 'user_id,card_id');
+    await _api.put('/me/daily-cards/$cardId', {'is_correct': isCorrect});
   }
+
+  Future<List<Map<String, dynamic>>> _answersInRange(
+    DateTime start,
+    DateTime end,
+  ) async =>
+      (await _api.get(
+                '/me/daily-cards/history',
+                query: {
+                  'from': start.toUtc().toIso8601String(),
+                  'to': end.toUtc().toIso8601String(),
+                },
+              )
+              as List)
+          .cast<Map<String, dynamic>>();
 
   @override
   Future<bool> hasAnsweredInRange({
     required String userId,
     required DateTime start,
     required DateTime end,
-  }) async {
-    final response = await _supabase
-        .from('user_daily_cards')
-        .select('card_id')
-        .eq('user_id', userId)
-        .gte('completed_at', start.toIso8601String())
-        .lt('completed_at', end.toIso8601String());
-    return response.isNotEmpty;
-  }
+  }) async => (await _answersInRange(start, end)).isNotEmpty;
 
   @override
   Future<AnsweredDailyCardDto?> getAnsweredCardInRange({
@@ -68,28 +66,27 @@ class DailyCardDataProviderImpl implements DailyCardDataProvider {
     required DateTime start,
     required DateTime end,
   }) async {
-    final response = await _supabase
-        .from('user_daily_cards')
-        .select('''
-        is_correct,
-        daily_cards(*)
-      ''')
-        .eq('user_id', userId)
-        .gte('completed_at', start.toIso8601String())
-        .lt('completed_at', end.toIso8601String())
-        .maybeSingle();
-
-    if (response == null) return null;
-    return AnsweredDailyCardDto.fromJson(response);
+    final rows = await _answersInRange(start, end);
+    if (rows.isEmpty) return null;
+    final row = rows.first;
+    return AnsweredDailyCardDto.fromJson({
+      'is_correct': row['is_correct'],
+      'daily_cards': {
+        for (final key in [
+          'id',
+          'question',
+          'is_myth',
+          'explanation',
+          'day_number',
+        ])
+          key: row[key],
+      },
+    });
   }
 
   @override
-  Future<List<bool>> getAnswerHistory(String userId) async {
-    final response = await _supabase
-        .from('user_daily_cards')
-        .select('is_correct')
-        .eq('user_id', userId)
-        .order('completed_at', ascending: true);
-    return response.map((row) => row['is_correct'] as bool).toList();
-  }
+  Future<List<bool>> getAnswerHistory(String userId) async =>
+      (await _api.get('/me/daily-cards') as List)
+          .map((row) => (row as Map<String, dynamic>)['is_correct'] as bool)
+          .toList();
 }

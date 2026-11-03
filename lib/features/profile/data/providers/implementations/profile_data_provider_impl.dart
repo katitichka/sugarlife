@@ -1,41 +1,27 @@
+import 'package:sugarlife/core/api/api_client.dart';
 import 'package:sugarlife/features/avatars/data/dtos/avatar_dto.dart';
 import 'package:sugarlife/features/profile/data/providers/profile_data_provider.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ProfileDataProviderImpl implements ProfileDataProvider {
-  ProfileDataProviderImpl(this._supabase);
-
-  final SupabaseClient _supabase;
-
-  static const String _avatarsSvgBucket = 'avatars';
+  ProfileDataProviderImpl(this._api);
+  final ApiClient _api;
 
   @override
-  String? get currentUserId => _supabase.auth.currentUser?.id;
+  String? get currentUserId => _api.currentUserId;
+  @override
+  String resolveAvatarUrl(String path) => _api.assetUrl(path);
 
   @override
-  String resolveAvatarUrl(String path) {
-    return _supabase.storage.from(_avatarsSvgBucket).getPublicUrl(path);
-  }
-
-  @override
-  Future<AvatarDto> getAvatarById(int avatarId) async {
-    final response = await _supabase
-        .from('avatars')
-        .select('id, image_url')
-        .eq('id', avatarId)
-        .single();
-    return AvatarDto.fromJson(response);
-  }
+  Future<AvatarDto> getAvatarById(int avatarId) async => AvatarDto.fromJson(
+    await _api.get('/avatars/$avatarId') as Map<String, dynamic>,
+  );
 
   @override
   Future<void> updateUsername({
     required String userId,
     required String newUsername,
   }) async {
-    await _supabase
-        .from('user_profile')
-        .update({'username': newUsername})
-        .eq('id', userId);
+    await _api.patch('/me', {'username': newUsername});
   }
 
   @override
@@ -43,18 +29,12 @@ class ProfileDataProviderImpl implements ProfileDataProvider {
     required String userId,
     required int avatarId,
   }) async {
-    await _supabase
-        .from('user_profile')
-        .update({'current_avatar_id': avatarId})
-        .eq('id', userId);
+    await _api.patch('/me', {'current_avatar_id': avatarId});
   }
 
   @override
-  Future<List<AvatarDto>> getAllAvatars() async {
-    final response = await _supabase
-        .from('avatars')
-        .select('id, image_url')
-        .order('id');
-    return response.map((row) => AvatarDto.fromJson(row)).toList();
-  }
+  Future<List<AvatarDto>> getAllAvatars() async =>
+      (await _api.get('/avatars') as List)
+          .map((row) => AvatarDto.fromJson(row as Map<String, dynamic>))
+          .toList();
 }
