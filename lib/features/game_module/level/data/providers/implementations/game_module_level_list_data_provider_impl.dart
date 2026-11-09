@@ -23,11 +23,17 @@ class GameModuleLevelListDataProviderImpl
 
   @override
   Future<Map<int, int>> getQuestionCountsByLevel(List<int> levelIds) async {
-    final counts = await Future.wait(levelIds.map(getQuestionsCountForLevel));
-    return {for (var i = 0; i < levelIds.length; i++) levelIds[i]: counts[i]};
+    if (levelIds.isEmpty) return {};
+    final rows = await _api.get('/levels/question-counts') as List;
+    final counts = {
+      for (final row in rows)
+        (row as Map<String, dynamic>)['level_id'] as int:
+            row['question_count'] as int,
+    };
+    return {for (final id in levelIds) id: counts[id] ?? 0};
   }
 
   @override
   Future<int> getQuestionsCountForLevel(int levelId) async =>
-      (await _api.get('/levels/$levelId/questions') as List).length;
+      (await getQuestionCountsByLevel([levelId]))[levelId] ?? 0;
 }
